@@ -1,0 +1,2 @@
+# stata-linter
+ 

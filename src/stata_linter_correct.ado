@@ -30,7 +30,48 @@ import os
 import re
 import sys
 
-# Style ===================
+# Functions for auto-correction ===================
+
+# Convert delimit to three forward slashes
+def delimit_to_three_forward_slashes(input_file, output_file, indent):
+    output_list = []
+    with open(input_file, 'r') as reader:
+        input_lines = reader.readlines()
+        delimit_on = 0
+        for line_index, line in enumerate(input_lines):
+            if re.search(r"#delimit ((?!cr).+)", line):
+                delimit_on = 1
+                delimit_symbol = re.search(r"#delimit ((?!cr).+)", line).group(1).strip()
+            elif re.search(r"#delimit cr", line):
+                delimit_on = 0
+            else:
+                if delimit_on == 0:
+                    output_list.append(line)
+                elif delimit_on == 1:
+                    line_split_for_comment = re.split(r"//", line)
+                    line_main = line_split_for_comment[0]
+                    if len(line_split_for_comment) > 1:
+                        line_comment = line_split_for_comment[1]
+
+                    line_main_rstrip = line_main.rstrip()
+                    if len(line_main_rstrip) > 0:
+                        if line_main_rstrip[-1] != delimit_symbol:
+                            if len(line_split_for_comment) > 1:
+                                output_list.append(line_main_rstrip + " ///" + line_comment)
+                            elif len(line_split_for_comment) == 1:
+                                output_list.append(line_main_rstrip + " ///\n")
+                        elif line_main_rstrip[-1] == delimit_symbol:
+                            if len(line_split_for_comment) > 1:
+                                output_list.append(re.sub(delimit_symbol, "", line_main).rstrip() + " //" + line_comment)
+                            elif len(line_split_for_comment) == 1:
+                                output_list.append(re.sub(delimit_symbol, "", line_main).rstrip() + " \n")
+                    if len(line_main_rstrip) == 0:
+                        output_list.append(line)
+                    
+    with open(output_file, 'w') as writer:
+        for output_line in output_list:
+            writer.write(output_line)
+
 
 # Convert hard tabs to soft tabs (= whitespaces)
 def tab_to_space(input_file, output_file, indent):
@@ -55,7 +96,7 @@ def indent_in_bracket(input_file, output_file, indent):
         for line_index, line in enumerate(input_lines):
             line_rstrip = re.sub(r'//.*', r'', line).rstrip()
             if len(line_rstrip) > 0:
-                if re.search(re.compile(r"^(foreach |while |forval|if |else )"), line.lstrip()) != None:
+                if re.search(re.compile(r"^(foreach |while |forval|if |else |cap)"), line.lstrip()) != None:
                     if line_rstrip[-1] == "{":
                         loop_start.append(line_index)
                         bracket_start.append(line_index)
@@ -94,7 +135,7 @@ def too_long_line(input_file, output_file, indent):
         input_lines = reader.readlines()
         newline_flag = 0
         for line_index, line in enumerate(input_lines):
-            if (len(line) <= 80) | ((line.lstrip() + ' ')[0] == "*") | ((line.lstrip() + '  ')[:2] == "//"):
+            if (len(line) <= 80) | ((line.lstrip() + ' ')[0] == "*") | ((line.lstrip() + '  ')[:2] == "//") | ("///" in line):
                 output_list.append(line)
             else:
                 line_split_for_comment = re.split(r"//", line)
@@ -143,7 +184,7 @@ def too_long_line(input_file, output_file, indent):
 
                 if len(line_split) == 1:
                     if len(line_split_for_comment) > 1:
-                        output_list.append(' ' * line_indent + line_split[0].lstrip() + " //" + line_comment + "\n")
+                        output_list.append(' ' * line_indent + line_split[0].lstrip() + " //" + line_comment)
                     elif len(line_split_for_comment) == 1:
                         output_list.append(' ' * line_indent + line_split[0].lstrip() + "\n")
                 elif len(line_split) > 1:
@@ -232,7 +273,8 @@ def remove_duplicated_blank_lines(input_file, output_file, indent):
 
 # Run linter program to correct script ===================
 def stata_linter_correct_py(input_file, output_file, indent):
-    tab_to_space(input_file, output_file, indent)
+    delimit_to_three_forward_slashes(input_file, output_file, indent)
+    tab_to_space(output_file, output_file, indent)
     indent_in_bracket(output_file, output_file, indent)
     too_long_line(output_file, output_file, indent)
     space_before_curly(output_file, output_file, indent)

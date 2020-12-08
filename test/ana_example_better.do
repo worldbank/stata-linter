@@ -58,5 +58,5 @@ use "/Users/anamelo/Dropbox/Brazil_Exam/Data/SISU/adoption_graph.dta", clear
             graphregion(color(white)) plotregion(fcolor(white)) ///
  
 graph export "/Users/anamelo/Dropbox/Brazil_Exam/Images/SISU_Adoption.pdf", ///
-  replace
+    replace
 

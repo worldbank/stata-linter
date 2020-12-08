@@ -49,6 +49,10 @@
 	* Line is too long
 	local a = asodfas as[odifgaj sdkjf  asodif asl;kdjf a;sdigfuas ;dlfkjasda;sldiufasodfas as[odifgaj sdkjf  asodif asl;kdjf a;sdigfuas ;dlfkjasda;sldiuf 
 
+	local a = asodfas as[odifgaj sdkjf  asodif asl;kdjf ///
+  a;sdigfuas ;dlfkjasda;sldiufasodfas as[odifgaj sdkjf  asodif asl;kdjf a;sdigfuas ;dlfkjasda;sldiuf 
+
+
 	* Condition is not explicit
 	if something {
 		do something

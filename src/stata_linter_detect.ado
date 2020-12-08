@@ -1,13 +1,29 @@
 /*****************************************************************************/
 /* program stata_linter_detect : Linter do file: detect bad coding practices */
 /*****************************************************************************/
+
+cap ssc install filelist
+
 cap prog drop stata_linter_detect
 program stata_linter_detect 
     version 16
-    syntax, Input(string) [Indent(string) Nocheck suppress summary excel(string)]
 
-    * set indent size = 4 if indent is missing
+    cap python search
+    if _rc {
+        noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
+        exit
+    }
+
+    syntax, Input(string) [Indent(string) Nocheck suppress summary excel(string) linemax(string) tab_space(string)]
+
+    * set indent size = 4 if missing
     if missing("`indent'") local indent "4"
+
+    * set whitespaces for tab (tab_space) = indent size if tab_space is missing
+    if missing("`tab_space'") local tab_space "`indent'"
+  
+    * set linemax = 80 if missing
+    if missing("`linemax'") local linemax "80"
 
     * set excel = "" if excel is missing
     if missing("`excel'") local excel ""
@@ -25,7 +41,7 @@ program stata_linter_detect
 		if !missing("`summary'") local summary_flag "1"
 
     * call the python function
-    python: stata_linter_detect_py("`input'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'")
+    python: stata_linter_detect_py("`input'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
 
 end
 
@@ -42,7 +58,8 @@ import pandas as pd
 
 def abstract_index_name(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"^(foreach)|(forval)"), line.lstrip()):
@@ -71,18 +88,65 @@ def abstract_index_name(
 
 def proper_indent(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
-    if re.search(re.compile(r"^(foreach |forval|if |else )"), line.lstrip()):
-        line_ws = line.expandtabs(indent)
+    line_rstrip = re.sub(r'(\/\/)|(\/\*).*', r'', line).rstrip()
+    if len(line_rstrip) > 0:
+        if (
+              (re.search(re.compile(r"^(foreach |forval|if |else )"), line.lstrip()) != None) &
+              (line_rstrip[-1] == "{")
+            ):
+            line_ws = line.expandtabs(tab_space)
+            j = 1
+            while (j + line_index <= len(input_lines)):
+                if (j + line_index == len(input_lines)):
+                    next_line = input_lines[line_index + 1]
+                    break
+                if (
+                    (len(input_lines[line_index + j].strip()) > 0) &
+                    (re.search(r"^(\*|\/\/)", input_lines[line_index + j].lstrip()) == None)
+                    ):
+                    next_line = input_lines[line_index + j]
+                    break
+                j += 1
+            next_line_ws = next_line.expandtabs(tab_space)
+            line_left_spaces = len(line_ws) - len(line_ws.lstrip())
+            next_line_left_spaces = len(next_line_ws) - len(next_line_ws.lstrip())
+            if (next_line_left_spaces - line_left_spaces < indent) & (len(next_line_ws.strip()) > 0):
+                print_output = (
+                    '''After declaring for loop statement or if-else statement, add indentation ({:d} whitespaces).'''.format(indent)
+                    )
+
+                if suppress != "1":
+                    print(
+                        '''(line {:d}) style: '''.format(line_index + 1) +
+                        print_output
+                        )
+
+                style_dictionary["proper_indent"] += 1
+                excel_output_list.append([line_index + 1, "style", print_output])
+    return([style_dictionary, excel_output_list])
+
+def indent_after_newline(
+    line_index, line, input_lines, indent,
+    suppress, style_dictionary, excel_output_list,
+    tab_space
+    ):
+
+    if (
+            (re.search(re.compile(r"\/\/\/"), line) != None) & 
+            (re.search(re.compile(r"\/\/\/"), input_lines[max(line_index - 1, 0)]) == None)
+        ):
+        line_ws = line.expandtabs(tab_space)
         next_line = input_lines[line_index + 1]
-        next_line_ws = next_line.expandtabs(indent)
+        next_line_ws = next_line.expandtabs(tab_space)
         line_left_spaces = len(line_ws) - len(line_ws.lstrip())
         next_line_left_spaces = len(next_line_ws) - len(next_line_ws.lstrip())
-        if (next_line_left_spaces - line_left_spaces != indent) & (len(next_line_ws.strip()) > 0):
+        if (next_line_left_spaces - line_left_spaces < indent) & (len(next_line_ws.strip()) > 0):
             print_output = (
-                '''After declaring for loop statement or if-else statement, add indentation ({:d} whitespaces).'''.format(indent)
+                '''After new line statement ("///"), add indentation ({:d} whitespaces).'''.format(indent)
                 )
 
             if suppress != "1":
@@ -91,13 +155,14 @@ def proper_indent(
                     print_output
                     )
 
-            style_dictionary["proper_indent"] += 1
+            style_dictionary["indent_after_newline"] += 1
             excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
 def condition_missing(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"(<|!=)( )*\."), line):
@@ -116,7 +181,8 @@ def condition_missing(
 
 def dont_use_delimit(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"#delimit(?! cr)"), line):
@@ -135,7 +201,8 @@ def dont_use_delimit(
 
 def dont_use_cd(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"^cd "), line.lstrip()):
@@ -153,14 +220,15 @@ def dont_use_cd(
     return([style_dictionary, excel_output_list])
 
 def too_long_line(
-    line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    line_index, line, input_lines, indent, linemax,
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
-    if (len(line) >= 80) & ("///" not in line):
+    if (len(line) >= linemax) & ("///" not in line):
         print_output = (
             '''This line is too long ({:d} characters). '''.format(len(line)) +
-            '''Use "///" for line breaks so that one line has at most 80 characters.'''
+            '''Use "///" for line breaks so that one line has at most {:d} characters.'''.format(linemax)
             )
         if suppress != "1":
             print(
@@ -174,7 +242,8 @@ def too_long_line(
 
 def explicit_if(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if (re.search(re.compile(r"^(if|else if) "), line.lstrip()) != None) & (re.search(re.compile(r"((=|<|>))"), line) == None):
@@ -194,12 +263,13 @@ def explicit_if(
 
 def parentheses_for_global_macro(
     line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list
+    suppress, style_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"\\$\w"), line):
         print_output = (
-            '''style: Always use "\${}" for global macros. '''
+            '''Always use "\${}" for global macros. '''
             )
         if suppress != "1":
             print(
@@ -215,7 +285,8 @@ def parentheses_for_global_macro(
 
 def check_missing(
     line_index, line, input_lines, indent,
-    suppress, check_dictionary, excel_output_list
+    suppress, check_dictionary, excel_output_list,
+    tab_space
     ):
     if re.search(re.compile(r"(~=)|(!=)"), line):
         print_output = (
@@ -234,7 +305,8 @@ def check_missing(
 
 def backslash_in_path(
     line_index, line, input_lines, indent,
-    suppress, check_dictionary, excel_output_list
+    suppress, check_dictionary, excel_output_list,
+    tab_space
     ):
     if re.search(r"\\(\w| |-)+\\", line):
         print_output = (
@@ -253,7 +325,8 @@ def backslash_in_path(
 
 def bang_not_tilde(
     line_index, line, input_lines, indent,
-    suppress, check_dictionary, excel_output_list
+    suppress, check_dictionary, excel_output_list,
+    tab_space
     ):
 
     if re.search(re.compile(r"~"), line):
@@ -288,7 +361,11 @@ def update_comment_delimiter(comment_delimiter, line):
 
 
 # Run linter program to detect bad coding practices ===================
-def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel):
+def stata_linter_detect_py(
+    input_file, indent, nocheck, 
+    suppress, summary, excel, linemax,
+    tab_space
+    ):
 
     excel_output_list = []
 
@@ -323,6 +400,7 @@ def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel
     style_dictionary = {
         "abstract_index_name": 0,
         "proper_indent": 0,
+        "indent_after_newline": 0,
         "condition_missing": 0,
         "explicit_if": 0,
         "dont_use_delimit": 0,
@@ -345,35 +423,48 @@ def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel
             else:
                 style_dictionary, excel_output_list = abstract_index_name(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = proper_indent(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
+                    )
+                style_dictionary, excel_output_list = indent_after_newline(
+                    line_index, line, input_lines, int(indent),
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = condition_missing(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = explicit_if(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = dont_use_delimit(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = dont_use_cd(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = too_long_line(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    line_index, line, input_lines, int(indent), int(linemax),
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
                 style_dictionary, excel_output_list = parentheses_for_global_macro(
                     line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
                     )
     # check ============
     check_dictionary = {
@@ -400,15 +491,18 @@ def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel
                 else:
                     check_dictionary, excel_output_list = check_missing(
                         line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list
+                        suppress, check_dictionary, excel_output_list,
+                        int(tab_space)
                         )
                     check_dictionary, excel_output_list = backslash_in_path(
                         line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list
+                        suppress, check_dictionary, excel_output_list,
+                        int(tab_space)
                         )
                     check_dictionary, excel_output_list = bang_not_tilde(
                         line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list
+                        suppress, check_dictionary, excel_output_list,
+                        int(tab_space)
                         )
 
     if summary == "1":
@@ -417,7 +511,8 @@ def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel
         print("\n[Style]")
         print("Hard tabs instead of soft tabs (whitespaces) used: {:s}".format(hard_tab))
         print("Abstract index used in for-loop: {:d}".format(style_dictionary["abstract_index_name"]))
-        print("Not proper indentation: {:d}".format(style_dictionary["proper_indent"]))
+        print("Not proper indentation in for-loop for if-else statement: {:d}".format(style_dictionary["proper_indent"]))
+        print("Not proper indentation in newline: {:d}".format(style_dictionary["indent_after_newline"]))
         print("Condition incomplete: {:d}".format(style_dictionary["condition_missing"]))
         print("Not explicit if statement: {:d}".format(style_dictionary["explicit_if"]))
         print("Delimit used: {:d}".format(style_dictionary["dont_use_delimit"]))
@@ -433,8 +528,15 @@ def stata_linter_detect_py(input_file, indent, nocheck, suppress, summary, excel
 
     if excel != "":
         output_df = pd.DataFrame(excel_output_list)
+        if (output_df.empty == True):
+            output_df = pd.DataFrame(columns = ["Line", "Type", "Problem"])
         output_df.columns = ["Line", "Type", "Problem"]
-        output_df.to_excel(excel, index = False)
+        if os.path.exists(excel):
+            with pd.ExcelWriter(excel, engine = "openpyxl", mode = "a") as writer:
+                output_df.to_excel(writer, index = False, sheet_name = os.path.basename(input_file)[:20])
+        else:
+            with pd.ExcelWriter(excel) as writer:
+                output_df.to_excel(writer, index = False, sheet_name = os.path.basename(input_file)[:20])
         print("\n File {:s} created".format(excel))
 
 end

@@ -267,22 +267,24 @@ def explicit_if(
     ):
 
     # warn if "if" statement is used but the condition is not explicit
-    if (
-        (re.search(re.compile(r"^(if|else if) "), line.lstrip()) != None) & 
-        (re.search(re.compile(r"((=|<|>))"), line) == None)
-        ):
-        print_output = (
-            '''style: Always explicitly specify the condition in the if statement. ''' +
-            '''(For example, declare "if var == 1" instead of "if var".) '''
-            )
-        if suppress != "1":
-            print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
-                print_output
+    search_if = re.search(re.compile(r"^(if|else if) "), line.lstrip())
+    if (search_if != None):
+        if (
+            (re.search(re.compile(r"missing\("), search_if[search_if.span()[0]:]) == None) &
+            (re.search(re.compile(r"((=|<|>))"), search_if[search_if.span()[0]:]) == None)
+            ):
+            print_output = (
+                '''Always explicitly specify the condition in the if statement. ''' +
+                '''(For example, declare "if var == 1" instead of "if var".) '''
                 )
+            if suppress != "1":
+                print(
+                    '''(line {:d}) style: '''.format(line_index + 1) +
+                    print_output
+                    )
+            style_dictionary["too_long_line"] += 1
+            excel_output_list.append([line_index + 1, "style", print_output])
 
-        style_dictionary["too_long_line"] += 1
-        excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
 # Use parentheses for global macros

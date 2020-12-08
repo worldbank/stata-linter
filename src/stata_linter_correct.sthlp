@@ -32,7 +32,7 @@ help for {hi:stata_linter_correct}
 {synopt :{cmdab:automatic}}Correct all bad coding practices without asking if you want each bad coding practice to be corrected or not{p_end}
 {synopt :{cmdab:replace}}Replace the existing {it:output} file{p_end}
 {synopt :{cmdab:input_replace_force}}Allow the output file name to be the same as the name of the input file{p_end}
-{synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: 4){p_end}
+{synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
 
 {synoptline}
 

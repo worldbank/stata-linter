@@ -33,7 +33,7 @@ help for {hi:stata_linter_detect}
 {synopt :{cmdab:summary}}Show summary results (number of bad practices){p_end}
 {synopt :{cmdab:excel(}{it:{help filename}}{cmd:)}}Make an excel file of line-by-line results{p_end}
 {synopt :{cmdab:linemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80){p_end}
-{synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: 4){p_end}
+{synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
 
 {synoptline}
 

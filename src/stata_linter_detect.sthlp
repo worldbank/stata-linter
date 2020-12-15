@@ -80,6 +80,11 @@ For lines that are too long, use {cmdab:///} for line breaks and divide them int
 It is recommended to restrict the number of characters in a line under 80.
 Whereas sometimes this is difficult since, for example, Stata does not allow line breaks within double quotes, try to follow this rule when possible.
 
+{pstd}{hi:Add whitespaces around math symbols such as +, =, <, >, etc.}
+{break}
+For better readability, add whitespaces around math symbols.
+For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d==e}.
+
 {pstd}{hi:Specify the condition in the if statement}
 {break}
 Always explicitly specify the condition in the if statement.

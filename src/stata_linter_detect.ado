@@ -181,7 +181,7 @@ def whitespace_symbol(
     if re.search(re.compile(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)"), line):
         print_output = (
             '''Before and after math symbols (>, <, =, +, etc), it is recommended to use whitespaces. ''' +
-            '''(For example, do "gen a = 1" instead of "gen a=1".)'''
+            '''(For example, do "gen a = b + c" instead of "gen a=b+c".)'''
             )
         if suppress != "1":
             print(

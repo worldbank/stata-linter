@@ -43,10 +43,10 @@ program stata_linter_detect_all
         di ""
 
         if !missing("`excel'") {
-            stata_linter_detect, input("${path}/`l'") indent("`indent'") `option_list' excel("`excel'") linemax("`linemax'") tab_space("`tab_space'")
+            stata_linter_detect, input("`input'/`l'") indent("`indent'") `option_list' excel("`excel'") linemax("`linemax'") tab_space("`tab_space'")
         }
         else {
-            stata_linter_detect, input("${path}/`l'") indent("`indent'") `option_list' linemax("`linemax'") tab_space("`tab_space'")
+            stata_linter_detect, input("`input'/`l'") indent("`indent'") `option_list' linemax("`linemax'") tab_space("`tab_space'")
         }
     }
     restore

@@ -270,8 +270,8 @@ def explicit_if(
     search_if = re.search(re.compile(r"^(if|else if) "), line.lstrip())
     if (search_if != None):
         if (
-            (re.search(re.compile(r"missing\("), search_if[search_if.span()[0]:]) == None) &
-            (re.search(re.compile(r"((=|<|>))"), search_if[search_if.span()[0]:]) == None)
+            (re.search(re.compile(r"missing\("), line[search_if.span()[0]:]) == None) &
+            (re.search(re.compile(r"((=|<|>))"), line[search_if.span()[0]:]) == None)
             ):
             print_output = (
                 '''Always explicitly specify the condition in the if statement. ''' +
@@ -282,7 +282,7 @@ def explicit_if(
                     '''(line {:d}) style: '''.format(line_index + 1) +
                     print_output
                     )
-            style_dictionary["too_long_line"] += 1
+            style_dictionary["explicit_if"] += 1
             excel_output_list.append([line_index + 1, "style", print_output])
 
     return([style_dictionary, excel_output_list])

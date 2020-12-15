@@ -318,8 +318,10 @@ def too_long_line(input_file, output_file, indent, tab_space):
                         line_main = line_main.rstrip()
                     if len(line_split_for_comment) > 1:
                         line_comment = line_split_for_comment[1]
-                    line_indent = len(line_main.rstrip()) - 
+                    line_indent = (
+                        len(line_main.rstrip()) - 
                         len(line_main.rstrip().expandtabs(int(indent)).lstrip())
+                        )
 
                     i = 0
                     break_line = []

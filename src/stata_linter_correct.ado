@@ -119,8 +119,8 @@ def update_comment_delimiter(comment_delimiter, line):
 
 # Functions for auto-correction ===================
 
-# Convert delimit to three forward slashes
-def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space): -------------------
+# Convert delimit to three forward slashes -------------------
+def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space):
     output_list = []
     with open(input_file, 'r') as reader:
         input_lines = reader.readlines()

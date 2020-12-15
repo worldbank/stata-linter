@@ -122,7 +122,7 @@ def update_comment_delimiter(comment_delimiter, line):
 # Convert delimit to three forward slashes -------------------
 def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         delimit_on = 0
         comment_delimiter = 0
@@ -198,7 +198,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
                         elif len(line_main_rstrip) == 0:
                             output_list.append(line)
                         
-    with open(output_file, 'w') as writer:
+    with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
 
@@ -206,7 +206,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
 # Convert hard tabs to soft tabs (= whitespaces) ----------------------
 def tab_to_space(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         comment_delimiter = 0
         for line_index, line in enumerate(input_lines):
@@ -217,13 +217,13 @@ def tab_to_space(input_file, output_file, indent, tab_space):
             elif comment_delimiter == 0:
                 # replace the hard tabs detected in a line to soft tabs (whitespaces)
                 output_list.append(line.replace("\t", " " * int(tab_space)))
-    with open(output_file, 'w') as writer:
+    with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
 
 # Use indents in brackets after for and while loops or if/else conditions --------------------
 def indent_in_bracket(input_file, output_file, indent, tab_space):
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         loop_start = []
         bracket_start = []
@@ -237,12 +237,12 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
             if comment_delimiter == 0:
                 # get the main command of the line (ignoring comments at the end) and remove
                 # redundant whitespaces
-                line_rstrip = re.sub(r'(\/\/)|(\/\*).*', r'', line).rstrip()
+                line_rstrip = re.sub(r"(\/\/)|(\/\*).*", r"", line).rstrip()
                 # if the line is not blank or has any command other than comments,
                 # do the followings
                 if len(line_rstrip) > 0:
                     # check if the line starts with commands that potentially have curly brackets
-                    if re.search(re.compile(r"^(foreach |while |forval|if |else |cap)"), line.lstrip()) != None:
+                    if re.search(r"^(foreach |while |forval|if |else |cap)", line.lstrip()) != None:
                         # if the line ends with an open curly bracket,
                         # then tag it (here the depth of the nests are stored as well)
                         if line_rstrip[-1] == "{":
@@ -256,7 +256,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                         elif (line_rstrip[-1] != "{") & (re.search(r"//", line) != None):
                             loop_start.append(line_index)
                             for i in range(line_index, len(input_lines)):
-                                temp_line_rstrip = re.sub(r'//.*', r'', input_lines[i]).rstrip()
+                                temp_line_rstrip = re.sub(r"//.*", r"", input_lines[i]).rstrip()
                                 if temp_line_rstrip[-1] == "{":
                                     bracket_start.append(i)
                                     break
@@ -264,7 +264,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                             max_nest_level = max(max_nest_level, nest_level)
                     # check if the line ends with a closing curly bracket 
                     # (ignore it if that is not used for global macro)
-                    if (line_rstrip[-1] == "}") & (not re.search(r'\$.?{', line)):
+                    if (line_rstrip[-1] == "}") & (not re.search(r"\$.?{", line)):
                         bracket_pair.append([loop_start.pop(), line_index, nest_level, bracket_start.pop()])
                         nest_level -= 1
         # for each depth of nests, add appropriate indentations
@@ -280,8 +280,8 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                             pass
                         # if the line is not blank, then add indentations at the beginning of the line
                         elif len(input_lines[j].lstrip()) > 0:
-                            input_lines[j] = ' ' * (start_indent + int(indent)) + (input_lines[j].lstrip())
-    with open(output_file, 'w') as writer:
+                            input_lines[j] = " " * (start_indent + int(indent)) + (input_lines[j].lstrip())
+    with open(output_file, "w") as writer:
         for output_line in input_lines:
             writer.write(output_line)
 
@@ -289,7 +289,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
 # (but do not break strings in double quotes (""), parentheses, or curly brackets) --------------------
 def too_long_line(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         newline_flag = 0
         comment_delimiter = 0
@@ -302,8 +302,8 @@ def too_long_line(input_file, output_file, indent, tab_space):
                 # do nothing if any of the following conditions are met
                 if (
                     (len(line) <= 80) | # the line if not too long, or
-                    ((line.lstrip() + ' ')[0] == "*") | # the line is a comment
-                    ((line.lstrip() + '  ')[:2] == "//") | # the line ends with a line break
+                    ((line.lstrip() + " ")[0] == "*") | # the line is a comment
+                    ((line.lstrip() + "  ")[:2] == "//") | # the line ends with a line break
                     ("///" in line) # line contains a comment
                     ):
                     output_list.append(line)
@@ -342,17 +342,17 @@ def too_long_line(input_file, output_file, indent, tab_space):
                             curly_count -= 1
                         if (
                             (
-                                ((i >= 30) & (c == ',')) | # break line at "," if characters > 30
+                                ((i >= 30) & (c == ",")) | # break line at "," if characters > 30
                                 (i >= (70 - line_indent)) # break line if characters > 70
                                 ) & 
                             (double_quote_count == 0) & # ignore if in double quotes
                             (parenthesis_count == 0) & # ignore if in parentheses
                             (curly_count == 0)# ignore if in curly brackets
                             ):
-                            if (c == ' '):
+                            if (c == " "):
                                 break_line.append(j)
                                 i = 0
-                            if (c == ','):
+                            if (c == ","):
                                 break_line.append(j + 1)
                                 i = 0
                             else:
@@ -380,38 +380,38 @@ def too_long_line(input_file, output_file, indent, tab_space):
                     if len(line_split) == 1:
                         if len(line_split_for_comment) > 1:
                             output_list.append(
-                                ' ' * line_indent + line_split[0].lstrip() + " //" + line_comment
+                                " " * line_indent + line_split[0].lstrip() + " //" + line_comment
                                 )
                         elif len(line_split_for_comment) == 1:
-                            output_list.append(' ' * line_indent + line_split[0].lstrip() + "\n")
+                            output_list.append(" " * line_indent + line_split[0].lstrip() + "\n")
                     # otherwise, break the line
                     elif len(line_split) > 1:
                         for i, temp_line in enumerate(line_split):
                             # the first line
                             if i == 0:
-                                new_line = ' ' * line_indent + temp_line.lstrip() + " ///\n"
+                                new_line = " " * line_indent + temp_line.lstrip() + " ///\n"
                             # from the second to the last to the second line
                             elif (i > 0) & (i < len(line_split) - 1):
                                 # if the previous line does not include a line break, then
                                 # add an appropriate indentations
                                 if newline_flag == 0:
-                                    new_line = ' ' * (line_indent + int(indent)) + temp_line.lstrip() + " ///\n"
+                                    new_line = " " * (line_indent + int(indent)) + temp_line.lstrip() + " ///\n"
                                 # if the previous line does include a line break, then
                                 # assuming that the indentation is correctly done,
                                 # add no indentations
                                 elif newline_flag == 1:
-                                    new_line = ' ' * (line_indent) + temp_line.lstrip() + " ///\n"
+                                    new_line = " " * (line_indent) + temp_line.lstrip() + " ///\n"
                             # the last line
                             elif (i == len(line_split) - 1):
                                 # if the previous line does not include a line break, then
                                 # add an appropriate indentations
                                 if newline_flag == 0:
-                                    new_line = ' ' * (line_indent + int(indent)) + temp_line.lstrip()
+                                    new_line = " " * (line_indent + int(indent)) + temp_line.lstrip()
                                 # if the previous line does include a line break, then
                                 # assuming that the indentation is correctly done,
                                 # add no indentations
                                 elif newline_flag == 1:
-                                    new_line = ' ' * (line_indent) + temp_line.lstrip()
+                                    new_line = " " * (line_indent) + temp_line.lstrip()
                                 # if there is any comment in the original line, add it at the end
                                 if len(line_split_for_comment) > 1:
                                     new_line = new_line + " //" + line_comment
@@ -422,7 +422,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
                     newline_flag = 1
                 else:
                     newline_flag = 0
-    with open(output_file, 'w') as writer:
+    with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
 
@@ -430,7 +430,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
 # (but not if the curly bracket is used for global macro, as in "${}") --------------------
 def space_before_curly(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         comment_delimiter = 0
         for line_index, line in enumerate(input_lines):
@@ -442,15 +442,15 @@ def space_before_curly(input_file, output_file, indent, tab_space):
                 # replace "{" with " {" if there is no whitespace 
                 # before an open curly bracket, but ignore if
                 # "${" since this is for global macro
-                output_list.append(re.sub(r'([^ $]){', r'\1 {', line))
-    with open(output_file, 'w') as writer:
+                output_list.append(re.sub(r"([^ $]){", r"\1 {", line))
+    with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
 
 # Remove blank lines before curly brackets are closed --------------------
 def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         comment_delimiter = 0
         for line_index, line in enumerate(input_lines):
@@ -464,15 +464,15 @@ def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_s
                         if len(input_lines[i].strip()) == 0:
                             pass
                         elif len(input_lines[i].strip()) > 0:
-                            line_rstrip = ' ' + re.sub(r'//.*', r'', input_lines[i]).rstrip()
-                            if (line_rstrip[-1] == "}") & (not re.search(r'\$.*{', input_lines[i])):
+                            line_rstrip = " " + re.sub(r"//.*", r"", input_lines[i]).rstrip()
+                            if (line_rstrip[-1] == "}") & (not re.search(r"\$.*{", input_lines[i])):
                                 break
                             else:
                                 output_list.append(line)
                                 break
                 elif len(line.strip()) > 0:
                     output_list.append(line)
-    with open(output_file, 'w') as writer:
+    with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
 
@@ -480,7 +480,7 @@ def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_s
 # Remove duplicated blank lines --------------------
 def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space):
     output_list = []
-    with open(input_file, 'r') as reader:
+    with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         blank_line_flag = 0
         comment_delimiter = 0
@@ -499,7 +499,7 @@ def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space):
                 elif len(line.strip()) > 0:
                     blank_line_flag = 0
                     output_list.append(line)
-    with open(output_file, 'w') as writer:
+    with open(output_file, "w") as writer:
         for i, output_line in enumerate(output_list):
             if i < len(output_list) - 1:
                 writer.write(output_line)

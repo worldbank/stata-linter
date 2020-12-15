@@ -63,13 +63,13 @@ def abstract_index_name(
     tab_space
     ):
 
-    if re.search(re.compile(r"^(foreach)|(forval)"), line.lstrip()):
+    if re.search(r"^(foreach)|(forval)", line.lstrip()):
         list_of_words = line.split()
         # get the index used in for loops
         for word in list_of_words:
-            if re.search(re.compile(r"^(foreach)"), word):
+            if re.search(r"^(foreach)", word):
                 index_in_loop = list_of_words[list_of_words.index(word) + 1]
-            elif re.search(re.compile(r"^(forval)"), word):
+            elif re.search(r"^(forval)", word):
                 index_in_loop = list_of_words[list_of_words.index(word) + 1].split("=")[0]
             break
         # warn if the number of characters in the index is just 1
@@ -96,11 +96,11 @@ def proper_indent(
     tab_space
     ):
 
-    line_rstrip = re.sub(r'(\/\/)|(\/\*).*', r'', line).rstrip()
+    line_rstrip = re.sub(r"(\/\/)|(\/\*).*", r"", line).rstrip()
     if len(line_rstrip) > 0:
         # check if the line includes for-loop, while-loop, or if/else statements
         if (
-            (re.search(re.compile(r"^(foreach |forval|if |else )"), line.lstrip()) != None) &
+            (re.search(r"^(foreach |forval|if |else )", line.lstrip()) != None) &
             (line_rstrip[-1] == "{")
             ):
             line_ws = line.expandtabs(tab_space)
@@ -146,8 +146,8 @@ def indent_after_newline(
 
     # check if the line includes "///" but the previous line does not include "///"
     if (
-        (re.search(re.compile(r"\/\/\/"), line) != None) & 
-        (re.search(re.compile(r"\/\/\/"), input_lines[max(line_index - 1, 0)]) == None)
+        (re.search(r"\/\/\/", line) != None) & 
+        (re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]) == None)
         ):
         line_ws = line.expandtabs(tab_space)
         # warn if the following line (after line break) is not properly indented
@@ -178,7 +178,7 @@ def whitespace_symbol(
     ):
 
     # warn if no whitespaces around math symbols
-    if re.search(re.compile(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)"), line):
+    if re.search(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)", line):
         print_output = (
             '''Before and after math symbols (>, <, =, +, etc), it is recommended to use whitespaces. ''' +
             '''(For example, do "gen a = b + c" instead of "gen a=b+c".)'''
@@ -201,7 +201,7 @@ def condition_missing(
     ):
 
     # warn if "var < ." or "var != ." are used 
-    if re.search(re.compile(r"(<|!=)( )*\."), line):
+    if re.search(r"(<|!=)( )*\.", line):
         print_output = (
             '''Use "!missing(var)" instead of "var < ." or "var != .".'''
             )
@@ -223,7 +223,7 @@ def dont_use_delimit(
     ):
 
     # warn if "#delimit" is used
-    if re.search(re.compile(r"#delimit(?! cr)"), line):
+    if re.search(r"#delimit(?! cr)", line):
         print_output = (
             '''Avoid to use "delimit". For line breaks, use "///" instead.'''
             )
@@ -245,7 +245,7 @@ def dont_use_cd(
     ):
 
     # warn if "#cd" is used
-    if re.search(re.compile(r"(^| )cd "), line.lstrip()):
+    if re.search(r"(^| )cd ", line.lstrip()):
         print_output = (
             '''Do not use "cd" but use absolute and dynamic file paths.'''
             )
@@ -290,11 +290,11 @@ def explicit_if(
     ):
 
     # warn if "if" statement is used but the condition is not explicit
-    search_if = re.search(re.compile(r"^(if|else if) "), line.lstrip())
+    search_if = re.search(r"^(if|else if) ", line.lstrip())
     if (search_if != None):
         if (
-            (re.search(re.compile(r"missing\("), line[search_if.span()[0]:]) == None) &
-            (re.search(re.compile(r"((=|<|>))"), line[search_if.span()[0]:]) == None)
+            (re.search(r"missing\(", line[search_if.span()[0]:]) == None) &
+            (re.search(r"((=|<|>))", line[search_if.span()[0]:]) == None)
             ):
             print_output = (
                 '''Always explicitly specify the condition in the if statement. ''' +
@@ -318,7 +318,7 @@ def parentheses_for_global_macro(
     ):
 
     # warn if global macros are used without parentheses
-    if re.search(re.compile(r"\\$\w"), line):
+    if re.search(r"\\$\w", line):
         print_output = (
             '''Always use "\${}" for global macros. '''
             )
@@ -341,7 +341,7 @@ def check_missing(
     tab_space
     ):
     # ask if missing variables are properly taken into account
-    if re.search(re.compile(r"(~=)|(!=)(?!(( )*\.))"), line):
+    if re.search(r"(~=)|(!=)(?!(( )*\.))", line):
         print_output = (
             '''Are you taking missing values into account properly? ''' +
             '''(Remember that "a != 0" includes cases where a is missing.)'''
@@ -387,7 +387,7 @@ def bang_not_tilde(
 
     # warn if tilde is used, which suggests 
     # that the user may be using tilde for negation
-    if re.search(re.compile(r"~"), line):
+    if re.search(r"~", line):
         print_output = (
             '''Are you using tilde (~) for negation? ''' +
             '''If so, for negation, use bang (!) instead of tilde (~).'''

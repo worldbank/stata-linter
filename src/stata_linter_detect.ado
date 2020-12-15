@@ -170,6 +170,29 @@ def indent_after_newline(
             excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
+# No whitespaces around math symbols ----------------
+def whitespace_symbol(
+    line_index, line, input_lines, indent,
+    suppress, style_dictionary, excel_output_list,
+    tab_space
+    ):
+
+    # warn if no whitespaces around math symbols
+    if re.search(re.compile(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)"), line):
+        print_output = (
+            '''Before and after math symbols (>, <, =, +, etc), it is recommended to use whitespaces. ''' +
+            '''(For example, do "gen a = 1" instead of "gen a=1".)'''
+            )
+        if suppress != "1":
+            print(
+                '''(line {:d}) style: '''.format(line_index + 1) +
+                print_output
+                )
+
+        style_dictionary["whitespace_symbol"] += 1
+        excel_output_list.append([line_index + 1, "style", print_output])
+    return([style_dictionary, excel_output_list])
+
 # For missing values "var < ." or "var != ." are used (!missing(var) is recommended) ----------------
 def condition_missing(
     line_index, line, input_lines, indent,
@@ -318,7 +341,7 @@ def check_missing(
     tab_space
     ):
     # ask if missing variables are properly taken into account
-    if re.search(re.compile(r"(~=)|(!=)"), line):
+    if re.search(re.compile(r"(~=)|(!=)(?!(( )*\.))"), line):
         print_output = (
             '''Are you taking missing values into account properly? ''' +
             '''(Remember that "a != 0" includes cases where a is missing.)'''
@@ -420,7 +443,7 @@ def stata_linter_detect_py(
                 if re.search(r"\t", line):
                     hard_tab = "Yes"
                     print_output = (
-                        '''Use {:d} white spaces instead of tabs.'''.format(int(indent)) +
+                        '''Use {:d} white spaces instead of tabs. '''.format(int(indent)) +
                         '''(This may apply to other lines as well.)'''
                         )
                     excel_output_list.append([line_index + 1, "style", print_output])
@@ -436,6 +459,7 @@ def stata_linter_detect_py(
         "abstract_index_name": 0,
         "proper_indent": 0,
         "indent_after_newline": 0,
+        "whitespace_symbol": 0,
         "condition_missing": 0,
         "explicit_if": 0,
         "dont_use_delimit": 0,
@@ -467,6 +491,11 @@ def stata_linter_detect_py(
                     int(tab_space)
                     )
                 style_dictionary, excel_output_list = indent_after_newline(
+                    line_index, line, input_lines, int(indent),
+                    suppress, style_dictionary, excel_output_list,
+                    int(tab_space)
+                    )
+                style_dictionary, excel_output_list = whitespace_symbol(
                     line_index, line, input_lines, int(indent),
                     suppress, style_dictionary, excel_output_list,
                     int(tab_space)
@@ -548,6 +577,7 @@ def stata_linter_detect_py(
         print("Abstract index used in for-loop: {:d}".format(style_dictionary["abstract_index_name"]))
         print("Not proper indentation in for-loop for if-else statement: {:d}".format(style_dictionary["proper_indent"]))
         print("Not proper indentation in newline: {:d}".format(style_dictionary["indent_after_newline"]))
+        print("No whitespaces around math symbols: {:d}".format(style_dictionary["whitespace_symbol"]))
         print("Condition incomplete: {:d}".format(style_dictionary["condition_missing"]))
         print("Not explicit if statement: {:d}".format(style_dictionary["explicit_if"]))
         print("Delimit used: {:d}".format(style_dictionary["dont_use_delimit"]))

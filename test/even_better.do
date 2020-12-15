@@ -32,7 +32,9 @@
         cassava maize potato cassava maize potato cassava maize potato cassava ///
         maize potato cassava maize potato cassava maize {
         if something != 1 & !missing(something) {
-            do something // some very very very very very very very very very very very very very very very very very very very very very very long comment
+            do something // some very very very very very very very very very 
+                         // very very very very very very very very very very 
+                         // very very very long comment
         } 
     }
 

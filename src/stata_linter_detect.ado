@@ -63,13 +63,13 @@ def abstract_index_name(
     tab_space
     ):
 
-    if re.search(r"^(foreach)|(forval)", line.lstrip()):
+    if re.search(r"^(foreach)|(forv)", line.lstrip()):
         list_of_words = line.split()
         # get the index used in for loops
         for word in list_of_words:
             if re.search(r"^(foreach)", word):
                 index_in_loop = list_of_words[list_of_words.index(word) + 1]
-            elif re.search(r"^(forval)", word):
+            elif re.search(r"^(forv)", word):
                 index_in_loop = list_of_words[list_of_words.index(word) + 1].split("=")[0]
             break
         # warn if the number of characters in the index is just 1
@@ -100,7 +100,7 @@ def proper_indent(
     if len(line_rstrip) > 0:
         # check if the line includes for-loop, while-loop, or if/else statements
         if (
-            (re.search(r"^(foreach |forval|if |else )", line.lstrip()) != None) &
+            (re.search(r"^(foreach |forv|if |else )", line.lstrip()) != None) &
             (line_rstrip[-1] == "{")
             ):
             line_ws = line.expandtabs(tab_space)

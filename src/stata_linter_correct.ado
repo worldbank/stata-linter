@@ -166,34 +166,26 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
                             # then that means the command continues to the next line,
                             # so add a line break
                             if line_main_rstrip[-1] != delimit_symbol:
-                                # if there is any comment in the line, then
-                                # add "///" before the comment and append the comment
-                                if len(line_split_for_comment) > 1:
-                                    output_list.append(
-                                        line_main_rstrip + " ///" + line_comment
-                                        )
-                                # if there is no comment in the line, then
-                                # add "///", but do not forget to add a newline command (\n)
-                                # which is removed when stripping redundant whitespaces above
-                                elif len(line_split_for_comment) == 1:
-                                    output_list.append(line_main_rstrip + " ///\n")
+                                output_line = line_main_rstrip + " ///"
                             # if the line does end with the delimit symbol, then
-                            # just remove the symbol
+                            # just remove the last symbol in the line
                             elif line_main_rstrip[-1] == delimit_symbol:
-                                # if there is any comment in the line, then
-                                # just append the comment 
-                                if len(line_split_for_comment) > 1:
-                                    output_list.append(
-                                        re.sub(delimit_symbol, "", line_main).rstrip() + 
-                                        " //" + line_comment
-                                        )
-                                # if there is no comment in the line, then
-                                # just add a newline command (\n) at the end
-                                elif len(line_split_for_comment) == 1:
-                                    output_list.append(
-                                        re.sub(delimit_symbol, "", line_main).rstrip() + 
-                                        " \n"
-                                        )
+                                output_line = line_main_rstrip[:-1]
+
+                            # replace all the remaining delimit symbols to "\n"
+                            output_line = re.sub(delimit_symbol, "\n", output_line)
+
+                            # if there is any comment in the line, then
+                            # just append the comment 
+                            if len(line_split_for_comment) > 1:
+                                output_line = output_line + " //" + line_comment
+                            # if there is no comment in the line, then
+                            # just add a newline command (\n) at the end
+                            elif len(line_split_for_comment) == 1:
+                                output_line = output_line + " \n"
+
+                            output_list.append(output_line)
+
                         # if the line is blank, just append the blank line
                         elif len(line_main_rstrip) == 0:
                             output_list.append(line)
@@ -242,7 +234,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                 # do the followings
                 if len(line_rstrip) > 0:
                     # check if the line starts with commands that potentially have curly brackets
-                    if re.search(r"^(foreach |while |forval|if |else |cap)", line.lstrip()) != None:
+                    if re.search(r"^(foreach |while |forv|if |else |cap)", line.lstrip()) != None:
                         # if the line ends with an open curly bracket,
                         # then tag it (here the depth of the nests are stored as well)
                         if line_rstrip[-1] == "{":
@@ -253,10 +245,10 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                         # if the line does not end with an open curly bracket but includes line breaks,
                         # then search for the line including the open curly bracket in the following lines 
                         # and tag the line
-                        elif (line_rstrip[-1] != "{") & (re.search(r"//", line) != None):
+                        elif (line_rstrip[-1] != "{") & (re.search(r"\/\/\/", line) != None):
                             loop_start.append(line_index)
                             for i in range(line_index, len(input_lines)):
-                                temp_line_rstrip = re.sub(r"//.*", r"", input_lines[i]).rstrip()
+                                temp_line_rstrip = re.sub(r"\/\/.*", r"", input_lines[i]).rstrip()
                                 if temp_line_rstrip[-1] == "{":
                                     bracket_start.append(i)
                                     break

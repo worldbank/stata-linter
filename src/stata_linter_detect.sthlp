@@ -8,6 +8,10 @@ help for {hi:stata_linter_detect}
 
 {phang2}{cmdab:stata_linter_detect} {hline 2} detects bad coding practices in a do file
 
+{phang2}For this command to run, Stata version has to be >=16, python has to be installed, and a python package {browse "https://pandas.pydata.org/":pandas} has to be installed.
+On how to install python, refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page}.
+On how to install python packages, refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page}.
+
 {title:Syntax}
 
 {phang2}

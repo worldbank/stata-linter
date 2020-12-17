@@ -19,3 +19,13 @@ do 2013-0533_do_figures.do
 do 2013-0533_do_figures_correct.do
 
 
+global src_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/src"
+global test_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/test"
+
+cd "${src_dir}"
+
+run stata_linter_detect.ado
+
+stata_linter_detect, input("${test_dir}/bad.do") indent(2) suppress
+
+

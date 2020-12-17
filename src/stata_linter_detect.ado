@@ -8,13 +8,21 @@ cap prog drop stata_linter_detect
 program stata_linter_detect 
     version 16
 
+    syntax, Input(string) [INdent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
+
+    * Check if python is installed
     cap python search
     if _rc {
         noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
         exit
     }
 
-    syntax, Input(string) [Indent(string) Nocheck suppress summary excel(string) linemax(string) tab_space(string)]
+    * Check if pandas package is installed
+    cap python which pandas
+    if _rc {
+        noi di as error `"{phang} For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+        exit
+    }
 
     * set indent size = 4 if missing
     if missing("`indent'") local indent "4"
@@ -53,6 +61,7 @@ import os
 import re
 import sys
 import pandas as pd
+from sfi import Macro
 
 # Style ===================
 
@@ -416,7 +425,6 @@ def update_comment_delimiter(comment_delimiter, line):
     elif (re.search(r"\*\/", line) != None) & (comment_delimiter > 0):
         comment_delimiter -= 1
     return(comment_delimiter)
-
 
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(

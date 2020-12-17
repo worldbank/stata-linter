@@ -7,7 +7,7 @@ cap ssc install filelist
 cap prog drop stata_linter_detect_all
 program stata_linter_detect_all
     version 16
-    syntax, [Input(string) Indent(string) Nocheck suppress summary excel(string) linemax(string) tab_space(string)]
+    syntax, [INPut(string) INDent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
 
     * if input is missing, set to the current folder
     if missing("`input'") local input "."

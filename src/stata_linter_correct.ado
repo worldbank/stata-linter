@@ -11,7 +11,7 @@ program def stata_linter_correct
         exit
     }
 
-    syntax, Input(string) Output(string) [Indent(string) automatic replace input_replace_force tab_space(string)]
+    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace INPUT_Replace_force Tab_space(string)]
 
     * unless input_replace_force, return error if input file and output file have the same name
     if !missing("`input_replace_force'") & ("`input'" == "`output'") {

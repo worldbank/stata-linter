@@ -24,8 +24,6 @@ global test_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/test"
 
 cd "${src_dir}"
 
-run stata_linter_detect.ado
-
-stata_linter_detect, input("${test_dir}/bad.do") indent(2) suppress
+stata_linter_detect, input("${test_dir}/bad.do") indent(2) summary suppress
 
 

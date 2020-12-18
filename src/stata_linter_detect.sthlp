@@ -6,13 +6,18 @@ help for {hi:stata_linter_detect}
 
 {title:Title}
 
-{phang2}{cmdab:stata_linter_detect} {hline 2} detects bad coding practices in a do file
+{phang2}{cmdab:stata_linter_detect} {hline 2} detects bad coding practices in do files
+
+{phang2}For this command to run, Stata version has to be >=16, python has to be installed, and a python package {browse "https://pandas.pydata.org/":pandas} has to be installed.
+On how to install python, refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page}.
+On how to install python packages, refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page}.
 
 {title:Syntax}
 
 {phang2}
-{cmdab:stata_linter_detect}, {cmdab:input(}{it:{help filename}}{cmd:)}
+{cmdab:stata_linter_detect}, 
 [
+{cmdab:input_option}{it:{help filename}}
 {it:options}
 ]
 
@@ -20,9 +25,10 @@ help for {hi:stata_linter_detect}
 {synoptset 23}{...}
 {synopthdr:options}
 {synoptline}
-{pstd}{it:    {ul:{hi:Required options:}}}{p_end}
+{pstd}{it:    {ul:{hi:Input options (one of the following options needs to be used):}}}{p_end}
 
-{synopt :{cmdab:input(}{it:{help filename}}{cmd:)}}do file in which the command is executed on
+{synopt :{cmdab:file(}{it:{help filename}}{cmd:)}}do file in which the command is executed on{p_end}
+{synopt :{cmdab:folder(}{it:{help filename}}{cmd:)}}path to a folder so that the command is executed on do files in the folder{p_end}
 
 {pstd}{it:    {ul:{hi:Optional options:}}}{p_end}
 
@@ -79,6 +85,11 @@ Avoid to use {cmdab:cd} but use absolute and dynamic file paths.
 For lines that are too long, use {cmdab:///} for line breaks and divide them into multiple lines.
 It is recommended to restrict the number of characters in a line under 80.
 Whereas sometimes this is difficult since, for example, Stata does not allow line breaks within double quotes, try to follow this rule when possible.
+
+{pstd}{hi:Add whitespaces around math symbols such as +, =, <, >, etc.}
+{break}
+For better readability, add whitespaces around math symbols.
+For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d==e}.
 
 {pstd}{hi:Specify the condition in the if statement}
 {break}

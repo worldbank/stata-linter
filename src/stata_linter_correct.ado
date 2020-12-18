@@ -11,11 +11,11 @@ program def stata_linter_correct
         exit
     }
 
-    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace INPUT_Replace_force Tab_space(string)]
+    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace inprep Tab_space(string)]
 
-    * unless input_replace_force, return error if input file and output file have the same name
-    if !missing("`input_replace_force'") & ("`input'" == "`output'") {
-			noi di as error `"{phang} Output file is recommended to have a different name from the input file since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option input_replace_force .{p_end}"'
+    * unless inprep is used, return error if input file and output file have the same name
+    if missing("`inprep'") & ("`input'" == "`output'") {
+			noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep .{p_end}"'
 			exit
     }
 
@@ -26,11 +26,11 @@ program def stata_linter_correct
     if missing("`tab_space'") local tab_space "`indent'"
   
     * copy the input file to the output file, which will be edited by the commands below
-    if !missing("`replace'") copy "`input'" "`output'", replace
+    if (!missing("`replace'") | !missing("`inprep'")) copy "`input'" "`output'", replace
     else copy "`input'" "`output'"
 
     * import python functions
-    findfile stata_linter_correct.ado
+    qui: findfile stata_linter_correct.ado
     local ado_path = r(fn)
     python: import sys, os
     python: sys.path.append(os.path.dirname("`ado_path'"))

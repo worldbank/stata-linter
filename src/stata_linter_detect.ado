@@ -2,13 +2,11 @@
 /* program stata_linter_detect : Linter do file: detect bad coding practices */
 /*****************************************************************************/
 
-cap ssc install filelist
-
 cap prog drop stata_linter_detect
 program stata_linter_detect 
     version 16
 
-    syntax, Input(string) [INdent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
+    syntax, [FIle(string) FOlder(string) INDent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
 
     * Check if python is installed
     cap python search
@@ -33,6 +31,8 @@ program stata_linter_detect
     * set linemax = 80 if missing
     if missing("`linemax'") local linemax "80"
 
+    *if !missing("`excel'") cap erase `excel'
+    if !missing("`excel'") cap rm `excel'
     * set excel = "" if excel is missing
     if missing("`excel'") local excel ""
 
@@ -49,15 +49,42 @@ program stata_linter_detect
 		if !missing("`summary'") local summary_flag "1"
 
     * call the python function
-    findfile stata_linter_detect.ado
+    qui: findfile stata_linter_detect.ado
     local ado_path = r(fn)
     python: import sys, os
     python: sys.path.append(os.path.dirname("`ado_path'"))
     python: from stata_linter_detect import stata_linter_detect_py
-    python: stata_linter_detect_py("`input'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+
+    * Only one of "file" and "folder" can be non-missing
+    if !missing("`file'") & !missing("`folder'") {
+        noi di as error `"{phang} You cannot use both {bf:file()} option and {bf:folder()} option at the same time. {p_end}"'
+        exit
+    }
+    * At least either "file" or "folder" needs to be used
+    else if missing("`file'") & missing("`folder'") {
+        noi di as error `"{phang} You need to either use {bf:file()} option to detect bad practices in the specified .do file or use {bf:folder()} option to detect bad practices in all .do files in the specified folder. {p_end}"'
+        exit
+    }
+    * The case where one .do file is checked
+    else if !missing("`file'") {
+        python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+    }
+    * The case where all .do files in a folder are checked
+    else if !missing("`folder'") {
+        preserve
+        local files: dir "`folder'" files "*.do"
+        foreach l of local files {
+            di ""
+            di "`l' **************************************"
+            di ""
+
+            python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        }
+        restore
+    }
+
 
 end
-
 
 /* *********** END program stata_linter_detect ***************************************** */
 

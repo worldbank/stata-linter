@@ -11,7 +11,7 @@ program def stata_linter_correct
         exit
     }
 
-    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace inprep Tab_space(string)]
+    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace INPRep Tab_space(string)]
 
     * unless inprep is used, return error if input file and output file have the same name
     if missing("`inprep'") & ("`input'" == "`output'") {

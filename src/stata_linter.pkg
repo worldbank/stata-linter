@@ -1,0 +1,11 @@
+v 1.0
+d stata-linter. DIME Analytics stata-linter public beta
+d DIME Analytics, World Bank Group, Development Economics Research
+f stata_linter_correct.ado
+f stata_linter_correct.py
+f stata_linter_correct.sthlp
+f stata_linter_detect.ado
+f stata_linter_detect.py
+f stata_linter_detect.sthlp
+e
+

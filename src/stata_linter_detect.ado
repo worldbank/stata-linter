@@ -49,19 +49,12 @@ program stata_linter_detect
 		if !missing("`summary'") local summary_flag "1"
 
     * call the python function
+    findfile stata_linter_detect.ado
+    local ado_path = r(fn)
+    python: import sys, os
+    python: sys.path.append(os.path.dirname("`ado_path'"))
+    python: from stata_linter_detect import stata_linter_detect_py
     python: stata_linter_detect_py("`input'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
-
-end
-
-version 16
-python:
-
-# Import packages ====================
-import os
-import re
-import sys
-import pandas as pd
-from stata_linter_detect import stata_linter_detect_py
 
 end
 

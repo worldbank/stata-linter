@@ -8,7 +8,7 @@
   * Set the global to folder where test files are stored
   global test_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/test"
   
-  * to run the command, you need to change your current directory to src_dir
+  * To run the command, you need to change your current directory to src_dir
   cd "${src_dir}"
 
   * -------------------- *

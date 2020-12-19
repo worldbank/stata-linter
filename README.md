@@ -10,7 +10,7 @@ If you think something is different in version in this repo, and the version ins
 
 When we are publishing new versions of **ietoolkit** then there could be a discrepancy between the master branch and the version on SSC as the master branch is updates a couple of days before. You can confirm if that could be the case by checking if we recently published a new [release](https://github.com/worldbank/ietoolkit/releases). -->
 
-#### Installing unpublished branches of this repository
+<!---#### Installing unpublished branches of this repository--->
 <!---Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. ---> The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. <!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
 
 ```
@@ -181,7 +181,7 @@ If you wish to make a contribution by making *forks and pull requests* but are n
 ---->
 
 ### **License**
-**ietoolkit** is developed under MIT license. See http://adampritchard.mit-license.org/ or see [the `LICENSE` file](https://github.com/worldbank/ietoolkit/blob/master/LICENSE) for details.
+**stata_linter** is developed under MIT license. See http://adampritchard.mit-license.org/ or see [the `LICENSE` file](https://github.com/worldbank/ietoolkit/blob/master/LICENSE) for details.
 
 ### **Main Contact**
 Luiza Cardoso de Andrade ([dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org))

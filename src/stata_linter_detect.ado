@@ -6,7 +6,7 @@ cap prog drop stata_linter_detect
 program stata_linter_detect 
     version 16
 
-    syntax, [FIle(string) FOlder(string) INDent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
+    syntax, [FIle(string) FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
 
     * Check if python is installed
     cap python search
@@ -36,17 +36,17 @@ program stata_linter_detect
     * set excel = "" if excel is missing
     if missing("`excel'") local excel ""
 
-		* set a constant for the nocheck option being used
-		local nocheck_flag "0"
-		if !missing("`nocheck'") local nocheck_flag "1"
+    * set a constant for the nocheck option being used
+    local nocheck_flag "0"
+    if !missing("`nocheck'") local nocheck_flag "1"
 
-		* set a constant for the suppress option being used
-		local suppress_flag "0"
-		if !missing("`suppress'") local suppress_flag "1"
+    * set a constant for the suppress option being used
+    local suppress_flag "0"
+    if !missing("`suppress'") local suppress_flag "1"
 
-		* set a constant for the summary option being used
-		local summary_flag "0"
-		if !missing("`summary'") local summary_flag "1"
+    * set a constant for the summary option being used
+    local summary_flag "0"
+    if !missing("`summary'") local summary_flag "1"
 
     * call the python function
     qui: findfile stata_linter_detect.ado

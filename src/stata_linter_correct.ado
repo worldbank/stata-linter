@@ -11,12 +11,12 @@ program def stata_linter_correct
         exit
     }
 
-    syntax, INPUT(string) Output(string) [INDent(string) Automatic Replace INPRep Tab_space(string)]
+    syntax, INPUt(string) Output(string) [INDent(string) Automatic Replace INPRep Tab_space(string)]
 
     * unless inprep is used, return error if input file and output file have the same name
     if missing("`inprep'") & ("`input'" == "`output'") {
-			noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep .{p_end}"'
-			exit
+        noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep .{p_end}"'
+        exit
     }
 
     * set indent size = 4 if indent is missing
@@ -80,8 +80,8 @@ program def stata_linter_correct
         else local createfile "Y"
 
         * If manual was used and input was N, file is not corrected for this issue
-        *if 	("`createfile'" == "N") noi di as result "{pstd} File not corrected for this issue. {p_end}"
-        if 	("`createfile'" == "N") noi di as result ""
+        *if ("`createfile'" == "N") noi di as result "{pstd} File not corrected for this issue. {p_end}"
+        if ("`createfile'" == "N") noi di as result ""
 
         *If "manual" were used and input was Y or if manual was not used, create the file
         else if ("`createfile'" == "Y") {

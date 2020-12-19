@@ -4,17 +4,17 @@
 ### **Install and Update**
 
 <!-- #### Installing published versions of `ietoolkit`
-To install **ietoolkit**, type **`ssc install ietoolkit`** in Stata. This will install the latest published version of **ietoolkit**. The main version of the code in the repo (the `master` branch) is what is published on SSC as well. -->
+To install **ietoolkit**, type **`ssc install ietoolkit`** in Stata. This will install the latest published version of **ietoolkit**. The main version of the code in the repo (the `master` branch) is what is published on SSC as well. 
 
-<!-- If you think something is different in version in this repo, and the version installed on your computer, make sure that you both look at the `master` branch in this repo, and that you have the most recent version of **ietoolkit** installed. To update all files associated with **ietoolkit** type **`adoupdate ietoolkit, update`** in Stata. (It is wise to be in the habit of regularly checking if any of your .ado files installed in Stata need updates by typing **`adoupdate`**.) -->
+If you think something is different in version in this repo, and the version installed on your computer, make sure that you both look at the `master` branch in this repo, and that you have the most recent version of **ietoolkit** installed. To update all files associated with **ietoolkit** type **`adoupdate ietoolkit, update`** in Stata. (It is wise to be in the habit of regularly checking if any of your .ado files installed in Stata need updates by typing **`adoupdate`**.)
 
-<!-- When we are publishing new versions of **ietoolkit** then there could be a discrepancy between the master branch and the version on SSC as the master branch is updates a couple of days before. You can confirm if that could be the case by checking if we recently published a new [release](https://github.com/worldbank/ietoolkit/releases). -->
+When we are publishing new versions of **ietoolkit** then there could be a discrepancy between the master branch and the version on SSC as the master branch is updates a couple of days before. You can confirm if that could be the case by checking if we recently published a new [release](https://github.com/worldbank/ietoolkit/releases). -->
 
 #### Installing unpublished branches of this repository
-Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.
+<!---Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. ---> The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. <!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
 
 ```
-    net install ietoolkit , from("https://raw.githubusercontent.com/worldbank/ietoolkit/master/src") replace
+    net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master/src") replace
 ```
 
 #### Requirements
@@ -23,30 +23,47 @@ For setting up Stata to use Python, refer to [this web page](https://blog.stata.
 Also, for `stata_linter_detect` command, a Python package `pandas` needs to be installed.
 For how to install Python packages, refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/).
 
-
 ### **Background**
-These commands are developed by people that work at or with the Development Impact Evaluations (DIME) unit at the World Bank. While the commands are developed with best practices for impact evaluations in mind, these commands can be useful outside that field as well.
+These commands are developed by people that work at or with the Development Impact Evaluations (DIME) department at the World Bank. 
 
+<!---
 ### **Bug Reports and Feature Requests**
 If you are familiar with GitHub go to the **Contributions** section below for advanced instructions.
 
 An easy but still very efficient way to provide any feedback on these commands is to create an *issue* in GitHub. You can read *issues* submitted by other users or create a new *issue* in the top menu below [**worldbank**/**ietoolkit**](https://github.com/worldbank/ietoolkit) at [https://github.com/worldbank/ietoolkit](https://github.com/worldbank/ietoolkit). While the word *issue* has a negative connotation outside GitHub, it can be used for any kind of feedback. If you have an idea for a new command, or a new feature on an existing command, creating an *issue* is a great tool for suggesting that. Please read already existing *issues* to check whether someone else has made the same suggestion or reported the same error before creating a new *issue*.
 
 While we have a slight preference for receiving feedback here on GitHub, you are still very welcome to send a regular email with your feedback to [dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org).
+--->
 
 ### **Content**
-**ietoolkit** provides a set of commands that address different aspects of data management and data analysis in relation to Impact Evaluations. The list of commands will be extended continuously, and suggestions for new commands are greatly appreciated. Some of the commands are related to standardized best practices developed at DIME (The World Bank’s unit for Impact Evaluations). For these commands, the corresponding help files provide justifications for the standardized best practices applied.
+**stata_linter** provides a set of commands that attempt to improve readability of Stata do files.
+The list of commands will be extended continuously, and suggestions for new commands are greatly appreciated. 
+The commands are written based on good coding practices according to the standards at DIME (The World Bank’s unit for Impact Evaluations).
+For these commands, the corresponding help files provide justifications for the standardized best practices applied.
 
- - **ietoolkit** returns meta info on the version of _ietoolkit_ installed. Can be used to ensure that the team uses the same version.
- - **iebaltab** is a tool for multiple treatment arm balance tables
- - **ieddtab** is a tool for difference-in-difference regression tables
- - **ieboilstart** standardizes the boilerplate code at the top of all do-files
- - **iefolder** sets up project folders and master do-files according to DIME's recommended folder structure
- - **iegitaddmd** adds placeholder README.md files to all empty subfolders allowing them to be synced on GitHub
- - **iematch** is an algorithm for matching observations in one group to the "most similar" observations in another group
- - **iegraph** produces graphs of estimation results in common impact evaluation regression models
- - **iedropone** drops observations and controls that the correct number was dropped
- - **ieboilsave** performs checks before saving a data set
+ - **stata_linter_detect** detects bad coding practices in one or multiple Stata do files and returns the results.
+ - **stata_linter_correct** corrects bad coding practies in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+
+### **Examples**
+
+```
+  stata_linter_detect, file("test/bad.do") 
+```
+
+```
+Style =====================
+(line 14) style: Use 4 white spaces instead of tabs. (This may apply to other lines as well.)
+(line 15) style: Avoid to use "delimit". For line breaks, use "///" instead.
+(line 17) style: This line is too long (82 characters). Use "///" for line breaks so that one line has at most 80 characters.
+(line 25) style: After declaring for loop statement or if-else statement, add indentation (4 whitespaces).
+(line 25) style: Use "!missing(var)" instead of "var < ." or "var != .".
+...
+Check =====================
+(line 25) check: Are you taking missing values into account properly? (Remember that "a != 0" includes cases where a is missing.)
+(line 25) style: Are you using tilde (~) for negation? If so, for negation, use bang (!) instead of tilde (~).
+...
+
+```
 
 <!----
 ### **Contributions**

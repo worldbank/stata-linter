@@ -325,7 +325,7 @@ def backslash_in_path(
                 print_output
                 )
 
-        check_dictionary["check_missing"] += 1
+        check_dictionary["backslash_in_path"] += 1
         excel_output_list.append([line_index + 1, "check", print_output])
     return([check_dictionary, excel_output_list])
 
@@ -349,7 +349,7 @@ def bang_not_tilde(
                 print_output
                 )
 
-        check_dictionary["check_missing"] += 1
+        check_dictionary["bang_not_tilde"] += 1
         excel_output_list.append([line_index + 1, "check", print_output])
     return([check_dictionary, excel_output_list])
 

@@ -11,62 +11,62 @@
 
 * All hard tabs are replaced with soft tabs (= whitespaces)
 
-  * delimit is corrected and three forward slashes will be used instead
+    * delimit is corrected and three forward slashes will be used instead
 
-  foreach something in something something something something something something /// 
-      something something {  // some comment
-      do something  
-  }  
+    foreach something in something something something something something something /// 
+        something something {  // some comment
+        do something  
+    }  
 
-  * Add indentation in brackets
-  if something ~= 1 & something != . {
-      do something
-      if another == 1 {
-          do that
-      } 
-  }
+    * Add indentation in brackets
+    if something ~= 1 & something != . {
+        do something
+        if another == 1 {
+            do that
+        } 
+    }
   
-  foreach ii in potato potato cassava maize potato ///
-      cassava maize potato cassava maize potato cassava maize potato ///
-      cassava maize potato cassava maize potato cassava maize potato cassava ///
-      maize {
-      if something ~= 1 & something != . {
-          do something // some very very very very very very very very very very very very very very very very very very very very very very long comment
-      } 
-  }
+    foreach ii in potato potato cassava maize potato ///
+        cassava maize potato cassava maize potato cassava maize ///
+        potato cassava maize potato cassava maize potato cassava maize ///
+        potato cassava maize {
+        if something ~= 1 & something != . {
+            do something // some very very very very very very very very very very very very very very very very very very very very very very long comment
+        } 
+    }
 
-  * Split a long line into multiple lines
-  * (for now, too long comments are not corrected)
-  foreach ii in potato potato cassava maize potato cassava maize potato ///
-      cassava maize potato cassava maize potato cassava maize potato cassava ///
-      maize potato cassava maize potato cassava maize {
-      if something ~= 1 & something != . {
-          do something // some very very very very very very very very very very very very very very very very very very very very very very long comment
-      } 
-  }
+    * Split a long line into multiple lines
+    * (for now, too long comments are not corrected)
+    foreach ii in potato potato cassava maize potato cassava maize ///
+        potato cassava maize potato cassava maize potato cassava maize potato ///
+        cassava maize potato cassava maize potato cassava maize {
+        if something ~= 1 & something != . {
+            do something // some very very very very very very very very very very very very very very very very very very very very very very long comment
+        } 
+    }
 
-  * Add a whitespace before an opening curly bracket " {"
-  if something ~= 1 & something != . {
-      do something
-  } 
+    * Add a whitespace before an opening curly bracket " {"
+    if something ~= 1 & something != . {
+        do something
+    } 
 
-  * Remove blank lines before a closing bracket "}"
-  if something ~= 1 & something != . {
+    * Remove blank lines before a closing bracket "}"
+    if something ~= 1 & something != . {
 
-      do something
-  } 
+        do something
+    } 
 
-  * Remove duplicated blank lines
-  if something ~= 1 & something != . { /* some comment */
+    * Remove duplicated blank lines
+    if something ~= 1 & something != . { /* some comment */
 
-      do something
-  } 
-  * Remove duplicated blank lines
-  if something ~= 1 & something != . {
+        do something
+    } 
+    * Remove duplicated blank lines
+    if something ~= 1 & something != . {
 
-      do something
-  } 
-  local a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        do something
+    } 
+    local a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 	/*
 

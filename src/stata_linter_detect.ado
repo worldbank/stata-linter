@@ -49,7 +49,7 @@ program stata_linter_detect
     if !missing("`summary'") local summary_flag "1"
 
     * call the python function
-    qui: findfile stata_linter_detect.ado
+    qui: findfile stata_linter_detect.py
     local ado_path = r(fn)
     python: import sys, os
     python: sys.path.append(os.path.dirname("`ado_path'"))

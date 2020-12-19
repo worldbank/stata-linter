@@ -30,7 +30,7 @@ program def stata_linter_correct
     else copy "`input'" "`output'"
 
     * import python functions
-    qui: findfile stata_linter_correct.ado
+    qui: findfile stata_linter_correct.py
     local ado_path = r(fn)
     python: import sys, os
     python: sys.path.append(os.path.dirname("`ado_path'"))

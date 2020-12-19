@@ -20,7 +20,7 @@ When we are publishing new versions of **ietoolkit** then there could be a discr
 #### Requirements
 Stata version 16 or later and Python installation are required for this package of commands.
 For setting up Stata to use Python, refer to [this web page](https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/).
-Also, for `stata_linter_detect` command, a Python package `pandas` needs to be installed.
+Also, for `stata_linter_detect` command in the package, a Python package `pandas` needs to be installed.
 For how to install Python packages, refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/).
 
 ### **Background**
@@ -45,6 +45,8 @@ For these commands, the corresponding help files provide justifications for the 
  - **stata_linter_correct** corrects bad coding practies in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
 
 ### **Examples**
+
+#### `stata_linter_detect`
 
 ```
   stata_linter_detect, file("test/bad.do") 

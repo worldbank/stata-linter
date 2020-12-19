@@ -67,6 +67,32 @@ Check =====================
 
 ```
 
+```
+  stata_linter_detect, file("test/bad.do") suppress summary
+```
+
+```
+Summary (number of lines where bad practices are detected) =======================
+
+[Style]
+Hard tabs instead of soft tabs (whitespaces) used: Yes
+Abstract index used in for-loop: 2
+Not proper indentation in for-loop for if-else statement: 6
+Not proper indentation in newline: 1
+No whitespaces around math symbols: 0
+Condition incomplete: 7
+Not explicit if statement: 0
+Delimit used: 1
+cd used: 0
+Line too long: 6
+Parentheses not used for global macro: 0
+
+[Check]
+Missing values properly treated?: 14
+Backslash used in file path?: 0
+Bang (!) used instead of tilde (~) for negation?: 0
+```
+
 <!----
 ### **Contributions**
 If you are not familiar with GitHub see the **Bug reports and feature requests** section above for a less technical but still very helpful way to contribute to **ietoolkit**.

@@ -60,9 +60,11 @@ Style =====================
 (line 25) style: After declaring for loop statement or if-else statement, add indentation (4 whitespaces).
 (line 25) style: Use "!missing(var)" instead of "var < ." or "var != .".
 ...
+...
 Check =====================
 (line 25) check: Are you taking missing values into account properly? (Remember that "a != 0" includes cases where a is missing.)
 (line 25) style: Are you using tilde (~) for negation? If so, for negation, use bang (!) instead of tilde (~).
+...
 ...
 
 ```
@@ -88,10 +90,80 @@ Line too long: 6
 Parentheses not used for global macro: 0
 
 [Check]
-Missing values properly treated?: 14
+Missing values properly treated?: 7
 Backslash used in file path?: 0
-Bang (!) used instead of tilde (~) for negation?: 0
+Bang (!) used instead of tilde (~) for negation?: 7
 ```
+
+```
+  stata_linter_detect, file("test/bad.do") excel("test/detect_output.xlsx")
+```
+
+```
+  stata_linter_detect, folder("test") excel("test/detect_output.xlsx")
+```
+
+#### `stata_linter_correct`
+
+**Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+
+```
+  stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace
+```
+
+```
+  stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace automatic
+```
+
+As a results of this command, for example,
+
+```
+	#delimit ;
+
+	foreach something in something something something something something something
+		something something{ ; // some comment
+		do something ;
+	} ;
+
+	#delimit cr
+
+```
+
+becomes
+
+```
+    foreach something in something something something something something something /// 
+        something something {  // some comment
+        do something  
+    }  
+```
+
+and
+
+```
+	if something ~= 1 & something != . {
+	do something
+	if another == 1 {
+	do that
+	} 
+	}
+
+```
+
+becomes
+
+```
+    if something ~= 1 & something != . {
+        do something
+        if another == 1 {
+            do that
+        } 
+    }
+```
+
+### Workflow example
+
+
 
 <!----
 ### **Contributions**

@@ -1,0 +1,3 @@
+v 1
+d DIME Analytics, World Bank Group, Development Economics Research
+p stata_linter DIME Analytics

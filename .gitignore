@@ -44,6 +44,8 @@
 !/**/*.do
 !/**/*.ado
 !/**/*.sthlp
+!/**/*.pkg
+!/**/stata.toc
 
 # R
 !/**/*.R
@@ -67,6 +69,7 @@
 
 # Julia
 !/**/*.jl
+
 
 #######################
 # Include some additional file formats in any output folder. You might have

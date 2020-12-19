@@ -11,7 +11,9 @@ If you think something is different in version in this repo, and the version ins
 When we are publishing new versions of **ietoolkit** then there could be a discrepancy between the master branch and the version on SSC as the master branch is updates a couple of days before. You can confirm if that could be the case by checking if we recently published a new [release](https://github.com/worldbank/ietoolkit/releases). -->
 
 <!---#### Installing unpublished branches of this repository--->
-<!---Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. ---> The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. <!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
+<!---Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. ---> 
+The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. 
+<!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
 
 ```
     net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master/src") replace
@@ -39,10 +41,11 @@ While we have a slight preference for receiving feedback here on GitHub, you are
 **stata_linter** provides a set of commands that attempt to improve readability of Stata do files.
 The list of commands will be extended continuously, and suggestions for new commands are greatly appreciated. 
 The commands are written based on good coding practices according to the standards at DIME (The World Bank’s unit for Impact Evaluations).
-For these commands, the corresponding help files provide justifications for the standardized best practices applied.
+For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
+For the commands in this package, the corresponding help files provide justifications for the standardized best practices applied.
 
  - **stata_linter_detect** detects bad coding practices in one or multiple Stata do files and returns the results.
- - **stata_linter_correct** corrects bad coding practies in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+ - **stata_linter_correct** corrects bad coding practices in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
 
 ### **Examples**
 

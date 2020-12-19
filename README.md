@@ -12,7 +12,8 @@ When we are publishing new versions of **ietoolkit** then there could be a discr
 
 <!---#### Installing unpublished branches of this repository--->
 <!---Follow the instructions above if you want the most recent published version of **ietoolkit**. If you want a yet to be published version of **ietoolkit** then you can use the code below. ---> 
-The code below installs the version currently in the `master` branch, but replace _master_ in the URL below with the name of the branch you want to install from. 
+The code below installs the version currently in the `master` branch.
+If you want to install unpublished branches, replace _master_ in the URL below with the name of the branch you want to install from. 
 <!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
 
 ```

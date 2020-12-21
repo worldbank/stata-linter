@@ -45,8 +45,8 @@ The commands are written based on good coding practices according to the standar
 For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
 For the commands in this package, the corresponding help files provide justifications for the standardized best practices applied.
 
- - **stata_linter_detect** detects bad coding practices in one or multiple Stata do files and returns the results.
- - **stata_linter_correct** corrects bad coding practices in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+- **stata_linter_detect** detects bad coding practices in one or multiple Stata do files and returns the results.
+- **stata_linter_correct** corrects bad coding practices in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
 
 ### **Examples**
 
@@ -78,6 +78,10 @@ Check =====================
 ...
 
 ```
+
+You see that there are two kinds of outputs:
+`Style` chunk shows the lines that likely contain bad coding practices, and `Check` chunk shows the lines that potentially contain bad coding practices and worth checking. 
+If you only want to see `Style` outputs, use `nocheck` option.
 
 Using options `suppress` and `summary`, the command returns the summary results:
 

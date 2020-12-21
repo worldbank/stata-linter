@@ -194,7 +194,12 @@ becomes
 
 ### Workflow example
 
-
+To minimize the risk of crashing a `.do` file, `stata_linter_correct` works based on fewer rules than `stata_linter_detect`.
+That is, `stata_linter_detect` can detect more bad coding practices that `stata_linter_correct` does.
+Therefore, after writing codes in a `.do` file, you can first use `stata_linter_detect` to check how many bad coding practices are contained in the `.do` file.
+Afterwards, if there are not many bad practices, you can go through the lines flagged by `stata_linter_detect` and manually correct them, in which way you can avoid the potential crash by `stata_linter_correct` command.
+If there are many bad practices detected, then you can use `stata_linter_correct` to correct some of the flagged lines, and then you can use `stata_linter_detect` again and correct the remaining bad practices manually.
+After this process, do not forget to check if the results are not changed by `stata_linter_correct`.
 
 <!----
 ### **Contributions**

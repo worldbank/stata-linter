@@ -1,4 +1,4 @@
-**stata_linter - Stata Commands for linter do files**
+**stata_linter - Stata Commands for do file linter**
 =====
 
 ### **Install and Update**
@@ -52,9 +52,15 @@ For the commands in this package, the corresponding help files provide justifica
 
 #### `stata_linter_detect`
 
+This function detects bad coding practices in one or multiple `.do` files and notifies which lines should be modified for better code readability.
+A required option is `file()` for one `.do` file or `folder()` for all `.do` files in a folder, but not both.
+A basic command is
+
 ```
   stata_linter_detect, file("test/bad.do") 
 ```
+
+and on Stata console you will get the results of which bad coding practices are found in which lines:
 
 ```
 Style =====================
@@ -72,6 +78,8 @@ Check =====================
 ...
 
 ```
+
+Using options `suppress` and `summary`, the command returns the summary results:
 
 ```
   stata_linter_detect, file("test/bad.do") suppress summary
@@ -99,9 +107,14 @@ Backslash used in file path?: 0
 Bang (!) used instead of tilde (~) for negation?: 7
 ```
 
+The results can be stored in an excel file with an option `excel()`:
+
 ```
   stata_linter_detect, file("test/bad.do") excel("test/detect_output.xlsx")
 ```
+
+If an option `folder()`, not `file()`, is used, the command is applied to all `.do` files in a folder.
+The following command checks bad coding practices in all `.do` files in a folder and store the results in an excel file:
 
 ```
   stata_linter_detect, folder("test") excel("test/detect_output.xlsx")

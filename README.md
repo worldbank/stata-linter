@@ -124,9 +124,19 @@ The following command checks bad coding practices in all `.do` files in a folder
 
 **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
 
+This command corrects bad coding practices in a `.do` file.
+Required options are `input()` and `output()`:
+the file path to a `.do` file that you want to correct is passed to `input()` and `output()` will be the file name of the corrected `.do` file.
+**It is strongly recommended that the output file name should be different from the input file name as the original `.do` file should be kept as a backup.**
+
+There are several rules used in the command: indentations are added in curly brackets, a long line is split into multiple lines, etc.
+The following command asks you which rule you would like to apply to your `.do` file:
+
 ```
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace
 ```
+
+If you would like to apply all rules, you can use an option `automatic`:
 
 ```
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace automatic

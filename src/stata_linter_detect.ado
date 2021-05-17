@@ -51,14 +51,14 @@ program stata_linter_detect
     * call the python function
     qui: findfile stata_linter_detect.py
     if c(os) == "Windows" {
-        local ado_path = subinstr(r(fn), "/", "\", .) 
+        local ado_path = subinstr(r(fn), "\", "/", .) 
     }
     else {
         local ado_path = r(fn)
     }
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
-    python: from stata_linter_detect import stata_linter_detect_py
+    python: from stata_linter_detect import *
 
     * Only one of "file" and "folder" can be non-missing
     if !missing("`file'") & !missing("`folder'") {

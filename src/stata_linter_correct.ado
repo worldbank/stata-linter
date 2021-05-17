@@ -32,14 +32,14 @@ program def stata_linter_correct
     * import python functions
     qui: findfile stata_linter_correct.py
     if c(os) == "Windows" {
-        local ado_path = subinstr(r(fn), "/", "\", .) 
+        local ado_path = subinstr(r(fn), "\", "/", .) 
     }
     else {
         local ado_path = r(fn)
     }
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
-    python: from stata_linter_correct import stata_linter_correct_py
+    python: from stata_linter_correct import *
 
     * correct the output file, looping for each python command
     foreach fun in "delimit_to_three_forward_slashes" "tab_to_space" "indent_in_bracket" ///

@@ -39,7 +39,7 @@ program def stata_linter_correct
     }
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
-    python: from stata_linter_correct import *
+    python: from stata_linter_correct import stata_linter_correct_py
 
     * correct the output file, looping for each python command
     foreach fun in "delimit_to_three_forward_slashes" "tab_to_space" "indent_in_bracket" ///

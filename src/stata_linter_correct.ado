@@ -31,7 +31,12 @@ program def stata_linter_correct
 
     * import python functions
     qui: findfile stata_linter_correct.py
-    local ado_path = r(fn)
+    if c(os) == "Windows" {
+        local ado_path = subinstr(r(fn), "/", "\", .) 
+    }
+    else {
+        local ado_path = r(fn)
+    }
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_correct import *

@@ -33,7 +33,7 @@ program def stata_linter_correct
     qui: findfile stata_linter_correct.py
     local ado_path = r(fn)
     python: import sys, os
-    python: sys.path.append(os.path.dirname("`ado_path'"))
+    python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_correct import *
 
     * correct the output file, looping for each python command

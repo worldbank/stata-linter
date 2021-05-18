@@ -96,7 +96,7 @@ program def stata_linter_correct
         }
     }
 
-    cap confirm file `output'
+    cap confirm file "`output'"
     if !_rc {
         display "Created `output'."
     }

@@ -4,8 +4,9 @@
   * --------------- *
 
   * Set the global to folder where test files are stored
-  global test_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/test"
-
+  global project 	"D:/Documents/RA Jobs/DIME/analytics/linter/fork/stata-linter"
+  global test_dir 	"${project}/test"
+  
   * -------------------- *
   * Run example commands *
   * -------------------- *

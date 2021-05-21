@@ -2,11 +2,11 @@
 /* program stata_linter_detect : Linter do file: detect bad coding practices */
 /*****************************************************************************/
 
-cap prog drop stata_linter_detect
-program stata_linter_detect 
+cap prog drop lint
+program define lint 
     version 16
 
-    syntax, [FIle(string) FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
+    syntax using, [FIle(string) FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
 
     * Check if python is installed
     cap python search

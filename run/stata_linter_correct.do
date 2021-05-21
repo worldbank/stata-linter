@@ -4,8 +4,9 @@
   * --------------- *
 
   * Set the global to folder where test files are stored
-  global test_dir "/Users/mizuhirosuzuki/Documents/GitHub/stata-linter/test"
-
+  global project 	"D:/Documents/RA Jobs/DIME/analytics/linter/fork/stata-linter"
+  global test_dir 	"${project}/test"
+  
   * -------------------- *
   * Run example commands *
   * -------------------- *
@@ -27,6 +28,6 @@
   * Command only with optional option "tab_space", which specifies how many whitespaces are used for
   * hard tabs (default = same as "indent")
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") automatic replace tab_space(2)
-
+    
 
 

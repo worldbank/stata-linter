@@ -134,7 +134,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                 # do the followings
                 if len(line_rstrip) > 0:
                     # check if the line starts with commands that potentially have curly brackets
-                    if re.search(r"^(foreach |while |forv|if |else |cap)", line.lstrip()) != None:
+                    if re.search(r"^(qui[a-z]*\s+)?(foreach |while |forv|if |else |cap)", line.lstrip()) != None:
                         # if the line ends with an open curly bracket,
                         # then tag it (here the depth of the nests are stored as well)
                         if line_rstrip[-1] == "{":

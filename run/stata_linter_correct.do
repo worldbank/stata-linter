@@ -28,6 +28,6 @@
   * Command only with optional option "tab_space", which specifies how many whitespaces are used for
   * hard tabs (default = same as "indent")
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") automatic replace tab_space(2)
-
+    
 
 

@@ -1,6 +1,5 @@
-/********************************************************************************/
-/* program stata_linter_correct : Linter ado file: correct bad coding practices */
-/********************************************************************************/
+*! version 0.0.2  21may2021  DIME Analytics dimeanalytics@worldbank.org
+
 cap prog drop stata_linter_correct
 program def stata_linter_correct
 

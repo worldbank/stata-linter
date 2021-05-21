@@ -1,9 +1,8 @@
-/*****************************************************************************/
-/* program stata_linter_detect : Linter do file: detect bad coding practices */
-/*****************************************************************************/
+*! version 0.0.2  21may2021  DIME Analytics dimeanalytics@worldbank.org
 
 cap prog drop stata_linter_detect
-program stata_linter_detect 
+program stata_linter_detect
+
     version 16
 
     syntax, [FIle(string) FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]

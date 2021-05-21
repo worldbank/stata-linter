@@ -1,3 +1,4 @@
+# version 0.0.2  21may2021  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re

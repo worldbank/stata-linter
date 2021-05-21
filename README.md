@@ -17,7 +17,7 @@ If you want to install unpublished branches, replace _master_ in the URL below w
 <!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
 
 ```stata
-net install stata_linter, from("https://raw.githubusercontent.com/RRMaximiliano/stata-linter/master") replace
+net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
 ```
 
 #### Requirements

@@ -37,7 +37,7 @@ This function detects bad coding practices in one or multiple do-files and notif
 The basic usage is:
 
 ```stata
-  stata_linter_detect, file("test/bad.do") 
+stata_linter_detect, file("test/bad.do") 
 ```
 
 and on your Stata console you will get the results of which bad coding practices are found and in which lines:
@@ -67,7 +67,7 @@ You see that there are two kinds of outputs:
 Using options `suppress` and `summary`, the command returns a summary of the results:
 
 ```stata
-  stata_linter_detect, file("test/bad.do") suppress summary
+stata_linter_detect, file("test/bad.do") suppress summary
 ```
 
 ```stata
@@ -95,7 +95,7 @@ Bang (!) used instead of tilde (~) for negation?: 7
 The results can be stored in an excel file with an option `excel()`:
 
 ```stata
-  stata_linter_detect, file("test/bad.do") excel("test/detect_output.xlsx")
+stata_linter_detect, file("test/bad.do") excel("test/detect_output.xlsx")
 ```
 ### stata_linter_correct
 
@@ -109,13 +109,13 @@ The required options are `input()` and `output()`. The file path to a do-file th
 The basic usage of the command is as follows, and Stata will ask you which practices you would like to correct:
 
 ```stata
-  stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace
+stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace
 ```
 
 If you would like to apply all rules, you can use an option `automatic`:
 
 ```stata
-  stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace automatic
+stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace automatic
 ```
 
 As a result of this command, for example,

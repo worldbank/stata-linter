@@ -2,49 +2,47 @@
 
 ## Installation
 
-The code below installs the version currently in the `master` branch.
-If you want to install unpublished branches, replace _master_ in the URL below with the name of the branch you want to install from.
-<!---You can also install older version of **ietoolkit** like this but it will only go back to January 2019 when we set up this method of installing the package.--->
+Run the code beloew to install the current version in the `master` branch. If you want to install unpublished branches, replace _master_ in the URL below with the name of the branch you want to install from.
 
 ```stata
 net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
 ```
 
-### Requirements
-Stata version 16 or later and Python installation are required for this package of commands.
+## Requirements
+
+1. Stata version 16 or higher.
+2. Python 3 or higher
+
 For setting up Stata to use Python, refer to [this web page](https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/).
 Also, for `stata_linter_detect` command in the package, a Python package `pandas` needs to be installed.
-For how to install Python packages, refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/).
+For how to install Python packages, refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/). Refer to the wiki of this repo to more information about the requirements.
 
-### Content
+## Content
 
-**stata_linter** provides a set of commands that attempt to improve readability of Stata do files.
-The list of commands will be extended continuously, and suggestions for new commands are greatly appreciated.
-
-The commands are written based on good coding practices according to the standards at DIME (The World Bank’s unit for Impact Evaluations).
+`stata_linter` provides a set of commands that attempt to improve readability of Stata do files. The commands are written based on good coding practices according to the standards at DIME (The World Bank’s unit for Impact Evaluations).
 
 For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
 
-For the commands in this package, the corresponding help files provide justifications for the standardized best practices applied.
+This package contains two commands:
 
-- **stata_linter_detect** detects bad coding practices in one or multiple Stata do files and returns the results.
-- **stata_linter_correct** corrects bad coding practices in a Stata do file. **Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+1. **stata_linter_detect** which detects bad coding practices in one or multiple Stata do files and returns the results.
+2. **stata_linter_correct** which corrects bad coding practices in a Stata do file. Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.
 
-### Examples
+## Examples
 
-#### `stata_linter_detect`
+### stata_linter_detect
 
-This function detects bad coding practices in one or multiple `.do` files and notifies which lines should be modified for better code readability. A required option is `file()` for one `.do` file or `folder()` for all `.do` files in a folder, but not both.
+This function detects bad coding practices in one or multiple do-files and notifies which lines should be modified for better code readability. A required option is `file()` for one do-file or `folder()` for all do-files in a folder, but not both.
 
-A basic command is
+The basic usage is:
 
-```
+```stata
   stata_linter_detect, file("test/bad.do") 
 ```
 
-and on Stata console you will get the results of which bad coding practices are found in which lines:
+and on your Stata console you will get the results of which bad coding practices are found and in which lines:
 
-```
+```stata
 Style =====================
 (line 14) style: Use 4 white spaces instead of tabs. (This may apply to other lines as well.)
 (line 15) style: Avoid to use "delimit". For line breaks, use "///" instead.
@@ -62,16 +60,17 @@ Check =====================
 ```
 
 You see that there are two kinds of outputs:
-`Style` chunk shows the lines that likely contain bad coding practices, and `Check` chunk shows the lines that potentially contain bad coding practices and worth checking. 
-If you only want to see `Style` outputs, use `nocheck` option.
 
-Using options `suppress` and `summary`, the command returns the summary results:
+1. `Style` chunk that shows the lines that likely contain bad coding practices, and;
+2. `Check` chunk that shows the lines that potentially contain bad coding practices and are worth checking.
 
-```
+Using options `suppress` and `summary`, the command returns a summary of the results:
+
+```stata
   stata_linter_detect, file("test/bad.do") suppress summary
 ```
 
-```
+```stata
 Summary (number of lines where bad practices are detected) =======================
 
 [Style]
@@ -95,105 +94,96 @@ Bang (!) used instead of tilde (~) for negation?: 7
 
 The results can be stored in an excel file with an option `excel()`:
 
-```
+```stata
   stata_linter_detect, file("test/bad.do") excel("test/detect_output.xlsx")
 ```
+### stata_linter_correct
 
-If an option `folder()`, not `file()`, is used, the command is applied to all `.do` files in a folder.
-The following command checks bad coding practices in all `.do` files in a folder and store the results in an excel file:
+> Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.
 
-```
-  stata_linter_detect, folder("test") excel("test/detect_output.xlsx")
-```
+This command corrects bad coding practices in a do-file.
+The required options are `input()` and `output()`. The file path to a do-file that you want to correct is passed to `input()` and `output()` will be the file name of the corrected do-file.
 
-#### `stata_linter_correct`
+> It is strongly recommended that the output file name should be different from the input file name as the original do-file should be kept as a backup.
 
-**Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.**
+The basic usage of the command is as follows, and Stata will ask you which practices you would like to correct:
 
-This command corrects bad coding practices in a `.do` file.
-Required options are `input()` and `output()`:
-the file path to a `.do` file that you want to correct is passed to `input()` and `output()` will be the file name of the corrected `.do` file.
-**It is strongly recommended that the output file name should be different from the input file name as the original `.do` file should be kept as a backup.**
-
-There are several rules used in the command: indentations are added in curly brackets, a long line is split into multiple lines, etc.
-The following command asks you which rule you would like to apply to your `.do` file:
-
-```
+```stata
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace
 ```
 
 If you would like to apply all rules, you can use an option `automatic`:
 
-```
+```stata
   stata_linter_correct, input("${test_dir}/bad.do") output("${test_dir}/bad_correct.do") replace automatic
 ```
 
-As a results of this command, for example,
+As a result of this command, for example,
 
-```
-	#delimit ;
+```stata
+#delimit ;
 
-	foreach something in something something something something something something
-		something something{ ; // some comment
-		do something ;
-	} ;
+foreach something in something something something something something something
+  something something{ ; // some comment
+  do something ;
+} ;
 
-	#delimit cr
+#delimit cr
 
 ```
 
 becomes
 
-```
-    foreach something in something something something something something something /// 
-        something something {  // some comment
-        do something  
-    }  
+```stata
+foreach something in something something something something something something /// 
+    something something {  // some comment
+    do something  
+}  
 ```
 
 and
 
-```
-	if something ~= 1 & something != . {
-	do something
-	if another == 1 {
-	do that
-	} 
-	}
-
+```stata
+if something ~= 1 & something != . {
+do something
+if another == 1 {
+do that
+} 
+}
 ```
 
 becomes
 
-```
-    if something ~= 1 & something != . {
-        do something
-        if another == 1 {
-            do that
-        } 
-    }
+```stata
+if something ~= 1 & something != . {
+    do something
+    if another == 1 {
+        do that
+    } 
+}
 ```
 
-### Workflow example
+## Workflow example
 
-To minimize the risk of crashing a `.do` file, `stata_linter_correct` works based on fewer rules than `stata_linter_detect`.
+To minimize the risk of crashing a do-file, `stata_linter_correct` works based on fewer rules than `stata_linter_detect`.
 That is, `stata_linter_detect` can detect more bad coding practices that `stata_linter_correct` does.
-Therefore, after writing codes in a `.do` file, you can first use `stata_linter_detect` to check how many bad coding practices are contained in the `.do` file.
+Therefore, after writing codes in a do-file, you can first use `stata_linter_detect` to check how many bad coding practices are contained in the .do-file.
+
 Afterwards, if there are not many bad practices, you can go through the lines flagged by `stata_linter_detect` and manually correct them, in which way you can avoid the potential crash by `stata_linter_correct` command.
 If there are many bad practices detected, then you can use `stata_linter_correct` to correct some of the flagged lines, and then you can use `stata_linter_detect` again and correct the remaining bad practices manually.
 After this process, do not forget to check if the results are not changed by `stata_linter_correct`.
 
-### License
+## License
 
 **stata_linter** is developed under MIT license. See http://adampritchard.mit-license.org/ or see [the `LICENSE` file](https://github.com/worldbank/ietoolkit/blob/master/LICENSE) for details.
 
-### Main Contact
+## Main Contact
 Luiza Cardoso de Andrade ([dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org))
 
-### **Authors**
-DIME Analytics, The World Bank
+## **Authors**
+DIME Analytics Team, The World Bank
 
-### About DIME Analytics
+## About DIME Analytics
 
 [DIME](https://www.worldbank.org/en/research/dime) is the World Bank's impact evaluation department. Part of DIME’s mission is to intensify the production of and access to public goods that improve the quantity and quality of global development research, while lowering the costs of doing IE for the entire research community. This Library is developed and maintained by [DIME Analytics](https://www.worldbank.org/en/research/dime/data-and-analytics). DIME Analytics supports quality research processes across the DIME portfolio, offers public trainings, and develops tools for the global community of development researchers.
 

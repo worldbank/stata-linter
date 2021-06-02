@@ -5,9 +5,9 @@ program lint
 
     version 16
 
-    syntax using, [FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
+    syntax using/, [FOlder(string) Indent(string) VERBose NOSUMmary Nocheck Excel(string) Linemax(string) Tab_space(string)]
     
-    local file = `"`using'"'
+    local file "`using'"
     
     * Check if python is installed
     cap python search
@@ -43,12 +43,12 @@ program lint
     if !missing("`nocheck'")    local nocheck_flag "1"
 
     * set a constant for the suppress option being used
-    local suppress_flag "0"
-    if !missing("`suppress'")   local suppress_flag "1"
+    local suppress_flag "1"
+    if !missing("`verbose'")    local suppress_flag "0"
 
     * set a constant for the summary option being used
-    local summary_flag "0"
-    if !missing("`summary'")    local summary_flag "1"
+    local summary_flag "1"
+    if !missing("`nosummary'")  local summary_flag "0"
 
     * call the python function
     qui: findfile stata_linter_detect.py

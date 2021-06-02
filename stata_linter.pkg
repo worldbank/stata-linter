@@ -4,6 +4,7 @@ p stata_linter
 f /src/stata_linter_correct.ado
 f /src/stata_linter_correct.py
 f /src/stata_linter_detect.ado
+f /src/lint.ado
 f /src/stata_linter_detect.py
 f /help/stata_linter_correct.sthlp
 f /help/stata_linter_detect.sthlp

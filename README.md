@@ -5,7 +5,7 @@
 Run the code beloew to install the current version in the `master` branch. If you want to install unpublished branches, replace _master_ in the URL below with the name of the branch you want to install from.
 
 ```stata
-net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
+net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
 ```
 
 ## Requirements

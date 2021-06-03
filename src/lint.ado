@@ -1,31 +1,43 @@
 *! version 0.0.3  21may2021  DIME Analytics dimeanalytics@worldbank.org
 
-cap prog drop lint
+capture program drop lint
 program lint
 
   version 16
 
   // Syntax
-  syntax using/,        ///
+  syntax anything [using/],        ///
     /// Options
     [                   ///
-      FOlder(string)    ///
-      Indent(string)    ///
       VERBose           ///
       NOSUMmary         ///
+      Indent(string)    ///
       Nocheck           ///
-      Excel(string)     ///
       Linemax(string)   ///
       Tab_space(string) ///
       Correct(string)   ///
+      Excel(string)     ///
       Automatic         ///
       Replace           ///
       INPRep            ///
     ]
 
-  // File to be detected
-  local file = subinstr("`using'","\","/",.)
+  // File or Folder to be detected
+  gettoken anything : anything
+
+  // Check if it is a file or a folder and assign the respective local  
+  // get suffix
+  _getfilesuffix `"`anything'"'
+  local suffix `"`r(suffix)'"'
   
+  if `"`suffix'"' == ".do" {
+    local file = subinstr(`"`anything'"',"\","/",.)
+  }
+
+  else if `"`suffix'"' == "" {
+    local folder = subinstr(`"`anything'"',"\","/",.)
+  }
+
   // ---------------------------------------------------------------------------
   // PYTHON INFORMATION
   // ---------------------------------------------------------------------------
@@ -55,9 +67,9 @@ program lint
   // set linemax = 80 if missing
   if missing("`linemax'")     local linemax "80"
 
-  // if !missing("`excel'") cap erase `excel'
+  // if !missing("`excel'")   cap erase `excel'
   if !missing("`excel'")      cap rm `excel'
-
+  
   // set excel = "" if excel is missing
   if missing("`excel'")       local excel ""
 
@@ -85,107 +97,94 @@ program lint
   else {
       local ado_path = r(fn)
   }
-
-  // Stata Correct
-  qui: findfile stata_linter_correct.py
-  if c(os) == "Windows" {
-    local ado_path = subinstr(r(fn), "\", "/", .) 
-  }
-  else {
-    local ado_path = r(fn)
-  }
   
   // ---------------------------------------------------------------------------
-  // EXECTING THE FUNCTIONS
+  // EXECUTING THE FUNCTIONS
   // ---------------------------------------------------------------------------
   
   // Only Stata Detect ---------------------------------------------------------
-  if "`correct'" == "" {
+  if `"`using'"' == "" {
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_detect import *
-
-    // Only one of "file" and "folder" can be non-missing
-    if !missing("`file'") & !missing("`folder'") {
-        noi di as error `"{phang} You cannot use both {bf:file()} option and {bf:folder()} option at the same time. {p_end}"'
-        exit
-    }
-
-    // At least either "file" or "folder" needs to be used
-    else if missing("`file'") & missing("`folder'") {
-        noi di as error `"{phang} You need to either use {bf:file()} option to detect bad practices in the specified .do file or use {bf:folder()} option to detect bad practices in all .do files in the specified folder. {p_end}"'
-        exit
-    }
     
     // The case where one .do file is checked
-    else if !missing("`file'") {
+    if `"`file'"' != "" {
         python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
 
     // The case where all .do files in a folder are checked
-    else if !missing("`folder'") {
+    else if `"`folder'"' != "" {
+        local excel = `"`excel'"'
+        
         preserve
-        local files: dir "`folder'" files "*.do"
+        local files: dir `"`folder'"' files "*.do"
         foreach l of local files {
             di ""
-            di "`l' **************************************"
+            di as text "Do file: `l' **************************************"
             di ""
 
             python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
         restore
     }
-  } 
+  }
 
-  // Stata Correct + Stata Detect ----------------------------------------------
-  if "`correct'" != "" {
+  // Stata Detect + Stata Correct ----------------------------------------------
+  if `"`using'"' != "" {
     // Output file
-    local output  = subinstr("`correct'","\","/",.)
+    local output  = subinstr(`"`using'"',"\","/",.)
+      
+    * Suffix
+    _getfilesuffix `"`output'"' 
+    local suffix `"`r(suffix)'"'
+
+    if `"`suffix'"' != ".do" {
+      noi di as error `"{phang} This files needs to be a do-file. {p_end}"'
+      exit
+    } 
     
     // Input file
-    local input   = subinstr("`using'","\","/",.)
+    local input = `"`anything'"'
     
+    * Suffix 
+    _getfilesuffix `"`input'"'
+    local suffix `"`r(suffix)'"'
+    
+    if `"`suffix'"' == ".do" {
+      local input = subinstr(`"`anything'"',"\","/",.)
+    }
+
+    else if `"`suffix'"' != ".do" {
+      noi di as error `"{phang} This file needs to be a do-file. {p_end}"'
+      exit
+    } 
+
     // Stata Detect  -----------------------------------------------------------
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_detect import *
 
-    // Only one of "file" and "folder" can be non-missing
-    if !missing("`file'") & !missing("`folder'") {
-        noi di as error `"{phang} You cannot use both {bf:file()} option and {bf:folder()} option at the same time. {p_end}"'
-        exit
-    }
-
-    // At least either "file" or "folder" needs to be used
-    else if missing("`file'") & missing("`folder'") {
-        noi di as error `"{phang} You need to either use {bf:file()} option to detect bad practices in the specified .do file or use {bf:folder()} option to detect bad practices in all .do files in the specified folder. {p_end}"'
-        exit
-    }
-
-    // The case where one .do file is checked
-    else if !missing("`file'") {
+    // We just need one do file here
+    if !missing("`file'") {
         python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
   
-    // The case where all .do files in a folder are checked
-    else if !missing("`folder'") {
-        preserve
-        local files: dir "`folder'" files "*.do"
-        foreach l of local files {
-            di ""
-            di "`l' **************************************"
-            di ""
-
-            python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
-        }
-        restore
+    // Stata correct -----------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
+    // -------------------------------------------------------------------------
+    qui: findfile stata_linter_correct.py
+    if c(os) == "Windows" {
+      local ado_path = subinstr(r(fn), "\", "/", .) 
+    }
+    else {
+      local ado_path = r(fn)
     }
 
-    // Stata correct -----------------------------------------------------------
-    
     // unless inprep is used, return error if input file and output file have the same name
     if missing("`inprep'") & ("`input'" == "`output'") {
-      noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep .{p_end}"'
+      noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep. {p_end}"'
       exit
     }
 
@@ -193,15 +192,15 @@ program lint
     if (!missing("`replace'") | !missing("`inprep'")) copy "`input'" "`output'", replace
     else copy "`input'" "`output'"
 
-
     // display a message if the correct option is added, so the output can be separated
-    display as text " "
     display as text " "
     display as text " "
     display as result _dup(60) "-"
     display as result "Correcting {bf:do-file}"
     display as result _dup(60) "-"
-    
+    display as text " "
+    display as text " "
+
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_correct import *
@@ -275,6 +274,28 @@ program lint
     }
   } 
   
+end
+
+capture program drop _getfilesuffix
+prog _getfilesuffix, rclass               // based on official _getfilename.ado and esttab 
+  version 8
+  gettoken filename rest : 0
+  if `"`rest'"' != "" {
+      exit 198
+  }
+  local hassuffix 0
+  gettoken word rest : filename, parse(".")
+  while `"`rest'"' != "" {
+      local hassuffix 1
+      gettoken word rest : rest, parse(".")
+  }
+  if `"`word'"' == "." {
+      di as err `"incomplete filename; ends in ."'
+      exit 198
+  }
+  if index(`"`word'"',"/") | index(`"`word'"',"\") local hassuffix 0
+  if `hassuffix' return local suffix `".`word'"'
+  else           return local suffix ""
 end
 
 // Have a lovely day!

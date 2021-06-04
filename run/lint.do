@@ -2,7 +2,7 @@
   global project 	    "D:/Documents/RA Jobs/DIME/analytics/linter/stata-linter"
   global test_dir     "${project}/test"
 
-  net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
+  // net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
   // run "${project}/src/lint.ado"
 
   // Detect --------------------------------------------------------------------
@@ -16,11 +16,11 @@
     excel("${test_dir}/detect_lint.xlsx")      
   
   // Lint a folder
-  lint "${test_dir}/"
+  lint "${test_dir}"
 
   // Lint a folder and create an excel file
-  lint "${test_dir}/"                            ///
-      excel("${test_dir}/detect_lint_all.xlsx")
+  lint "${test_dir}",                           ///
+    excel("${test_dir}/detect_output_all.xlsx")
 
   // Correct -------------------------------------------------------------------
   lint "${test_dir}/bad.do"                     ///

@@ -26,16 +26,27 @@ program lint
   gettoken anything : anything
 
   // Check if it is a file or a folder and assign the respective local  
-  // get suffix
-  _getfilesuffix `"`anything'"'
-  local suffix `"`r(suffix)'"'
-  
-  if `"`suffix'"' == ".do" {
+  _getfilepath    `"`anything'"'
+    local path = "`r(path)'"
+    local name =  "`r(filename)'"
+  _getfilesuffix  `"`anything'"'
+    local suffix = "`r(suffix)'"
+
+  * Do file
+  if "`suffix'" == ".do" {
     local file = subinstr(`"`anything'"',"\","/",.)
   }
 
-  else if `"`suffix'"' == "" {
-    local folder = subinstr(`"`anything'"',"\","/",.)
+  * Path 
+  else if "`suffix'" == "" {
+    _shortenpath `"`anything'"', len(100)
+    local folder = `"`r(pfilename)'"'
+  }
+
+  * Anything else
+  else if "`suffix'" != ".do" {
+    display as error "Make sure you are passing a do-file"
+    exit 198
   }
 
   // ---------------------------------------------------------------------------
@@ -109,24 +120,26 @@ program lint
     python: from stata_linter_detect import *
     
     // The case where one .do file is checked
-    if `"`file'"' != "" {
+    if !missing("`file'") {
+        di as text ""
+        di as text "{hline 59}"
+        di as text "Do-file: `name'"
+        di as text "{hline 59}"
+
         python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
 
     // The case where all .do files in a folder are checked
-    else if `"`folder'"' != "" {
-        local excel = `"`excel'"'
-        
-        preserve
-        local files: dir `"`folder'"' files "*.do"
+    else if !missing("`folder'") {
+        local files: dir "`folder'" files "*.do"
         foreach l of local files {
-            di ""
-            di as text "Do file: `l' **************************************"
-            di ""
+          di as text ""
+          di as text "{hline 59}"
+          di as text "Do-file: `l'"
+          di as text "{hline 59}"
 
-            python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+          python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
-        restore
     }
   }
 
@@ -141,7 +154,7 @@ program lint
 
     if `"`suffix'"' != ".do" {
       noi di as error `"{phang} This files needs to be a do-file. {p_end}"'
-      exit
+      exit 198
     } 
     
     // Input file
@@ -157,7 +170,7 @@ program lint
 
     else if `"`suffix'"' != ".do" {
       noi di as error `"{phang} This file needs to be a do-file. {p_end}"'
-      exit
+      exit 198
     } 
 
     // Stata Detect  -----------------------------------------------------------
@@ -276,6 +289,7 @@ program lint
   
 end
 
+// File Suffix
 capture program drop _getfilesuffix
 prog _getfilesuffix, rclass               // based on official _getfilename.ado and esttab 
   version 8
@@ -296,6 +310,27 @@ prog _getfilesuffix, rclass               // based on official _getfilename.ado 
   if index(`"`word'"',"/") | index(`"`word'"',"\") local hassuffix 0
   if `hassuffix' return local suffix `".`word'"'
   else           return local suffix ""
+end
+
+// File Paths
+capture program drop _getfilepath
+program define _getfilepath, rclass
+    version 8
+    gettoken pathfile rest : 0
+    if `"`rest'"' != "" {
+        exit 198
+    }
+    gettoken word rest : pathfile, parse("\/:")
+    while `"`rest'"' != "" {
+        local path `"`macval(path)'`macval(word)'"'
+        gettoken word rest : rest, parse("\/:")
+    }
+    if inlist(`"`word'"', "\", "/", ":") {
+        di as err `"incomplete path-filename; ends in separator `word'. Removed the last `word'."'
+        exit 198
+    }
+    return local filename `"`word'"'
+    return local path `"`path'"'
 end
 
 // Have a lovely day!

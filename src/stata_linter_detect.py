@@ -4,6 +4,25 @@ import os
 import re
 import sys
 import pandas as pd
+import argparse
+
+# simple run entry point
+def run():
+    parser = argparse.ArgumentParser(description='Lint a Stata do-file.')
+    parser.add_argument('filename', metavar='file', type=str, nargs='?',
+                    help='The name of the file to lint.')
+
+    args=parser.parse_args()
+    stata_linter_detect_py(
+        input_file=args.filename,
+        indent=4,
+        nocheck=0, 
+        suppress=0,
+        summary=0,
+        excel="",
+        linemax=80,
+        tab_space=4
+        )
 
 # Style ===================
 

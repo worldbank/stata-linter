@@ -10,18 +10,37 @@ import argparse
 def run():
     parser = argparse.ArgumentParser(description='Lint a Stata do-file.')
     parser.add_argument('filename', metavar='file', type=str, nargs='?',
-                    help='The name of the file to lint.')
-
+                        help='The name of the file to lint.')
+    parser.add_argument('--indent', type=int, nargs='?', default=4,
+                            help="Number of spaces to use for each indentation"
+                            )
+    parser.add_argument('--nocheck', action='store_true',
+                            help="Disable checking"
+                            )
+    parser.add_argument('--suppress', action='store_true',
+                            help="Suppress line item printout"
+                            )
+    parser.add_argument('--summary', action='store_true',
+                            help="Print a summary of bad practices detected"
+                            )
+    parser.add_argument('--linemax', type=int, nargs='?', default=80,
+                            help="Maximum number of characters per line"
+                            )
+    parser.add_argument('--excel_output', type=str, nargs='?', default="",
+                            help="If specified, save results to Excel workbook"
+                            )
+                           
+    
     args=parser.parse_args()
     stata_linter_detect_py(
         input_file=args.filename,
-        indent=4,
-        nocheck=0, 
-        suppress=0,
-        summary=0,
-        excel="",
-        linemax=80,
-        tab_space=4
+        indent=args.indent,
+        nocheck="1" if args.nocheck else "0", 
+        suppress="1" if args.suppress else "0",
+        summary="1" if args.summary else "0",
+        excel=args.excel_output,
+        linemax=args.linemax,
+        tab_space=args.indent
         )
 
 # Style ===================

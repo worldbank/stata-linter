@@ -8,6 +8,16 @@ Run the code beloew to install the current version in the `master` branch. If yo
 net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
 ```
 
+### Python Stand-alone
+
+To install the linter to run directly with Python and not via Stata, clone the repository and then install using `pip`:
+
+```python
+pip install -e src/
+```
+
+This will also install `pandas` if it is not currently installed.
+
 ## Requirements
 
 1. Stata version 16 or higher.

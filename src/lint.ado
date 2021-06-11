@@ -1,4 +1,4 @@
-*! version 0.0.3  21may2021  DIME Analytics dimeanalytics@worldbank.org
+*! version 0.0.4  21may2021  DIME Analytics dimeanalytics@worldbank.org
 
 capture program drop lint
 program lint
@@ -26,10 +26,10 @@ program lint
   gettoken anything : anything
 
   // Check if it is a file or a folder and assign the respective local  
-  _getfilepath    `"`anything'"'
-    local path = "`r(path)'"
-    local name =  "`r(filename)'"
-  _getfilesuffix  `"`anything'"'
+  _getfilepath     `"`anything'"'
+    local path =   "`r(path)'"
+    local name =   "`r(filename)'"
+  _getfilesuffix   `"`anything'"'
     local suffix = "`r(suffix)'"
 
   * Do file

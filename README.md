@@ -163,6 +163,65 @@ You can use the following options with the `lint` command:
   - `linemax()`: maximum number of characters in a line (default: 80)
   - `tab_space()`: number of whitespaces used instead of hard tabs (default is 4).
 
+## Style rules and check suggestions
+
+### Style
+
+- Use soft tabs (i.e., whitespaces), not hard tabs
+Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs. You can change this option in the do-file editor preferences.
+
+- Avoid to use abstract index names
+In *for loops*, index names should describe what the code is looping over.  Hence, for example, avoid coding like this:
+
+  ```
+  foreach i of var cassava maize wheat { }
+  ```
+
+  Instead, when looping commands should name that index descriptively:
+
+  ```
+  foreach crop of var cassava maize wheat { }
+  ```
+
+- Use proper indentations:
+After declaring for loop statement or if-else statement, add indentation with whitespaces (usually 2 or 4 whitespaces).
+
+- Use indentations after declaring newline symbols `///`:
+After a new line statement `(///)`, add indentation (usually 2 or 4 whitespaces).
+
+- Use `!missing` function for conditions of missing values:
+For clarity, use `!missing(var)` instead of `var < .` or `var != .`
+
+- Do not use `delimit`, instead use `///` for line breaks:
+More information about the use of line breaks [here](https://worldbank.github.io/dime-data-handbook/coding.html#line-breaks).
+
+- Do not use `cd` command to change the current folder:
+Use absolute and dynamic file paths. More about this [here](https://worldbank.github.io/dime-data-handbook/coding.html#writing-file-paths).
+
+- Use line breaks for too long lines:
+For lines that are too long, use `///` for line breaks and divide them into multiple lines. It is recommended to restrict the number of characters in a line under 80.  Whereas sometimes this is difficult since, for example, Stata does not allow line
+breaks within double quotes, try to follow this rule when possible.
+
+- Add whitespaces around math symbols such as `+, =, <, >,` etc.:
+For better readability, add whitespaces around math symbols.  For example, write `gen a = b + c if d == e` instead of `gen a=b+c if d==e`.
+
+- Specify the condition in the if statement:
+Always explicitly specify the condition in the if statement.  For example, declare `if var == 1` instead of `if var`.
+
+- Use curly brackets for global macros:
+Always use `${ }` for global macros.  For instance, use `${global}` instead of `$global`.
+
+### Check
+
+- Check if missing values are properly taken into account:
+Note that `a != 0` includes cases where a is missing.
+
+- Check if backslashes are not used in file paths:
+Check if backslashes `(\)` are not used in file paths. If you are using them, then replace them with forward slashes `(/)`.
+
+- Check if tildes `(~)` are not used for negations:
+If you are using tildes `(~)` are used for negations, replace them with the bang symbol `(!)`.
+
 ## Workflow
 
 To minimize the risk of crashing a do-file, the `correction` feature works based on fewer rules than the `detection` feature. That is, we can can detect more bad coding practices with `lint "input_file"` in comparison to `lint "input_file" using "output_file"`. Therefore, after writing a do-file, you can first `detect` bad practices to check how many bad coding practices are contained in the do-file and later decide whether you would like to use the correction feature.
@@ -188,6 +247,7 @@ This command is developed by DIME Analytics at DECIE, The World Bank's unit for 
 [DIME](https://www.worldbank.org/en/research/dime) is the World Bank's impact evaluation department. Part of DIME’s mission is to intensify the production of and access to public goods that improve the quantity and quality of global development research, while lowering the costs of doing IE for the entire research community. This Library is developed and maintained by [DIME Analytics](https://www.worldbank.org/en/research/dime/data-and-analytics). DIME Analytics supports quality research processes across the DIME portfolio, offers public trainings, and develops tools for the global community of development researchers.
 
 Other DIME Analytics public goods are:
+
 - [Development Research in Practice:](https://worldbank.github.io/dime-data-handbook/) the DIME Analytics Data Handbook
 - [DIME Wiki:](https://dimewiki.worldbank.org/wiki/Main_Page) a one-stop-shop for impact evaluation resources
 - [ietoolkit:](https://github.com/worldbank/ietoolkit) Stata package for impact evaluations

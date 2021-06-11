@@ -45,9 +45,9 @@ On how to install python packages, refer to {browse "https://blog.stata.com/2020
       
 {title:Style rules}
 
-{pstd}{hi:Use soft tabs (= whitespaces), not hard tabs}
+{pstd}{hi:Use soft tabs (i.e, whitespaces), not hard tabs}
 {break}
-Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs.
+Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs. You can change this option in the do-file editor preferences.
 
 {pstd}{hi:Avoid to use abstract index names}
 {break}
@@ -56,29 +56,29 @@ Hence, for example, avoid the code like this:
 
 {pmore}{input:foreach i of var cassava maize wheat {  }}
 
-{pstd}Instead, write like this:
+{pstd}Instead, when looping commands should name that index descriptively:
 
 {pmore}{input:foreach crop of var cassava maize wheat {  }}
 
 {pstd}{hi:Use proper indentations}
 {break}
-After declaring for loop statement or if-else statement, add indentation with whitespaces (usually 2 or 4 whitespaces are used).
+After declaring for loop statement or if-else statement, add indentation with whitespaces (usually 2 or 4 whitespaces).
 
 {pstd}{hi:Use indentations after declaring newline symbols (///)}
 {break}
-After new line statement ({cmdab:///}), add indentation (usually 2 or 4 whitespaces are used).
+After a new line statement (///), add indentation (usually 2 or 4 whitespaces).
 
 {pstd}{hi:Use "{cmdab:!missing}" function for conditions of missing values}
 {break}
 For clarity, use {cmdab:!missing(var)} instead of {cmdab:var < .} or {cmdab:var != .}
 
-{pstd}{hi:Do not use "{cmdab:delimit}" command but use "///" for line breaks}
+{pstd}{hi:Do not use "{cmdab:delimit}", instead use "///" for line breaks}
 {break}
-Avoid to use {cmdab:delimit}. For line breaks, use {cmdab:///} instead.
+More information about the use of line breaks {browse "https://worldbank.github.io/dime-data-handbook/coding.html#line-breaks":here}.
 
-{pstd}{hi:Do not use cd command to change current folder}
+{pstd}{hi:Do not use cd to change current folder}
 {break}
-Avoid to use {cmdab:cd} but use absolute and dynamic file paths.
+Use absolute and dynamic file paths. More about this {browse "https://worldbank.github.io/dime-data-handbook/coding.html#writing-file-paths":here}.
 
 {pstd}{hi:Use line breaks for too long lines}
 {break}
@@ -86,7 +86,7 @@ For lines that are too long, use {cmdab:///} for line breaks and divide them int
 It is recommended to restrict the number of characters in a line under 80.
 Whereas sometimes this is difficult since, for example, Stata does not allow line breaks within double quotes, try to follow this rule when possible.
 
-{pstd}{hi:Add whitespaces around math symbols such as +, =, <, >, etc.}
+{pstd}{hi:Add whitespaces around math symbols such as {cmdab:+, =, <, >,} etc.}
 {break}
 For better readability, add whitespaces around math symbols.
 For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d==e}.
@@ -96,7 +96,7 @@ For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d
 Always explicitly specify the condition in the if statement.
 For example, declare {cmdab:if var == 1} instead of {cmdab:if var}.
 
-{pstd}{hi:Use parentheses for global macros}
+{pstd}{hi:Use curly brackets for global macros}
 {break}
 Always use {cmdab:${ }} for global macros.
 For instance, use {cmdab:${global}} instead of {cmdab:$global}.

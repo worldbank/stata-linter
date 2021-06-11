@@ -528,13 +528,13 @@ def stata_linter_detect_py(
         print("Abstract index used in for-loop: {:d}".format(style_dictionary["abstract_index_name"]))
         print("Not proper indentation in for-loop for if-else statement: {:d}".format(style_dictionary["proper_indent"]))
         print("Not proper indentation in newline: {:d}".format(style_dictionary["indent_after_newline"]))
-        print("No whitespaces around math symbols: {:d}".format(style_dictionary["whitespace_symbol"]))
-        print("Condition incomplete: {:d}".format(style_dictionary["condition_missing"]))
+        print("Missing whitespaces around math symbols: {:d}".format(style_dictionary["whitespace_symbol"]))
+        print("Incomplete conditions: {:d}".format(style_dictionary["condition_missing"]))
         print("Not explicit if statement: {:d}".format(style_dictionary["explicit_if"]))
         print("Delimit used: {:d}".format(style_dictionary["dont_use_delimit"]))
         print("cd used: {:d}".format(style_dictionary["dont_use_cd"]))
-        print("Line too long: {:d}".format(style_dictionary["too_long_line"]))
-        print("Parentheses not used for global macro: {:d}".format(style_dictionary["parentheses_for_global_macro"]))
+        print("Lines too long: {:d}".format(style_dictionary["too_long_line"]))
+        print("Brackets not used for global macro: {:d}".format(style_dictionary["parentheses_for_global_macro"]))
 
         if int(nocheck) == 0:
             print("\n[Check]")

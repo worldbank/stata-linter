@@ -4,6 +4,7 @@ cap prog drop stata_linter_detect
 program stata_linter_detect
 
     version 16
+    display "Depracated: plese use lint instead."
 
     syntax, [FIle(string) FOlder(string) Indent(string) Nocheck SUPpress SUMmary Excel(string) Linemax(string) Tab_space(string)]
 

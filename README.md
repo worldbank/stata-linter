@@ -2,10 +2,10 @@
 
 ## Installation
 
-Run the code below to install the current version in the `master` branch. If you want to install unpublished branches, replace _master_ in the URL below with the name of the branch you want to install from.
+To install this command run the following:
 
 ```stata
-net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
+net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
 ```
 
 ## Requirements
@@ -17,25 +17,24 @@ For setting up Stata to use Python, refer to [this web page](https://blog.stata.
 
 ## Content
 
-The `lint` command is an opinionated detector that attempts to improve readability of Stata do files. The command is written based on the good coding practices at the Development Impact Evaluation Unit of The World Bank.
-
-For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
+The `lint` command is an opinionated detector that attempts to improve readability of Stata do files. The command is written based on the good coding practices of the Development Impact Evaluation Unit at The World Bank. For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
 
 The `lint` command can be broken into two functionalities:
 
 1. **detection** which refers to identifying bad coding practices in one or multiple Stata do-files;
 2. **correction** which refers to correcting bad coding practices in a Stata do-file.
 
-> Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.
+> _Disclaimer_: Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.
 
-## Syntax
+## Syntax and basic usage
 
 ```stata
 lint "input_file" using "output_file", options  
 ```
-### Detection
 
-To the detect bad practices in a do-file you can run the following: 
+### 1. Detection
+
+To detect bad practices in a do-file you can run the following:
 
 ```stata
 lint "test/bad.do" 
@@ -68,7 +67,7 @@ Bang (!) used instead of tilde (~) for negation?: 6
 The output is divided into two:
 
 1. `[Style]` chunk that shows the lines that likely contain bad coding practices, and;
-2. `[Check]` chunk that shows the lines that potentially contain bad coding practices and are worth checking.
+2. `[Check]` chunk that shows the lines that contain bad coding practices that could produce erroneous results and are worth checking.
 
 If you want to get the lines where those bad coding practices appear you can use the option `verbose`:
 
@@ -89,18 +88,15 @@ Check =====================
 
 You can also pass a folder path to detect all the bad practices in all the do-files that are in the same folder.
 
-### Correction
-
-> Note that this feature is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this feature, you check if results of the do file do not change.
+### 2. Correction
 
 If you would like to correct bad practices in a do-file you can run the following:
 
 ```stata
-lint "${test_dir}/bad.do"                ///
-  using "${test_dir}/bad_corrected.do"   
+lint "test/bad.do" using "test/bad_corrected.do"   
 ```
 
-In this case, the lint command will export a do-file called `bad_corrected.do` with the correction. Stata will then ask you if you would like to perform a set of correction. If you don't Stata to do this, you can add the option `automatic`. Additionally, it is strongly recommended that the output file name should be different from the input file name as the original do-file should be kept as a backup.
+In this case, the lint command will export a do-file called `bad_corrected.do`. Stata will ask you if you would like to perform a set of correction. You can add the option `automatic` to perform the correction automatically. Additionally, it is strongly recommended that the output file has a different from the input file, as the original do-file should be kept as a backup.
 
 As a result of this command, for example,
 
@@ -151,22 +147,29 @@ if something ~= 1 & something != . {
 
 You can use the following options with the `lint` command:
 
-* `verbose`: shows all the lines where bad practices appear.
-* `nosummary`: suppress the summary of bad practices.
-* `indent()`: specify the number of whitespaces used for indentation (default is 4).
-* `nocheck`: removes suggestions to check and only show style problems.
-* `linemax()`: maximum number of characters in a line (default: 80)
-* `tab_space()`: number of whitespaces used instead of hard tabs (default is 4).
-* `excel()`: export detection results to excel.
-* `automatic`: correct all bad coding practices without asking if you want each bad coding practice to be corrected or not (use only with the correction feature).
-* `replace`: replace the existing output file (use only with the correction feature).
-* `inprep`: allow the output file name to be the same as the name of the input file (use only with the correction feature).
+- Options related to the **detection** feature:
+  - `verbose`: shows all the lines where bad practices appear.
+  - `nosummary`: suppress the summary of bad practices.
+  - `excel()`: export detection results to excel.
+
+- Options related to the **correction** feature:
+  - `automatic`: correct all bad coding practices without asking if you want each bad coding practice to be corrected or not (use only with the correction feature).
+  - `replace`: replace the existing output file (use only with the correction feature).
+  - `inprep`: allow the output file name to be the same as the name of the input file (use only with the correction feature).
   
+- Options for **both** features:
+  - `indent()`: specify the number of whitespaces used for indentation (default is 4).
+  - `nocheck`: removes suggestions to check and only show style problems.
+  - `linemax()`: maximum number of characters in a line (default: 80)
+  - `tab_space()`: number of whitespaces used instead of hard tabs (default is 4).
+
 ## Workflow
 
-To minimize the risk of crashing a do-file, the `correction` feature works based on fewer rules than the `detection` feature. That is, we can can detect more bad coding practices with `lint "input_file"` in comparison to `lint "input_file" using "output_file"`. Therefore, after writing a do-file, you can first use detect bad practices to check how many bad coding practices are contained in the do-file and later decide whether you would like to use the correction feature. If there are not many bad practices, you can go through the lines flagged by the detection feature and manually correct them avoiding, in this case, potential crashes by the `correction` feature.
+To minimize the risk of crashing a do-file, the `correction` feature works based on fewer rules than the `detection` feature. That is, we can can detect more bad coding practices with `lint "input_file"` in comparison to `lint "input_file" using "output_file"`. Therefore, after writing a do-file, you can first `detect` bad practices to check how many bad coding practices are contained in the do-file and later decide whether you would like to use the correction feature.
 
-If there are many bad practices detected, then you can use the correction feature first to correct some of the flagged lines, and then you can detect again and correct the remaining bad practices manually. After this process, do not forget to check if the results are not changed by the correction feature.
+If there are not many bad practices, you can go through the lines flagged by the `detection` feature and manually correct them avoiding, in this case, potential crashes by the `correction` feature.
+
+If there are many bad practices detected, you can use the `correction` feature first to correct some of the flagged lines, and then you can `detect` again and `correct` the remaining bad practices manually. After this process, do not forget to check if the results are not changed by the correction feature.
 
 ## License
 
@@ -178,7 +181,7 @@ Luiza Cardoso de Andrade ([dimeanalytics@worldbank.org](mailto:dimeanalytics@wor
 
 ## **Authors**
 
-DIME Analytics Team, The World Bank
+This command is developed by DIME Analytics at DECIE, The World Bank's unit for Development Impact Evaluations.
 
 ## About DIME Analytics
 

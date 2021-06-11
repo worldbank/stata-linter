@@ -4,6 +4,9 @@ cap prog drop stata_linter_correct
 program def stata_linter_correct
 
     version 16
+
+    display "Depracated: plese use lint instead."
+    
     cap python search
     if _rc {
         noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'

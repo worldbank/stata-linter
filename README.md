@@ -1,4 +1,4 @@
-# stata_liner - Stata command for do file linter
+# stata_linter - Stata command for do file linter
 
 ## Installation
 

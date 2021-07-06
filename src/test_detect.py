@@ -1,4 +1,11 @@
-from stata_linter_detect import stata_linter_detect_py, run
+from stata_linter_detect import stata_linter_detect_py
+import subprocess
+
+class TestCLI:
+    def test_cli_bad(self):
+        assert subprocess.run(["stata_linter_detect", "test/bad.do"]).returncode == 1
+    def test_cli_simple(self):
+        assert subprocess.run(["stata_linter_detect", "test/simple.do"]).returncode == 0
 
 class TestDetect:
     def test_basic(self):

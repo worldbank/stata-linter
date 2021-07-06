@@ -4,8 +4,7 @@ setup(
     version='0.01',
     entry_points={
         'console_scripts': [
-            'stata_linter_detect=stata_linter_detect:run',
-            'stata_linter_correct=stata_linter_correct:run'
+            'stata_linter_detect=stata_linter_detect:run'
         ]
     },
     install_requires=[

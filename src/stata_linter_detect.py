@@ -32,7 +32,7 @@ def run():
                            
     
     args=parser.parse_args()
-    stata_linter_detect_py(
+    return stata_linter_detect_py(
         input_file=args.filename,
         indent=args.indent,
         nocheck="1" if args.nocheck else "0", 
@@ -580,8 +580,8 @@ def stata_linter_detect_py(
             print("Backslash used in file path?: {:d}".format(check_dictionary["backslash_in_path"]))
             print("Bang (!) used instead of tilde (~) for negation?: {:d}".format(check_dictionary["bang_not_tilde"]))
 
+    output_df = pd.DataFrame(excel_output_list)
     if excel != "":
-        output_df = pd.DataFrame(excel_output_list)
         if (output_df.empty == True):
             output_df = pd.DataFrame(columns = ["Line", "Type", "Problem"])
         output_df.columns = ["Line", "Type", "Problem"]
@@ -592,3 +592,5 @@ def stata_linter_detect_py(
             with pd.ExcelWriter(excel) as writer:
                 output_df.to_excel(writer, index = False, sheet_name = os.path.basename(input_file)[:20])
         print("\n File {:s} created".format(excel))
+
+    return( not output_df.empty )

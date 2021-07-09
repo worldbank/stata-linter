@@ -4,6 +4,44 @@ import os
 import re
 import sys
 import pandas as pd
+import argparse
+
+# simple run entry point
+def run():
+    parser = argparse.ArgumentParser(description='Lint a Stata do-file.')
+    parser.add_argument('filename', metavar='file', type=str, nargs='?',
+                        help='The name of the file to lint.')
+    parser.add_argument('--indent', type=int, nargs='?', default=4,
+                            help="Number of spaces to use for each indentation"
+                            )
+    parser.add_argument('--nocheck', action='store_true',
+                            help="Disable checking"
+                            )
+    parser.add_argument('--suppress', action='store_true',
+                            help="Suppress line item printout"
+                            )
+    parser.add_argument('--summary', action='store_true',
+                            help="Print a summary of bad practices detected"
+                            )
+    parser.add_argument('--linemax', type=int, nargs='?', default=80,
+                            help="Maximum number of characters per line"
+                            )
+    parser.add_argument('--excel_output', type=str, nargs='?', default="",
+                            help="If specified, save results to Excel workbook"
+                            )
+                           
+    
+    args=parser.parse_args()
+    return stata_linter_detect_py(
+        input_file=args.filename,
+        indent=args.indent,
+        nocheck="1" if args.nocheck else "0", 
+        suppress="1" if args.suppress else "0",
+        summary="1" if args.summary else "0",
+        excel=args.excel_output,
+        linemax=args.linemax,
+        tab_space=args.indent
+        )
 
 # Style ===================
 
@@ -542,8 +580,8 @@ def stata_linter_detect_py(
             print("Backslash used in file path?: {:d}".format(check_dictionary["backslash_in_path"]))
             print("Bang (!) used instead of tilde (~) for negation?: {:d}".format(check_dictionary["bang_not_tilde"]))
 
+    output_df = pd.DataFrame(excel_output_list)
     if excel != "":
-        output_df = pd.DataFrame(excel_output_list)
         if (output_df.empty == True):
             output_df = pd.DataFrame(columns = ["Line", "Type", "Problem"])
         output_df.columns = ["Line", "Type", "Problem"]
@@ -554,3 +592,5 @@ def stata_linter_detect_py(
             with pd.ExcelWriter(excel) as writer:
                 output_df.to_excel(writer, index = False, sheet_name = os.path.basename(input_file)[:20])
         print("\n File {:s} created".format(excel))
+
+    return( not output_df.empty )

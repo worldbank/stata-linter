@@ -126,7 +126,7 @@ program lint
         di as text "Do-file: `name'"
         di as text "{hline 59}"
 
-        python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
 
     // The case where all .do files in a folder are checked
@@ -138,7 +138,7 @@ program lint
           di as text "Do-file: `l'"
           di as text "{hline 59}"
 
-          python: stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+          python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
     }
   }
@@ -180,7 +180,7 @@ program lint
 
     // We just need one do file here
     if !missing("`file'") {
-        python: stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
   
     // Stata correct -----------------------------------------------------------

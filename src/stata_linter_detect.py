@@ -559,13 +559,11 @@ def stata_linter_detect_py(
                         )
 
     if summary == "1":
-        print("\nSummary (number of lines where bad practices are detected) =======================")
+        print("\nSummary of bad practices (number of lines where bad practices are detected) =======================")
 
-        print("\n[Style]")
-        print("\n[Style]")
         print("Hard tabs used instead of soft tabs: {:s}".format(hard_tab))
         print("One-letter local name in for-loop: {:d}".format(style_dictionary["abstract_index_name"]))
-        print("Non-standard indentation in \{ \} code block".format(style_dictionary["proper_indent"]))
+        print("Non-standard indentation in {{ }} code block".format(style_dictionary["proper_indent"]))
         print("No indentation on line following ///: {:d}".format(style_dictionary["indent_after_newline"]))
         print("Missing whitespaces around operators: {:d}".format(style_dictionary["whitespace_symbol"]))
         print("Implicit logic in if-condition: {:d}".format(style_dictionary["condition_missing"]))
@@ -573,10 +571,9 @@ def stata_linter_detect_py(
         print("Delimiter changed: {:d}".format(style_dictionary["dont_use_delimit"]))
         print("Working directory changed: {:d}".format(style_dictionary["dont_use_cd"]))
         print("Lines too long: {:d}".format(style_dictionary["too_long_line"]))
-        print("Global macro reference without \{ \}: {:d}".format(style_dictionary["parentheses_for_global_macro"]))
+        print("Global macro reference without {{ }}: {:d}".format(style_dictionary["parentheses_for_global_macro"]))
 
         if int(nocheck) == 0:
-            print("\n[Check]")
             print("Use of . where missing() is appropriate: {:d}".format(check_dictionary["check_missing"]))
             print("Backslash detected in potential file path: {:d}".format(check_dictionary["backslash_in_path"]))
             print("Tilde (~) used instead of bang (!) in expression: {:d}".format(check_dictionary["bang_not_tilde"]))

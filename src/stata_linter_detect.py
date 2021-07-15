@@ -565,14 +565,14 @@ def stata_linter_detect_py(
 
         print("{:69s} {:10s}".format("Hard tabs used instead of soft tabs: ", hard_tab))
         print("{:60s} {:10d}".format("One-letter local name in for-loop: ", style_dictionary["abstract_index_name"]))
-        print("{:60s} {:10d}".format("Non-standard indentation in {{ }} code block: ", style_dictionary["proper_indent"]))
+        print("{:60s} {:10d}".format("Non-standard indentation in { } code block: ", style_dictionary["proper_indent"]))
         print("{:60s} {:10d}".format("No indentation on line following ///: ", style_dictionary["indent_after_newline"]))
         print("{:60s} {:10d}".format("Missing whitespaces around operators: ", style_dictionary["whitespace_symbol"]))
         print("{:60s} {:10d}".format("Implicit logic in if-condition: ", style_dictionary["explicit_if"]))
         print("{:60s} {:10d}".format("Delimiter changed: ", style_dictionary["dont_use_delimit"]))
         print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
         print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
-        print("{:60s} {:10d}".format("Global macro reference without {{ }}: ", style_dictionary["parentheses_for_global_macro"]))
+        print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
 
         if int(nocheck) == 0:
             print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", check_dictionary["check_missing"]))

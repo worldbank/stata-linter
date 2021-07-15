@@ -70,7 +70,7 @@ def abstract_index_name(
                 )
             if suppress != "1":
                 print(
-                    '''(line {:d}) style: '''.format(line_index + 1) +
+                    '''(line {:d}): '''.format(line_index + 1) +
                     print_output
                     )
 
@@ -119,7 +119,7 @@ def proper_indent(
 
                 if suppress != "1":
                     print(
-                        '''(line {:d}) style: '''.format(line_index + 1) +
+                        '''(line {:d}): '''.format(line_index + 1) +
                         print_output
                         )
 
@@ -152,7 +152,7 @@ def indent_after_newline(
 
             if suppress != "1":
                 print(
-                    '''(line {:d}) style: '''.format(line_index + 1) +
+                    '''(line {:d}): '''.format(line_index + 1) +
                     print_output
                     )
 
@@ -175,7 +175,7 @@ def whitespace_symbol(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -197,7 +197,7 @@ def condition_missing(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -219,7 +219,7 @@ def dont_use_delimit(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -241,7 +241,7 @@ def dont_use_cd(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -264,7 +264,7 @@ def too_long_line(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -292,7 +292,7 @@ def explicit_if(
                 )
             if suppress != "1":
                 print(
-                    '''(line {:d}) style: '''.format(line_index + 1) +
+                    '''(line {:d}): '''.format(line_index + 1) +
                     print_output
                     )
             style_dictionary["explicit_if"] += 1
@@ -314,7 +314,7 @@ def parentheses_for_global_macro(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -338,7 +338,7 @@ def check_missing(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) check: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -361,7 +361,7 @@ def backslash_in_path(
             )
         if suppress != "1":
             print(
-                '''(line {:d}) check: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -385,7 +385,7 @@ def bang_not_tilde(
 
         if suppress != "1":
             print(
-                '''(line {:d}) style: '''.format(line_index + 1) +
+                '''(line {:d}): '''.format(line_index + 1) +
                 print_output
                 )
 
@@ -417,8 +417,6 @@ def stata_linter_detect_py(
     excel_output_list = []
 
     # style ============
-    if suppress != "1":
-        print("Style =====================")
     # Any hard tabs in the do file
     with open(input_file, "r") as f:
         input_lines = f.readlines()
@@ -438,7 +436,7 @@ def stata_linter_detect_py(
                     excel_output_list.append([line_index + 1, "style", print_output])
                     if suppress != "1":
                         print(
-                            '''(line {:d}) style: '''.format(line_index + 1) +
+                            '''(line {:d}): '''.format(line_index + 1) +
                             print_output
                             )
                     break
@@ -526,37 +524,35 @@ def stata_linter_detect_py(
         "bang_not_tilde": 0,
     }
 
-    if int(nocheck) == 0:
-        if suppress != "1":
-            print("Check =====================")
-        with open(input_file, "r") as f:
-            input_lines = f.readlines()
-            comment_delimiter = 0
-            for line_index, line in enumerate(input_lines):
+    with open(input_file, "r") as f:
+        input_lines = f.readlines()
+        comment_delimiter = 0
+        for line_index, line in enumerate(input_lines):
 
-                # update comment delimiter
-                comment_delimiter = update_comment_delimiter(comment_delimiter, line)
+            # update comment delimiter
+            comment_delimiter = update_comment_delimiter(comment_delimiter, line)
 
-                if re.search(r"^(\*|\/\/)", line.lstrip()) != None:
-                    pass
-                elif comment_delimiter > 0:
-                    pass
-                else:
-                    check_dictionary, excel_output_list = check_missing(
-                        line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list,
-                        int(tab_space)
-                        )
-                    check_dictionary, excel_output_list = backslash_in_path(
-                        line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list,
-                        int(tab_space)
-                        )
-                    check_dictionary, excel_output_list = bang_not_tilde(
-                        line_index, line, input_lines, int(indent),
-                        suppress, check_dictionary, excel_output_list,
-                        int(tab_space)
-                        )
+            if re.search(r"^(\*|\/\/)", line.lstrip()) != None:
+                pass
+            elif comment_delimiter > 0:
+                pass
+            else:
+                check_dictionary, excel_output_list = check_missing(
+                    line_index, line, input_lines, int(indent),
+                    suppress, check_dictionary, excel_output_list,
+                    int(tab_space)
+                    )
+                check_dictionary, excel_output_list = backslash_in_path(
+                    line_index, line, input_lines, int(indent),
+                    suppress, check_dictionary, excel_output_list,
+                    int(tab_space)
+                    )
+                check_dictionary, excel_output_list = bang_not_tilde(
+                    line_index, line, input_lines, int(indent),
+                    suppress, check_dictionary, excel_output_list,
+                    int(tab_space)
+                    )
+        print("")
 
     if summary == "1":
         print("-------------------------------------------------------------------------------------")
@@ -573,11 +569,9 @@ def stata_linter_detect_py(
         print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
         print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
         print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
-
-        if int(nocheck) == 0:
-            print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", check_dictionary["check_missing"]))
-            print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
-            print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
+        print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", check_dictionary["check_missing"]))
+        print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
+        print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
 
     output_df = pd.DataFrame(excel_output_list)
     if excel != "":

@@ -3,7 +3,7 @@
   global test_dir     "${project}/test"
 
   // net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
-  // run "${project}/src/lint.ado"
+  run "${project}/src/lint.ado"
 
   // Detect --------------------------------------------------------------------
   lint "${test_dir}/bad.do"
@@ -16,7 +16,8 @@
     excel("${test_dir}/detect_lint.xlsx")      
   
   // Lint a folder
-  lint "${test_dir}"
+  lint "${test_dir}", 
+  lint "${test_dir}", verbose 
 
   // Lint a folder and create an excel file
   lint "${test_dir}",                           ///

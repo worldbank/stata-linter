@@ -122,20 +122,25 @@ program lint
     // The case where one .do file is checked
     if !missing("`file'") {
         di as text ""
-        di as text "{hline 59}"
         di as text "Do-file: `name'"
-        di as text "{hline 59}"
+        di as text ""
 
         python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        display as result "-------------------------------------------------------------------------------------"
+        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
 
     // The case where all .do files in a folder are checked
     else if !missing("`folder'") {
         local files: dir "`folder'" files "*.do"
         foreach l of local files {
+          di as text ""
+          di as text ""
           di as text "Do-file: `l'"
           python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
+        display as result "-------------------------------------------------------------------------------------"
+        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
   }
 
@@ -203,11 +208,9 @@ program lint
 
     // display a message if the correct option is added, so the output can be separated
     display as text " "
-    display as text " "
     display as result _dup(60) "-"
     display as result "Correcting {bf:do-file}"
     display as result _dup(60) "-"
-    display as text " "
     display as text " "
 
     python: import sys, os

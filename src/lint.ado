@@ -133,11 +133,7 @@ program lint
     else if !missing("`folder'") {
         local files: dir "`folder'" files "*.do"
         foreach l of local files {
-          di as text ""
-          di as text "{hline 59}"
           di as text "Do-file: `l'"
-          di as text "{hline 59}"
-
           python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
     }

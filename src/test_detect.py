@@ -12,7 +12,6 @@ class TestDetect:
         assert stata_linter_detect_py(
         input_file="test/bad.do",
         indent=4,
-        nocheck="0", 
         suppress="0",
         summary="0",
         excel="",
@@ -24,7 +23,6 @@ class TestDetect:
         assert stata_linter_detect_py(
         input_file="test/bad.do",
         indent=4,
-        nocheck="0",
         suppress="0",
         summary="0",
         excel="linter.xlsx",
@@ -36,7 +34,6 @@ class TestDetect:
         assert stata_linter_detect_py(
         input_file="test/simple.do",
         indent=4,
-        nocheck="0",
         suppress="0",
         summary="0",
         excel="",

@@ -14,9 +14,6 @@ def run():
     parser.add_argument('--indent', type=int, nargs='?', default=4,
                             help="Number of spaces to use for each indentation"
                             )
-    parser.add_argument('--nocheck', action='store_true',
-                            help="Disable checking"
-                            )
     parser.add_argument('--suppress', action='store_true',
                             help="Suppress line item printout"
                             )
@@ -29,13 +26,12 @@ def run():
     parser.add_argument('--excel_output', type=str, nargs='?', default="",
                             help="If specified, save results to Excel workbook"
                             )
-                           
-    
+
+
     args=parser.parse_args()
     return stata_linter_detect_py(
         input_file=args.filename,
         indent=args.indent,
-        nocheck="1" if args.nocheck else "0", 
         suppress="1" if args.suppress else "0",
         summary="1" if args.summary else "0",
         excel=args.excel_output,
@@ -95,7 +91,7 @@ def proper_indent(
             ):
             line_ws = line.expandtabs(tab_space)
             j = 1
-            # find the next non-blank line 
+            # find the next non-blank line
             while (j + line_index <= len(input_lines)):
                 if (j + line_index == len(input_lines)):
                     next_line = input_lines[line_index + 1]
@@ -136,7 +132,7 @@ def indent_after_newline(
 
     # check if the line includes "///" but the previous line does not include "///"
     if (
-        (re.search(r"\/\/\/", line) != None) & 
+        (re.search(r"\/\/\/", line) != None) &
         (re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]) == None)
         ):
         line_ws = line.expandtabs(tab_space)
@@ -190,7 +186,7 @@ def condition_missing(
     tab_space
     ):
 
-    # warn if "var < ." or "var != ." are used 
+    # warn if "var < ." or "var != ." are used
     if re.search(r"(<|!=)( )*\.", line):
         print_output = (
             '''Use "!missing(var)" instead of "var < ." or "var != .".'''
@@ -272,7 +268,7 @@ def too_long_line(
         excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
-# "if" condition should be explicit 
+# "if" condition should be explicit
 def explicit_if(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -352,7 +348,7 @@ def backslash_in_path(
     suppress, check_dictionary, excel_output_list,
     tab_space
     ):
-    # warn if anything is sandwiched by backslashes, 
+    # warn if anything is sandwiched by backslashes,
     # which suggests that the user may be using backslashes for file paths
     if re.search(r"\\(\w| |-)+\\", line):
         print_output = (
@@ -375,7 +371,7 @@ def bang_not_tilde(
     tab_space
     ):
 
-    # warn if tilde is used, which suggests 
+    # warn if tilde is used, which suggests
     # that the user may be using tilde for negation
     if re.search(r"~", line):
         print_output = (
@@ -409,7 +405,7 @@ def update_comment_delimiter(comment_delimiter, line):
 
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(
-    input_file, indent, nocheck, 
+    input_file, indent, 
     suppress, summary, excel, linemax,
     tab_space
     ):

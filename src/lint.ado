@@ -128,7 +128,7 @@ program lint
         python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         display as result "-------------------------------------------------------------------------------------"
         if "`excel'" != "" {
-            display as result `"{phang}File {browse "`excel'":`excel'} created"'
+            display as result `"{phang}File {browse "`excel'":`excel'} created."'
         }
         display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
@@ -143,7 +143,10 @@ program lint
           python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
         display as result "-------------------------------------------------------------------------------------"
-        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
+        if "`excel'" != "" {
+            display as result `"{phang}File {browse "`excel'":`excel'} created."'
+        }
+        display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
   }
 

@@ -42,7 +42,7 @@ On how to install python packages, refer to {browse "https://blog.stata.com/2020
 
       1. {it:detection} which refers to identifying bad coding practices in one or multiple Stata do-files;
       2. {it:correction} which refers to correcting bad coding practices in a Stata do-file.
-      
+
 {title:Style rules}
 
 {pstd}{hi:Use soft tabs (i.e, whitespaces), not hard tabs}
@@ -122,60 +122,60 @@ If you are using tildes ({cmdab:~}) are used for negations, replace them with ba
 {p 4 4 2}
 The following examples are intended to illustrate the basic usage of
 {cmd:lint}. Additional examples can be found at
-{browse "https://github.com/worldbank/stata-linter/wiki/Lint"}. 
-    
+{browse "https://github.com/worldbank/stata-linter/wiki/Lint"}.
+
 {pstd}{hi:1. Detecting bad coding practices}
 
 {p 4 4 2} The basic usage is to point to a do-file that requires revision as follows:
 
         {com}. lint "test/bad.do"
-        
+
 {p 4 4 2} For the detection feature you can use all the options but {it:automatic, inprep, and replace}.
 
-        Options: 
-        
+        Options:
+
         1. Show in which lines there are bad coding practices
         {com}. lint "test/bad.do", verbose
-        
+
         2. Remove the summary of bad practices
         {com}. lint "test/bad.do", nosummary
-        
+
         3. Specify the number of whitespaces (default: 4):
         {com}. lint "test/bad.do", indent(2)
-        
+
         4. Keep only the {it:style} and not {it:check}:
         {com}. lint "test/bad.do", nocheck
-        
+
         5. Specify the maximum number of characters in a line (default: 80):
         {com}. lint "test/bad.do", linemax(100)
-        
-        6. Specify the number of whitespaces used instead of hard tabs (default: 4): 
+
+        6. Specify the number of whitespaces used instead of hard tabs (default: 4):
         {com}. lint "test/bad.do", tab_space(100)
-        
+
         7. Exports to excel the results of the line by line analysis
         {com}. lint "test/bad.do", excel("test_dir/detect_output.xlsx")
-        
+
         8. You can also use this command to test all the do-files that are in a folder:
         {com}. lint "test"
-        
+
 {pstd}{hi:2. Correcting bad coding practices}
 
-{p 4 4 2} In the case of correcting a do file, the basic usage is to point to a do-file 
+{p 4 4 2} In the case of correcting a do file, the basic usage is to point to a do-file
 that will be corrected and assign a new name to said do-file. If you do not include any
 options, Stata will ask you confirm if you want a specific bad practice to be corrected:
 
-        1. Basic usage (Stata will promp you with questions):
+        1. Basic usage (Stata will prompt you with questions):
         {com}. lint "test/bad.do" using "test/bad_corrected.do"
-        
+
         2. Automatic (Stata will correct the file automatically):
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic
-        
+
         3. Have the same name for the output file:
         {com}. lint "test/bad.do" using "test/bad.do", automatic inprep
-        
+
         4. Replace the output file
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic replace
-        
+
 {title:Authors}
 
 {phang}This command is developed by DIME Analytics at DECIE, The World Bank's unit for Development Impact Evaluations.
@@ -186,6 +186,3 @@ options, Stata will ask you confirm if you want a specific bad practice to be co
 
 {phang}You can also see the code, make comments to the code, see the version
 		 history of the code, and submit additions or edits to the code through {browse "https://github.com/worldbank/stata-linter":the GitHub repository of this package}.{p_end}
-
-        
-        

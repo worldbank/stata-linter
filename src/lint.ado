@@ -25,7 +25,7 @@ program lint
   // File or Folder to be detected
   gettoken anything : anything
 
-  // Check if it is a file or a folder and assign the respective local  
+  // Check if it is a file or a folder and assign the respective local
   _getfilepath     `"`anything'"'
     local path =   "`r(path)'"
     local name =   "`r(filename)'"
@@ -37,7 +37,7 @@ program lint
     local file = subinstr(`"`anything'"',"\","/",.)
   }
 
-  * Path 
+  * Path
   else if "`suffix'" == "" {
     _shortenpath `"`anything'"', len(100)
     local folder = `"`r(pfilename)'"'
@@ -80,7 +80,7 @@ program lint
 
   // if !missing("`excel'")   cap erase `excel'
   if !missing("`excel'")      cap rm `excel'
-  
+
   // set excel = "" if excel is missing
   if missing("`excel'")       local excel ""
 
@@ -99,26 +99,26 @@ program lint
   // ---------------------------------------------------------------------------
   // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
   // ---------------------------------------------------------------------------
-    
+
   // Stata Detect
   qui: findfile stata_linter_detect.py
   if c(os) == "Windows" {
-      local ado_path = subinstr(r(fn), "\", "/", .) 
+      local ado_path = subinstr(r(fn), "\", "/", .)
   }
   else {
       local ado_path = r(fn)
   }
-  
+
   // ---------------------------------------------------------------------------
   // EXECUTING THE FUNCTIONS
   // ---------------------------------------------------------------------------
-  
+
   // Only Stata Detect ---------------------------------------------------------
   if `"`using'"' == "" {
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_detect import *
-    
+
     // The case where one .do file is checked
     if !missing("`file'") {
         di as text ""
@@ -127,6 +127,9 @@ program lint
 
         python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         display as result "-------------------------------------------------------------------------------------"
+        if "`excel'" != "" {
+            display as result `"{phang}File {browse "`excel'":`excel'} created"'
+        }
         display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
 
@@ -148,23 +151,23 @@ program lint
   if `"`using'"' != "" {
     // Output file
     local output  = subinstr(`"`using'"',"\","/",.)
-      
+
     * Suffix
-    _getfilesuffix `"`output'"' 
+    _getfilesuffix `"`output'"'
     local suffix `"`r(suffix)'"'
 
     if `"`suffix'"' != ".do" {
       noi di as error `"{phang} This files needs to be a do-file. {p_end}"'
       exit 198
-    } 
-    
+    }
+
     // Input file
     local input = `"`anything'"'
-    
-    * Suffix 
+
+    * Suffix
     _getfilesuffix `"`input'"'
     local suffix `"`r(suffix)'"'
-    
+
     if `"`suffix'"' == ".do" {
       local input = subinstr(`"`anything'"',"\","/",.)
     }
@@ -172,7 +175,7 @@ program lint
     else if `"`suffix'"' != ".do" {
       noi di as error `"{phang} This file needs to be a do-file. {p_end}"'
       exit 198
-    } 
+    }
 
     // Stata Detect  -----------------------------------------------------------
     python: import sys, os
@@ -183,14 +186,14 @@ program lint
     if !missing("`file'") {
         python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
     }
-  
+
     // Stata correct -----------------------------------------------------------
     // -------------------------------------------------------------------------
     // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
     // -------------------------------------------------------------------------
     qui: findfile stata_linter_correct.py
     if c(os) == "Windows" {
-      local ado_path = subinstr(r(fn), "\", "/", .) 
+      local ado_path = subinstr(r(fn), "\", "/", .)
     }
     else {
       local ado_path = r(fn)
@@ -218,7 +221,7 @@ program lint
     python: from stata_linter_correct import *
 
     * correct the output file, looping for each python command
-    foreach fun in                                                                  /// 
+    foreach fun in                                                                  ///
       "delimit_to_three_forward_slashes" "tab_to_space" "indent_in_bracket"         ///
       "too_long_line" "space_before_curly" "remove_blank_lines_before_curly_close"  ///
       "remove_duplicated_blank_lines"                                               ///
@@ -231,7 +234,7 @@ program lint
           while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & "${confirmation}" != "BREAK") {
               if ("`fun'" == "delimit_to_three_forward_slashes") {
                   noi di as txt "{pstd} Avoid to use delimit, use three forward slashes (///) instead. {p_end}"
-              } 
+              }
               else if ("`fun'" == "tab_to_space") {
                   noi di as txt "{pstd} Avoid to use hard tabs, use soft tabs (white spaces) instead. {p_end}"
               }
@@ -259,7 +262,7 @@ program lint
           // If user wrote "BREAK" then exit the code
           if ("`createfile'" == "BREAK") error 1
       }
-      
+
       // if automatic is used, always create the file
       else local createfile "Y"
 
@@ -284,13 +287,13 @@ program lint
       display as error "Could not create `output'."
       error 1
     }
-  } 
-  
+  }
+
 end
 
 // File Suffix
 capture program drop _getfilesuffix
-prog _getfilesuffix, rclass               // based on official _getfilename.ado and esttab 
+prog _getfilesuffix, rclass               // based on official _getfilename.ado and esttab
   version 8
   gettoken filename rest : 0
   if `"`rest'"' != "" {

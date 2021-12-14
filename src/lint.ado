@@ -130,7 +130,7 @@ program lint
         if "`excel'" != "" {
             display as result `"{phang}File {browse "`excel'":`excel'} created."'
         }
-        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
+        display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
     }
 
     // The case where all .do files in a folder are checked
@@ -188,6 +188,12 @@ program lint
     // We just need one do file here
     if !missing("`file'") {
         python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        display as result "-------------------------------------------------------------------------------------"
+        if "`excel'" != "" {
+            display as result `"{phang}File {browse "`excel'":`excel'} created."'
+        }
+        display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
+
     }
 
     // Stata correct -----------------------------------------------------------

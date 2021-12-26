@@ -91,6 +91,11 @@ program lint
   local summary_flag "1"
   if !missing("`nosummary'")  local summary_flag "0"
 
+   * Do file
+   foreach local in excel folder path {
+       local `local' = subinstr(`"``local''"',"\","/",.)
+   }
+  
   // ---------------------------------------------------------------------------
   // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
   // ---------------------------------------------------------------------------
@@ -122,7 +127,11 @@ program lint
 
         python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         display as result "-------------------------------------------------------------------------------------"
-        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
+        if "`excel'" != "" {
+            _excellink, excel(`excel')
+        }
+        _wikilink
+		
     }
 
     // The case where all .do files in a folder are checked
@@ -135,7 +144,10 @@ program lint
           python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
         display as result "-------------------------------------------------------------------------------------"
-        display as result `"For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":stata linter wiki}."'
+        if "`excel'" != "" {
+            _excellink, excel(`excel')
+        }
+        _wikilink
     }
   }
 
@@ -176,7 +188,14 @@ program lint
 
     // We just need one do file here
     if !missing("`file'") {
+
         python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+
+        display as result "-------------------------------------------------------------------------------------"
+        if "`excel'" != "" {
+            _excellink, excel(`excel')
+        }
+        _wikilink
     }
 
     // Stata correct -----------------------------------------------------------
@@ -202,11 +221,11 @@ program lint
     else copy "`input'" "`output'"
 
     // display a message if the correct option is added, so the output can be separated
-    display as text " "
-    display as result _dup(60) "-"
-    display as result "Correcting {bf:do-file}"
-    display as result _dup(60) "-"
-    display as text " "
+    display as text 	" "
+    display as result 	_dup(60) "-"
+    display as result 	"Correcting {bf:do-file}" 
+    display as result	_dup(60) "-"
+    display as text 	" "
 
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
@@ -272,7 +291,7 @@ program lint
     // Corrected output file
     cap confirm file "`output'"
     if !_rc {
-      display "Created `output'."
+      display as result `"{phang}Saved corrected do-file to {browse "`output'":`output'}.{p_end}"'
     }
 
     else {
@@ -327,4 +346,21 @@ program define _getfilepath, rclass
     return local path `"`path'"'
 end
 
+// DIME Wiki link
+
+capture program drop 	_wikilink
+		program define	_wikilink
+		
+	display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":Stata linter wiki.}{p_end}"'
+ 
+ end
+ 
+ capture program drop 	_excellink
+		program define	_excellink
+ 
+	syntax , excel(string)
+	
+	display as result `"{phang}File {browse "`excel'":`excel'} created.{p_end}"'
+ 
+ end
 // Have a lovely day!

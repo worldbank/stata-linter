@@ -160,7 +160,7 @@ The following examples are intended to illustrate the basic usage of
 that will be corrected and assign a new name to said do-file. If you do not include any
 options, Stata will ask you confirm if you want a specific bad practice to be corrected:
 
-        1. Basic usage (Stata will promp you with questions):
+        1. Basic usage (Stata will prompt you with questions):
         {com}. lint "test/bad.do" using "test/bad_corrected.do"
 
         2. Automatic (Stata will correct the file automatically):

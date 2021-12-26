@@ -1,4 +1,4 @@
-# version 0.0.2  21may2021  DIME Analytics dimeanalytics@worldbank.org
+# version 0.0.3  14dec2021  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -580,6 +580,5 @@ def stata_linter_detect_py(
         else:
             with pd.ExcelWriter(excel) as writer:
                 output_df.to_excel(writer, index = False, sheet_name = os.path.basename(input_file)[:20])
-        print("\n File {:s} created".format(excel))
 
     return( not output_df.empty )

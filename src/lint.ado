@@ -96,6 +96,11 @@ program lint
   local summary_flag "1"
   if !missing("`nosummary'")  local summary_flag "0"
 
+   * Do file
+   foreach local in excel folder path {
+       local `local' = subinstr(`"``local''"',"\","/",.)
+   }
+  
   // ---------------------------------------------------------------------------
   // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
   // ---------------------------------------------------------------------------

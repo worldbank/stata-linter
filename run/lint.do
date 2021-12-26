@@ -1,5 +1,5 @@
 * Set the global to folder where test files are stored
-  global project 	    "D:/Documents/RA Jobs/DIME/analytics/linter/stata-linter"
+  global project 	  "C:\Users\wb501238\Documents\GitHub/stata-linter"
   global test_dir     "${project}/test"
 
   // net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
@@ -13,7 +13,7 @@
   
   // Lint with results in excel file
   lint "${test_dir}/bad.do", nosummary          ///
-    excel("${test_dir}/detect_lint.xlsx")      
+    excel("${test_dir}/detect_lint.xlsx")
   
   // Lint a folder
   lint "${test_dir}", 
@@ -39,7 +39,9 @@
 
   // Check errors --------------------------------------------------------------
   // This should return an error. Input file is not a do file
-  lint "${test_dir}/bad"                        ///
-    using "${test_dir}/bad_corrected.do",       ///
-    nosummary                                   ///
-    replace automatic
+  cap  	lint "${test_dir}/bad"                        ///
+		using "${test_dir}/bad_corrected.do",       ///
+		nosummary                                   ///
+		replace automatic
+	
+	assert _rc == 198

@@ -197,16 +197,35 @@ capture program drop lint
 /*******************************************************************************
 	Correct issues
 *******************************************************************************/
+	
+	if !missing("`using'") {
+		_correct, ///
+			input("`input'") output("`output'") ///
+			indent("`indent'") tab_space("`tab_space'") linemax("`linemax'") ///
+			`replace' `inprep' `automatic' `debug'
+	}
+	
+end
 
-    // Stata Detect  -----------------------------------------------------------
-    python: import sys, os
-    python: sys.path.append(os.path.dirname(r"`ado_path'"))
-    python: from stata_linter_detect import *
+/*******************************************************************************
+********************************************************************************
+	
+	PART 3: Auxiliary functions
+	
+********************************************************************************
+*******************************************************************************/
 
-    // Stata correct -----------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
-    // -------------------------------------------------------------------------
+// Correct ---------------------------------------------------------------------
+
+capture program drop 	_correct
+		program			_correct
+		
+	syntax, ///
+		input(string) output(string) ///
+		indent(string) tab_space(string) linemax(string) ///
+		[replace inprep automatic debug]
+	
+	* Check whether function exists
     qui: findfile stata_linter_correct.py
     if c(os) == "Windows" {
       local ado_path = subinstr(r(fn), "\", "/", .)
@@ -215,13 +234,7 @@ capture program drop lint
       local ado_path = r(fn)
     }
 
-    // unless inprep is used, return error if input file and output file have the same name
-    if missing("`inprep'") & ("`input'" == "`output'") {
-      noi di as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep. {p_end}"'
-      exit
-    }
-
-    // copy the input file to the output file, which will be edited by the commands below
+    * copy the input file to the output file, which will be edited by the commands below
     if (!missing("`replace'") | !missing("`inprep'")) copy "`input'" "`output'", replace
     else copy "`input'" "`output'"
 
@@ -250,25 +263,25 @@ capture program drop lint
 
           while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & "${confirmation}" != "BREAK") {
               if ("`fun'" == "delimit_to_three_forward_slashes") {
-                  noi di as txt "{pstd} Avoid to use delimit, use three forward slashes (///) instead. {p_end}"
+                  di as result "{pstd} Avoid using [delimit], use three forward slashes (///) instead. {p_end}"
               }
               else if ("`fun'" == "tab_to_space") {
-                  noi di as txt "{pstd} Avoid to use hard tabs, use soft tabs (white spaces) instead. {p_end}"
+                  di as result "{pstd} Avoid using hard tabs, use soft tabs (white spaces) instead. {p_end}"
               }
               else if ("`fun'" == "indent_in_bracket") {
-                  noi di as txt "{pstd} Commands in curly brackets should be indented. {p_end}"
+                  di as result "{pstd} Indent commands inside curly brackets. {p_end}"
               }
               else if ("`fun'" == "too_long_line") {
-                  noi di as txt "{pstd} Each line should not be too long. {p_end}"
+                  di as result "{pstd} Limit line length to `linemax' characters. {p_end}"
               }
               else if ("`fun'" == "space_before_curly") {
-                  noi di as txt "{pstd} White space is recommended to be added before open curly brackets. {p_end}"
+                  di as result "{pstd} Use white space before opening curly brackets. {p_end}"
               }
               else if ("`fun'" == "remove_blank_lines_before_curly_close") {
-                  noi di as txt "{pstd} Redundant blank lines before closing brackets are better to be removed. {p_end}"
+                  di as result "{pstd} Remove redundant blank lines before closing brackets. {p_end}"
               }
               else if ("`fun'" == "remove_duplicated_blank_lines") {
-                  noi di as txt "{pstd} Duplicated blank lines are redundant, better to be compressed. {p_end}"
+                  di as result "{pstd} Remove duplicated blank lines. {p_end}"
               }
               noi di as txt "{pstd} Do you want to correct this? To confirm type {bf:Y} and hit enter, to abort type {bf:N} and hit enter. Type {bf:BREAK} and hit enter to stop the code. See option {help iegitaddmd:automatic} to not be prompted before creating files. {p_end}", _request(confirmation)
           }
@@ -304,15 +317,8 @@ capture program drop lint
       error 1
     }
 
+	
 end
-
-/*******************************************************************************
-********************************************************************************
-	
-	PART 3: Auxiliary functions
-	
-********************************************************************************
-*******************************************************************************/
 
 // Detect ----------------------------------------------------------------------
 
@@ -320,7 +326,7 @@ capture program drop	_detect
 		program			_detect
 		
 		syntax , ///
-				name(string) file(string) ///
+				name(string) file(string) ado_path(string) ///
 				indent(string) linemax(string) tab_space(string) ///
 				nocheck_flag(string) suppress_flag(string) summary_flag(string) ///
 				[excel(string) header footer]

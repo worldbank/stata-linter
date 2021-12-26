@@ -1,25 +1,25 @@
 *! version 0.0.4  21may2021  DIME Analytics dimeanalytics@worldbank.org
 
 capture program drop lint
-program lint
+		program 	 lint
 
   version 16
 
-  // Syntax
-  syntax anything [using/],        ///
-    /// Options
-    [                   ///
-      VERBose           ///
-      NOSUMmary         ///
-      Indent(string)    ///
-      Nocheck           ///
-      Linemax(string)   ///
-      Tab_space(string) ///
-      Correct(string)   ///
-      Excel(string)     ///
-      Automatic         ///
-      Replace           ///
-      INPRep            ///
+  syntax anything [using/],        	///
+									/// Options
+    [                   			///
+      VERBose           			///
+      NOSUMmary         			///
+      Indent(string)    			///
+      Nocheck           			///
+      Linemax(string)   			///
+      Tab_space(string) 			///
+      Correct(string)   			///
+      Excel(string)     			///
+      Automatic         			///
+      Replace           			///
+      INPRep            			///
+	  debug							///
     ]
 
 /*******************************************************************************
@@ -30,15 +30,49 @@ program lint
 ********************************************************************************
 *******************************************************************************/
 
-  // File or Folder to be detected
-  gettoken anything : anything
+* File or Folder to be detected
+	gettoken anything : anything
 
-  // Check if it is a file or a folder and assign the respective local
+// Check if it is a file or a folder and assign the respective local -----------
+
   _getfilepath     `"`anything'"'
     local path =   "`r(path)'"
     local name =   "`r(filename)'"
   _getfilesuffix   `"`anything'"'
     local suffix = "`r(suffix)'"
+
+// Set defaults ----------------------------------------------------------------
+ 
+  * set indent size = 4 if missing
+  if missing("`indent'")      local indent "4"
+
+  * set whitespaces for tab (tab_space) = indent size if tab_space is missing
+  if missing("`tab_space'")   local tab_space "`indent'"
+
+  * set linemax = 80 if missing
+  if missing("`linemax'")     local linemax "80"
+
+  * if !missing("`excel'")   cap erase `excel'
+  if !missing("`excel'")      cap rm `excel'
+
+  * set excel = "" if excel is missing
+  if missing("`excel'")       local excel ""
+
+  * set a constant for the nocheck option being used
+  local nocheck_flag "0"
+  if !missing("`nocheck'")    local nocheck_flag "1"
+
+  * set a constant for the suppress option being used
+  local suppress_flag "1"
+  if !missing("`verbose'")    local suppress_flag "0"
+
+  * set a constant for the summary option being used
+  local summary_flag "1"
+  if !missing("`nosummary'")  local summary_flag "0"
+  
+  if !missing("`debug'") di "Inputs prepared"
+  
+// Prepare file paths ----------------------------------------------------------
 
   * Do file
   if "`suffix'" == ".do" {
@@ -49,6 +83,7 @@ program lint
   else if "`suffix'" == "" {
     _shortenpath `"`anything'"', len(100)
     local folder = `"`r(pfilename)'"'
+	local folder = subinstr(`"`folder'"',"\","/",.)
   }
 
   * Anything else
@@ -56,7 +91,26 @@ program lint
     display as error "Make sure you are passing a do-file"
     exit 198
   }
+  
+  * Excel filename
+  if !missing("`excel'") {
+    local excel = subinstr(`"`excel'"',"\","/",.)
+  }
+  
+   * Do file
+   foreach local in excel folder path name {
+       local `local' = subinstr(`"``local''"',"\","/",.)
+   }
 
+	* In debug mode, print file paths
+  if !missing("`debug'"){
+  	di "Folder: `folder'"
+	di "File: `file'"
+	di "Name: `name'"
+	di "Path: `path'"
+	di "Excel: `excel'"
+  }
+  
   // ---------------------------------------------------------------------------
   // PYTHON INFORMATION
   // ---------------------------------------------------------------------------
@@ -73,41 +127,6 @@ program lint
       noi di as error `"{phang} For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
       exit
   }
-
-  // ---------------------------------------------------------------------------
-  // OPTIONS -- Defaults
-  // ---------------------------------------------------------------------------
-  // set indent size = 4 if missing
-  if missing("`indent'")      local indent "4"
-
-  // set whitespaces for tab (tab_space) = indent size if tab_space is missing
-  if missing("`tab_space'")   local tab_space "`indent'"
-
-  // set linemax = 80 if missing
-  if missing("`linemax'")     local linemax "80"
-
-  // if !missing("`excel'")   cap erase `excel'
-  if !missing("`excel'")      cap rm `excel'
-
-  // set excel = "" if excel is missing
-  if missing("`excel'")       local excel ""
-
-  // set a constant for the nocheck option being used
-  local nocheck_flag "0"
-  if !missing("`nocheck'")    local nocheck_flag "1"
-
-  // set a constant for the suppress option being used
-  local suppress_flag "1"
-  if !missing("`verbose'")    local suppress_flag "0"
-
-  // set a constant for the summary option being used
-  local summary_flag "1"
-  if !missing("`nosummary'")  local summary_flag "0"
-
-   * Do file
-   foreach local in excel folder path {
-       local `local' = subinstr(`"``local''"',"\","/",.)
-   }
   
   // ---------------------------------------------------------------------------
   // CHECK WHETHER THE PYTHON FUNCTIONS EXIST

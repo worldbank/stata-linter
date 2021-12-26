@@ -111,26 +111,16 @@ capture program drop lint
 	di "Excel: `excel'"
   }
   
-  // ---------------------------------------------------------------------------
-  // PYTHON INFORMATION
-  // ---------------------------------------------------------------------------
-  // Check if python is installed
-  cap python search
-  if _rc {
-      noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
-      exit
-  }
-
-  // Check if pandas package is installed
-  cap python which pandas
-  if _rc {
-      noi di as error `"{phang} For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
-      exit
-  }
+  * Check if python is installed
+  _checkpyinstall
   
-  // ---------------------------------------------------------------------------
-  // CHECK WHETHER THE PYTHON FUNCTIONS EXIST
-  // ---------------------------------------------------------------------------
+/*******************************************************************************
+********************************************************************************
+	
+	PART 2: Excute linter
+	
+********************************************************************************
+*******************************************************************************/
 
   // Stata Detect
   qui: findfile stata_linter_detect.py
@@ -140,15 +130,7 @@ capture program drop lint
   else {
       local ado_path = r(fn)
   }
-
-/*******************************************************************************
-********************************************************************************
-	
-	PART 2: Excute linter
-	
-********************************************************************************
-*******************************************************************************/
-
+  
   // Only Stata Detect ---------------------------------------------------------
   if `"`using'"' == "" {
     python: import sys, os
@@ -344,34 +326,37 @@ end
 	
 ********************************************************************************
 *******************************************************************************/
+// File Suffix -----------------------------------------------------------------
 
-
-// File Suffix
 capture program drop _getfilesuffix
-prog _getfilesuffix, rclass               // based on official _getfilename.ado and esttab
-  version 8
-  gettoken filename rest : 0
-  if `"`rest'"' != "" {
-      exit 198
-  }
-  local hassuffix 0
-  gettoken word rest : filename, parse(".")
-  while `"`rest'"' != "" {
-      local hassuffix 1
-      gettoken word rest : rest, parse(".")
-  }
-  if `"`word'"' == "." {
-      di as err `"incomplete filename; ends in ."'
-      exit 198
-  }
-  if index(`"`word'"',"/") | index(`"`word'"',"\") local hassuffix 0
-  if `hassuffix' return local suffix `".`word'"'
-  else           return local suffix ""
+		program 	 _getfilesuffix, rclass	// based on official _getfilename.ado and esttab
+
+	  version 8
+	  gettoken filename rest : 0
+	  if `"`rest'"' != "" {
+		  exit 198
+	  }
+	  local hassuffix 0
+	  gettoken word rest : filename, parse(".")
+	  while `"`rest'"' != "" {
+		  local hassuffix 1
+		  gettoken word rest : rest, parse(".")
+	  }
+	  if `"`word'"' == "." {
+		  di as err `"incomplete filename; ends in ."'
+		  exit 198
+	  }
+	  if index(`"`word'"',"/") | index(`"`word'"',"\") local hassuffix 0
+	  if `hassuffix' return local suffix `".`word'"'
+	  else           return local suffix ""
+
 end
 
-// File Paths
+// File Paths ------------------------------------------------------------------
+
 capture program drop _getfilepath
-program define _getfilepath, rclass
+		program 	 _getfilepath, rclass
+
     version 8
     gettoken pathfile rest : 0
     if `"`rest'"' != "" {
@@ -388,12 +373,13 @@ program define _getfilepath, rclass
     }
     return local filename `"`word'"'
     return local path `"`path'"'
+
 end
 
-// DIME Wiki link
+// Messages --------------------------------------------------------------------
 
 capture program drop 	_wikilink
-		program define	_wikilink
+		program 		_wikilink
 		
 	display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":Stata linter wiki.}{p_end}"'
  
@@ -407,4 +393,26 @@ capture program drop 	_wikilink
 	display as result `"{phang}File {browse "`excel'":`excel'} created.{p_end}"'
  
  end
-// Have a lovely day!
+ 
+// Error checks ----------------------------------------------------------------
+
+capture program drop  	_checkpyinstall
+		program 		_checkpyinstall
+	
+	* Check if python is installed
+	cap python search
+	if _rc {
+		noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
+		exit
+	}
+
+	* Check if pandas package is installed
+	cap python which pandas
+	if _rc {
+		noi di as error `"{phang} For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		exit
+	}
+	
+end
+
+************************************************************* Have a lovely day!

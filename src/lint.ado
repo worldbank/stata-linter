@@ -74,32 +74,24 @@ capture program drop lint
   
 // Prepare file paths ----------------------------------------------------------
 
-  * Do file
+  * Do-file to be linted should have file format .do
   if "`suffix'" == ".do" {
     local file = subinstr(`"`anything'"',"\","/",.)
   }
-
-  * Path
+  * It may also be blank
   else if "`suffix'" == "" {
     _shortenpath `"`anything'"', len(100)
     local folder = `"`r(pfilename)'"'
-	local folder = subinstr(`"`folder'"',"\","/",.)
   }
-
-  * Anything else
-  else if "`suffix'" != ".do" {
-    display as error "Make sure you are passing a do-file"
+  * But any other suffix is an error
+  else {
+    display as error "The file to be linted does not have the file format [.do]. Make sure you are specifying a do-file as the main argument to [lint]."
     exit 198
-  }
-  
-  * Excel filename
-  if !missing("`excel'") {
-    local excel = subinstr(`"`excel'"',"\","/",.)
   }
   
    * Do file
    foreach local in excel folder path name {
-       local `local' = subinstr(`"``local''"',"\","/",.)
+		if !missing("``local''") local `local' = subinstr(`"``local''"',"\","/",.)
    }
 
 	* In debug mode, print file paths

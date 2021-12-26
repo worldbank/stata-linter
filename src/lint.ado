@@ -295,7 +295,7 @@ program lint
     // Corrected output file
     cap confirm file "`output'"
     if !_rc {
-      display "Created `output'."
+      display as result `"{phang}Saved corrected do-file to {browse "`output'":`output'}.{p_end}"'
     }
 
     else {

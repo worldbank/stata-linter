@@ -30,18 +30,9 @@ capture program drop lint
 ********************************************************************************
 *******************************************************************************/
 
-* File or Folder to be detected
-	gettoken anything : anything
-
-// Check if it is a file or a folder and assign the respective local -----------
-
-  _getfilepath     `"`anything'"'
-    local path =   "`r(path)'"
-    local name =   "`r(filename)'"
-  _getfilesuffix   `"`anything'"'
-    local suffix = "`r(suffix)'"
-
-// Set defaults ----------------------------------------------------------------
+/*******************************************************************************
+	Set defaults
+*******************************************************************************/
  
   * set indent size = 4 if missing
   if missing("`indent'")      local indent "4"
@@ -70,11 +61,27 @@ capture program drop lint
   local summary_flag "1"
   if !missing("`nosummary'")  local summary_flag "0"
   
+  * In debug mode, print status
   if !missing("`debug'") di "Inputs prepared"
   
-// Prepare file paths ----------------------------------------------------------
+  
+/*******************************************************************************
+	Prepare file paths 
+*******************************************************************************/
 
-  * Do-file to be linted should have file format .do
+// Check format of do-file to be linted ----------------------------------------
+
+	* File or Folder to be detected
+	gettoken anything : anything
+	
+	* Check if main input is a file or a folder
+  _getfilepath     `"`anything'"'
+    local path =   "`r(path)'"
+    local name =   "`r(filename)'"
+  _getfilesuffix   `"`anything'"'
+    local suffix = "`r(suffix)'"
+
+	* It should be a do-file
   if "`suffix'" == ".do" {
     local file = subinstr(`"`anything'"',"\","/",.)
   }
@@ -89,21 +96,42 @@ capture program drop lint
     exit 198
   }
   
-   * Do file
-   foreach local in excel folder path name {
+// Check format of do-file with corrections ------------------------------------
+
+  
+	if !missing("`using'") {
+		
+		local output  = subinstr(`"`using'"',"\","/",.)
+		
+		_getfilesuffix `"`output'"'
+		local suffix `"`r(suffix)'"'
+		if `"`suffix'"' != ".do" {
+			display as error "The file to be saved with corrections does not have the file format [.do]. Make sure you are specifying a do-file as the [using] argument to [lint]."
+			exit 198
+		}
+    }
+  
+// Replace all backslashes with forward slashes --------------------------------
+
+   foreach local in excel folder path name output {
 		if !missing("``local''") local `local' = subinstr(`"``local''"',"\","/",.)
    }
 
-	* In debug mode, print file paths
-  if !missing("`debug'"){
+// In debug mode, print file paths ---------------------------------------------
+
+  if !missing("`debug'") {
   	di "Folder: `folder'"
 	di "File: `file'"
 	di "Name: `name'"
 	di "Path: `path'"
 	di "Excel: `excel'"
+	di "Output: `output'"
   }
   
-  * Check if python is installed
+/*******************************************************************************
+	Check if python is installed
+*******************************************************************************/
+
   _checkpyinstall
   
 /*******************************************************************************
@@ -113,99 +141,58 @@ capture program drop lint
 	
 ********************************************************************************
 *******************************************************************************/
-
-  // Stata Detect
-  qui: findfile stata_linter_detect.py
-  if c(os) == "Windows" {
-      local ado_path = subinstr(r(fn), "\", "/", .)
-  }
-  else {
-      local ado_path = r(fn)
-  }
   
-  // Only Stata Detect ---------------------------------------------------------
-  if `"`using'"' == "" {
-    python: import sys, os
-    python: sys.path.append(os.path.dirname(r"`ado_path'"))
-    python: from stata_linter_detect import *
+/*******************************************************************************
+	Detect issues
+*******************************************************************************/
 
-    // The case where one .do file is checked
+	* Check that the Python function is defined
+	qui: findfile stata_linter_detect.py
+	if c(os) == "Windows" {
+		local ado_path = subinstr(r(fn), "\", "/", .)
+	}
+	else {
+		local ado_path = r(fn)
+	}
+
+    * Check a single do-file
     if !missing("`file'") {
-        di as text ""
-        di as text "Do-file: `name'"
-        di as text ""
-
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
-        display as result "-------------------------------------------------------------------------------------"
-        if "`excel'" != "" {
-            _excellink, excel(`excel')
-        }
-        _wikilink
 		
+		if missing("`using'") local header header
+		
+		_detect, ///
+			name("`name'") file("`file'") excel("`excel'")  ///
+			indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
+			nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+			`header' footer
     }
 
-    // The case where all .do files in a folder are checked
+    * Check all do-files in a folder
     else if !missing("`folder'") {
+		
         local files: dir "`folder'" files "*.do"
-        foreach l of local files {
-          di as text ""
-          di as text ""
-          di as text "Do-file: `l'"
-          python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
-        }
-        display as result "-------------------------------------------------------------------------------------"
-        if "`excel'" != "" {
-            _excellink, excel(`excel')
-        }
-        _wikilink
-    }
-  }
+		
+        foreach file of local files {
+			
+			_detect, ///
+				name("`file'") file("`folder'/`file'") excel("`excel'") ///
+				indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
+				nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+				header footer
+		}
+	}
 
+	* In debug mode, print status
+	if !missing("`debug'") noi di "Exiting detect function"
+	
   // Stata Detect + Stata Correct ----------------------------------------------
   if `"`using'"' != "" {
-    // Output file
-    local output  = subinstr(`"`using'"',"\","/",.)
-
-    * Suffix
-    _getfilesuffix `"`output'"'
-    local suffix `"`r(suffix)'"'
-
-    if `"`suffix'"' != ".do" {
-      noi di as error `"{phang} This files needs to be a do-file. {p_end}"'
-      exit 198
-    }
-
-    // Input file
-    local input = `"`anything'"'
-
-    * Suffix
-    _getfilesuffix `"`input'"'
-    local suffix `"`r(suffix)'"'
-
-    if `"`suffix'"' == ".do" {
-      local input = subinstr(`"`anything'"',"\","/",.)
-    }
-
-    else if `"`suffix'"' != ".do" {
-      noi di as error `"{phang} This file needs to be a do-file. {p_end}"'
-      exit 198
-    }
+    
 
     // Stata Detect  -----------------------------------------------------------
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_detect import *
-
-    // We just need one do file here
-    if !missing("`file'") {
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
-        display as result "-------------------------------------------------------------------------------------"
-        if "`excel'" != "" {
-            _excellink, excel(`excel')
-        }
-        _wikilink
-
-    }
 
     // Stata correct -----------------------------------------------------------
     // -------------------------------------------------------------------------
@@ -318,6 +305,49 @@ end
 	
 ********************************************************************************
 *******************************************************************************/
+
+// Detect ----------------------------------------------------------------------
+
+capture program drop	_detect
+		program			_detect
+		
+		syntax , ///
+				name(string) file(string) ///
+				indent(string) linemax(string) tab_space(string) ///
+				nocheck_flag(string) suppress_flag(string) summary_flag(string) ///
+				[excel(string) header footer]
+				
+		* Import relevant python functions
+		python: import sys, os
+		python: sys.path.append(os.path.dirname(r"`ado_path'"))
+		python: from stata_linter_detect import *
+		
+		* Stata result header
+		if !missing("`header'") {
+			di as text ""
+			di as text "Do-file: `name'"
+			di as text ""
+		}
+
+		* Actually run the Python code
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        
+		* Stata result footer
+		if !missing("`footer'") {
+    
+				display as result 	_dup(60) "-"
+		
+			if "`excel'" != "" {
+				display as result 	`"{phang}File {browse "`excel'":`excel'} created.{p_end}"'
+			}
+			
+				display as result 	`"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":Stata linter wiki.}{p_end}"'
+		}
+		
+
+
+end
+
 // File Suffix -----------------------------------------------------------------
 
 capture program drop _getfilesuffix
@@ -368,24 +398,6 @@ capture program drop _getfilepath
 
 end
 
-// Messages --------------------------------------------------------------------
-
-capture program drop 	_wikilink
-		program 		_wikilink
-		
-	display as result `"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":Stata linter wiki.}{p_end}"'
- 
- end
- 
- capture program drop 	_excellink
-		program define	_excellink
- 
-	syntax , excel(string)
-	
-	display as result `"{phang}File {browse "`excel'":`excel'} created.{p_end}"'
- 
- end
- 
 // Error checks ----------------------------------------------------------------
 
 capture program drop  	_checkpyinstall

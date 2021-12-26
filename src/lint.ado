@@ -75,19 +75,20 @@ capture program drop lint
 	gettoken anything : anything
 	
 	* Check if main input is a file or a folder
-  _getfilepath     `"`anything'"'
+	local input =  `"`anything'"'
+  _getfilepath     `"`input'"'
     local path =   "`r(path)'"
     local name =   "`r(filename)'"
-  _getfilesuffix   `"`anything'"'
+  _getfilesuffix   `"`input'"'
     local suffix = "`r(suffix)'"
 
 	* It should be a do-file
   if "`suffix'" == ".do" {
-    local file = subinstr(`"`anything'"',"\","/",.)
+    local file = subinstr(`"`input'"',"\","/",.)
   }
   * It may also be blank
   else if "`suffix'" == "" {
-    _shortenpath `"`anything'"', len(100)
+    _shortenpath `"`input'"', len(100)
     local folder = `"`r(pfilename)'"'
   }
   * But any other suffix is an error
@@ -96,24 +97,32 @@ capture program drop lint
     exit 198
   }
   
-// Check format of do-file with corrections ------------------------------------
+// Check do-file with corrections ----------------------------------------------
 
   
 	if !missing("`using'") {
 		
 		local output  = subinstr(`"`using'"',"\","/",.)
 		
+		* Check format
 		_getfilesuffix `"`output'"'
 		local suffix `"`r(suffix)'"'
 		if `"`suffix'"' != ".do" {
 			display as error "The file to be saved with corrections does not have the file format [.do]. Make sure you are specifying a do-file as the [using] argument to [lint]."
 			exit 198
 		}
+		
+		* Unless inprep is used, the output file should have a different name than the input
+		if missing("`inprep'") & ("`input'" == "`output'") {
+			display as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep. {p_end}"'
+			exit
+		}
+		
     }
   
 // Replace all backslashes with forward slashes --------------------------------
 
-   foreach local in excel folder path name output {
+   foreach local in excel folder path name output input {
 		if !missing("``local''") local `local' = subinstr(`"``local''"',"\","/",.)
    }
 
@@ -161,7 +170,7 @@ capture program drop lint
 		if missing("`using'") local header header
 		
 		_detect, ///
-			name("`name'") file("`file'") excel("`excel'")  ///
+			name("`name'") file("`file'") excel("`excel'") ado_path("`ado_path'") ///
 			indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
 			nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 			`header' footer
@@ -175,7 +184,7 @@ capture program drop lint
         foreach file of local files {
 			
 			_detect, ///
-				name("`file'") file("`folder'/`file'") excel("`excel'") ///
+				name("`file'") file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
 				indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
 				nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 				header footer
@@ -185,9 +194,9 @@ capture program drop lint
 	* In debug mode, print status
 	if !missing("`debug'") noi di "Exiting detect function"
 	
-  // Stata Detect + Stata Correct ----------------------------------------------
-  if `"`using'"' != "" {
-    
+/*******************************************************************************
+	Correct issues
+*******************************************************************************/
 
     // Stata Detect  -----------------------------------------------------------
     python: import sys, os
@@ -223,6 +232,7 @@ capture program drop lint
     display as result	_dup(60) "-"
     display as text 	" "
 
+	* Import relevant python libraries
     python: import sys, os
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_correct import *
@@ -284,17 +294,15 @@ capture program drop lint
       }
     }
 
-    // Corrected output file
+	* Print link to corrected output file
     cap confirm file "`output'"
     if !_rc {
-      display as result `"{phang}Saved corrected do-file to {browse "`output'":`output'}.{p_end}"'
+      display as result `"{phang}Corrected do-file saved to {browse "`output'":`output'}.{p_end}"'
     }
-
     else {
-      display as error "Could not create `output'."
+      display as error "{phang}Could not create `output'.{p_end}"
       error 1
     }
-  }
 
 end
 

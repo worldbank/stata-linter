@@ -17,7 +17,7 @@ capture program drop lint
       Correct(string)   			///
       Excel(string)     			///
       Automatic         			///
-      Replace           			///
+      replace           			///
       INPRep            			///
 	  debug							///
     ]
@@ -76,64 +76,46 @@ capture program drop lint
 	
 	* Check if main input is a file or a folder
 	local input =  `"`anything'"'
-  _getfilepath     `"`input'"'
-    local path =   "`r(path)'"
-    local name =   "`r(filename)'"
-  _getfilesuffix   `"`input'"'
-    local suffix = "`r(suffix)'"
-
-	* It should be a do-file
-  if "`suffix'" == ".do" {
-    local file = subinstr(`"`input'"',"\","/",.)
-  }
-  * It may also be blank
-  else if "`suffix'" == "" {
-    _shortenpath `"`input'"', len(100)
-    local folder = `"`r(pfilename)'"'
-  }
-  * But any other suffix is an error
-  else {
-    display as error "The file to be linted does not have the file format [.do]. Make sure you are specifying a do-file as the main argument to [lint]."
-    exit 198
-  }
+	
+	_testpath "`input'", ext(`"".do", ".ado""') argument(lint's main argument) exists `debug'
+	local folder =  "`r(folder)'"
+    local file 	 =  "`r(file)'"
   
 // Check do-file with corrections ----------------------------------------------
-
   
 	if !missing("`using'") {
 		
-		local output  = subinstr(`"`using'"',"\","/",.)
-		
-		* Check format
-		_getfilesuffix `"`output'"'
-		local suffix `"`r(suffix)'"'
-		if `"`suffix'"' != ".do" {
-			display as error "The file to be saved with corrections does not have the file format [.do]. Make sure you are specifying a do-file as the [using] argument to [lint]."
-			exit 198
+		* Can only be used when linting a do-file
+		if missing("`file'") {
+			di as error "{phang}Option [using] cannot be used when linting a directory. To use this option, specify a do-file as lint's main argument.{p_end}"
+			error 198
 		}
+		
+		_testpath "`using'", ext(`"".do", ".ado""') argument(lint's [using] argument) `debug'
+		local output = "`r(file)'"
 		
 		* Unless inprep is used, the output file should have a different name than the input
 		if missing("`inprep'") & ("`input'" == "`output'") {
-			display as error `"{phang} It is recommended that input file and output file have different names since the output of this command is not guaranteed to function properly and you may want to keep a backup. If you want to replace the input file with the output of this command, use the option inprep. {p_end}"'
-			exit
+			di as error "{phang}It is recommended to use different file names for lint's main argument and its [using] argument. This is because it is possible that the corrected do-file created by the command will contain bugs, and you may want to keep a backup. If you want to replace the current do-file with the do-file corrected by lint, use the option [inprep]. {p_end}"
+			error 198
 		}
-		
     }
+	
+// Check Excel with corrections ------------------------------------------------
   
-// Replace all backslashes with forward slashes --------------------------------
-
-   foreach local in excel folder path name output input {
-		if !missing("``local''") local `local' = subinstr(`"``local''"',"\","/",.)
-   }
-
+	if !missing("`excel'") {
+		
+		_testpath "`excel'", ext(`"".xls", ".xlsx""') argument(lint's [excel] argument) `debug'
+		local excel = "`r(file)'"
+	}
+	
 // In debug mode, print file paths ---------------------------------------------
 
   if !missing("`debug'") {
   	di "Folder: `folder'"
 	di "File: `file'"
-	di "Name: `name'"
-	di "Path: `path'"
 	di "Excel: `excel'"
+	di "Input: `input'"
 	di "Output: `output'"
   }
   
@@ -170,7 +152,7 @@ capture program drop lint
 		if missing("`using'") local header header
 		
 		_detect, ///
-			name("`name'") file("`file'") excel("`excel'") ado_path("`ado_path'") ///
+			file("`file'") excel("`excel'") ado_path("`ado_path'") ///
 			indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
 			nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 			`header' footer
@@ -184,7 +166,7 @@ capture program drop lint
         foreach file of local files {
 			
 			_detect, ///
-				name("`file'") file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
+				file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
 				indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
 				nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 				header footer
@@ -225,7 +207,7 @@ capture program drop 	_correct
 		indent(string) tab_space(string) linemax(string) ///
 		[replace inprep automatic debug]
 	
-	* Check whether function exists
+	* Check that the Python function is defined
     qui: findfile stata_linter_correct.py
     if c(os) == "Windows" {
       local ado_path = subinstr(r(fn), "\", "/", .)
@@ -326,7 +308,7 @@ capture program drop	_detect
 		program			_detect
 		
 		syntax , ///
-				name(string) file(string) ado_path(string) ///
+				file(string) ado_path(string) ///
 				indent(string) linemax(string) tab_space(string) ///
 				nocheck_flag(string) suppress_flag(string) summary_flag(string) ///
 				[excel(string) header footer]
@@ -338,9 +320,9 @@ capture program drop	_detect
 		
 		* Stata result header
 		if !missing("`header'") {
-			di as text ""
-			di as text "Do-file: `name'"
-			di as text ""
+			di as result ""
+			di as result "Linting file: `file'"
+			di as result ""
 		}
 
 		* Actually run the Python code
@@ -362,55 +344,85 @@ capture program drop	_detect
 
 end
 
-// File Suffix -----------------------------------------------------------------
-
-capture program drop _getfilesuffix
-		program 	 _getfilesuffix, rclass	// based on official _getfilename.ado and esttab
-
-	  version 8
-	  gettoken filename rest : 0
-	  if `"`rest'"' != "" {
-		  exit 198
-	  }
-	  local hassuffix 0
-	  gettoken word rest : filename, parse(".")
-	  while `"`rest'"' != "" {
-		  local hassuffix 1
-		  gettoken word rest : rest, parse(".")
-	  }
-	  if `"`word'"' == "." {
-		  di as err `"incomplete filename; ends in ."'
-		  exit 198
-	  }
-	  if index(`"`word'"',"/") | index(`"`word'"',"\") local hassuffix 0
-	  if `hassuffix' return local suffix `".`word'"'
-	  else           return local suffix ""
-
-end
-
 // File Paths ------------------------------------------------------------------
 
-capture program drop _getfilepath
-		program 	 _getfilepath, rclass
+cap program drop _testpath
+	program		 _testpath, rclass
 
-    version 8
-    gettoken pathfile rest : 0
-    if `"`rest'"' != "" {
-        exit 198
-    }
-    gettoken word rest : pathfile, parse("\/:")
-    while `"`rest'"' != "" {
-        local path `"`macval(path)'`macval(word)'"'
-        gettoken word rest : rest, parse("\/:")
-    }
-    if inlist(`"`word'"', "\", "/", ":") {
-        di as err `"incomplete path-filename; ends in separator `word'. Removed the last `word'."'
-        exit 198
-    }
-    return local filename `"`word'"'
-    return local path `"`path'"'
+	syntax anything, argument(string) ext(string) [details(string) debug exists] 
+	
+	if !missing("`debug'") di "Entering subcommand _filepath"
+		
+	* Standardize file path
+	local path = subinstr(`"`anything'"', "\", "/", .)
+	
+	* If a folder, test that folder exists
+	if !regex(`"`path'"', "\.") {
+	    _testdirectory 	`path'	, argument(`argument') details(`details') 	   `debug'			
+		local folder 	`path'
+	}
+	
+	* If a file, parse information
+	else {
+	    _testfile  `path'		, argument(`argument') ext(`"`ext'"') `exists' `debug'
+		local file `path'
+	}
+	
+	return local folder "`folder'"
+	if !missing("`debug'") di `"Folder: `folder'"'
+	
+	return local file 	"`file'"
+	if !missing("`debug'") di `"File: `file'"'
+		
+	if !missing("`debug'") di "Exiting subcommand _filepath"
+	
+end	
 
+// Test file format ------------------------------------------------------------
+
+cap program drop _testfile
+	program		 _testfile, rclass
+	
+	syntax anything, ext(string) argument(string) [debug exists]
+	
+	if !missing("`debug'") di "Entering subcommand _testfile"
+
+		
+	if !missing("`exists'") {
+	    confirm file `anything'
+	}
+
+	* Get index of separation between file name and file format
+	local r_lastdot = strlen(`anything') - strpos(strreverse(`anything'), ".")
+	
+	* File format starts at the last period and ends at the end of the string 
+	local suffix     = substr(`anything', `r_lastdot' + 1, .) 
+	
+	if !inlist("`suffix'", `ext') {
+	    di as error `"{phang}File `anything' is not a valid input for `argument'. Only the following file extensions are accepted: `ext'.{p_end}"'
+		error 198
+	}
+	
 end
+
+// Check if folder exists ------------------------------------------------------
+
+cap program drop _testdirectory
+    program      _testdirectory
+	
+	syntax anything, argument(string) [details(string) debug]
+	
+	if !missing("`debug'") di "Entering subcommand _testdirectory"
+		
+	* Test that the folder for the report file exists
+	 mata : st_numscalar("r(dirExist)", direxists(`anything'))
+	 if `r(dirExist)' == 0  {
+	 	noi di as error `"{phang}Directory `anything', used `argument', does not exist. `details'{p_end}"'
+		error 601
+	 }	
+	
+end
+
 
 // Error checks ----------------------------------------------------------------
 

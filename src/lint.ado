@@ -215,12 +215,16 @@ capture program drop 	_correct
     else {
       local ado_path = r(fn)
     }
+		
+    * Copy the input file to the output file, which will be edited by the commands below
+    if (!missing("`replace'") | !missing("`inprep'"))  {
+		copy "`input'" "`output'", replace
+	}
+    else {
+		copy "`input'" "`output'"
+	}
 
-    * copy the input file to the output file, which will be edited by the commands below
-    if (!missing("`replace'") | !missing("`inprep'")) copy "`input'" "`output'", replace
-    else copy "`input'" "`output'"
-
-    // display a message if the correct option is added, so the output can be separated
+    * Display a message if the correct option is added, so the output can be separated
     display as text 	" "
     display as result 	_dup(60) "-"
     display as result 	"Correcting {bf:do-file}" 
@@ -233,11 +237,10 @@ capture program drop 	_correct
     python: from stata_linter_correct import *
 
     * correct the output file, looping for each python command
-    foreach fun in                                                                  ///
-      "delimit_to_three_forward_slashes" "tab_to_space" "indent_in_bracket"         ///
-      "too_long_line" "space_before_curly" "remove_blank_lines_before_curly_close"  ///
-      "remove_duplicated_blank_lines"                                               ///
-      {
+     foreach fun in 	delimit_to_three_forward_slashes tab_to_space ///
+						indent_in_bracket too_long_line space_before_curly ///
+						remove_blank_lines_before_curly_close ///
+						remove_duplicated_blank_lines {
 
       if missing("`automatic'") {
           noi di ""
@@ -276,17 +279,18 @@ capture program drop 	_correct
       }
 
       // if automatic is used, always create the file
-      else local createfile "Y"
+      else {
+	  	local createfile "Y"
+	  }
 
-      // If manual was used and input was N, file is not corrected for this issue
-      if ("`createfile'" == "N") noi di as result ""
-
-      // If "manual" were used and input was Y or if manual was not used, create the file
-      else if ("`createfile'" == "Y") {
-          * call the python function
-          python: `fun'("`output'", "`output'", "`indent'", "`tab_space'")
-
-      }
+		* If option [manual] was used and input was [N], file is not corrected for this issue
+		if ("`createfile'" == "N") {
+			noi di as result ""
+		}
+		* If option [manual] was used and input was [Y], or if option [manual] was not used, create the file
+		else if ("`createfile'" == "Y") {
+			python: `fun'("`output'", "`output'", "`indent'", "`tab_space'")
+		}
     }
 
 	* Print link to corrected output file

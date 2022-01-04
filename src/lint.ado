@@ -48,9 +48,6 @@ capture program drop lint
   * set excel = "" if excel is missing
   if missing("`excel'")      	local excel ""
 
-  * set a constant for the nocheck option being used
-  local nocheck_flag "0"
-
   * set a constant for the suppress option being used
   local suppress_flag "1"
   if !missing("`verbose'")    	local suppress_flag "0"

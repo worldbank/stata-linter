@@ -27,7 +27,6 @@ On how to install python packages, refer to {browse "https://blog.stata.com/2020
 {marker columnoptions}{...}
 {synopt :{cmdab:verbose}}Shows line-by-line results{p_end}
 {synopt :{cmdab:nosummary}}Excludes summary results (number of bad practices){p_end}
-{synopt :{cmdab:nocheck}}Do not show suggestions to check and only show style problems{p_end}
 {synopt :{cmdab:indent(}{it:integer}{cmd:)}}The number of whitespaces used for indentation (default: 4){p_end}
 {synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
 {synopt :{cmdab:linemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80){p_end}
@@ -143,19 +142,16 @@ The following examples are intended to illustrate the basic usage of
         3. Specify the number of whitespaces (default: 4):
         {com}. lint "test/bad.do", indent(2)
 
-        4. Keep only the {it:style} and not {it:check}:
-        {com}. lint "test/bad.do", nocheck
-
-        5. Specify the maximum number of characters in a line (default: 80):
+        4. Specify the maximum number of characters in a line (default: 80):
         {com}. lint "test/bad.do", linemax(100)
 
-        6. Specify the number of whitespaces used instead of hard tabs (default: 4):
+        5. Specify the number of whitespaces used instead of hard tabs (default: 4):
         {com}. lint "test/bad.do", tab_space(100)
 
-        7. Exports to excel the results of the line by line analysis
+        6. Exports to excel the results of the line by line analysis
         {com}. lint "test/bad.do", excel("test_dir/detect_output.xlsx")
 
-        8. You can also use this command to test all the do-files that are in a folder:
+        7. You can also use this command to test all the do-files that are in a folder:
         {com}. lint "test"
 
 {pstd}{hi:2. Correcting bad coding practices}

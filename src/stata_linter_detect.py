@@ -14,9 +14,6 @@ def run():
     parser.add_argument('--indent', type=int, nargs='?', default=4,
                             help="Number of spaces to use for each indentation"
                             )
-    parser.add_argument('--nocheck', action='store_true',
-                            help="Disable checking"
-                            )
     parser.add_argument('--suppress', action='store_true',
                             help="Suppress line item printout"
                             )
@@ -35,7 +32,6 @@ def run():
     return stata_linter_detect_py(
         input_file=args.filename,
         indent=args.indent,
-        nocheck="1" if args.nocheck else "0",
         suppress="1" if args.suppress else "0",
         summary="1" if args.summary else "0",
         excel=args.excel_output,
@@ -409,7 +405,7 @@ def update_comment_delimiter(comment_delimiter, line):
 
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(
-    input_file, indent, nocheck,
+    input_file, indent, 
     suppress, summary, excel, linemax,
     tab_space
     ):

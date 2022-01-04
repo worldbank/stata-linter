@@ -12,7 +12,6 @@ program lint
       VERBose           ///
       NOSUMmary         ///
       Indent(string)    ///
-      Nocheck           ///
       Linemax(string)   ///
       Tab_space(string) ///
       Correct(string)   ///
@@ -84,10 +83,6 @@ program lint
   // set excel = "" if excel is missing
   if missing("`excel'")       local excel ""
 
-  // set a constant for the nocheck option being used
-  local nocheck_flag "0"
-  if !missing("`nocheck'")    local nocheck_flag "1"
-
   // set a constant for the suppress option being used
   local suppress_flag "1"
   if !missing("`verbose'")    local suppress_flag "0"
@@ -130,7 +125,7 @@ program lint
         di as text "Do-file: `name'"
         di as text ""
 
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         display as result "-------------------------------------------------------------------------------------"
         if "`excel'" != "" {
             _excellink, excel(`excel')
@@ -146,7 +141,7 @@ program lint
           di as text ""
           di as text ""
           di as text "Do-file: `l'"
-          python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+          python: r = stata_linter_detect_py("`folder'/`l'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
         }
         display as result "-------------------------------------------------------------------------------------"
         if "`excel'" != "" {
@@ -193,13 +188,14 @@ program lint
 
     // We just need one do file here
     if !missing("`file'") {
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+
         display as result "-------------------------------------------------------------------------------------"
         if "`excel'" != "" {
             _excellink, excel(`excel')
         }
         _wikilink
-
     }
 
     // Stata correct -----------------------------------------------------------

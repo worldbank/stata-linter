@@ -1,7 +1,9 @@
 * Set the global to folder where test files are stored
-  global project 	  "C:\Users\wb501238\Documents\GitHub/stata-linter"
-  global test_dir     "${project}/test"
 
+	global project 	  	"C:\Users\wb501238\Documents\GitHub/stata-linter"
+	global test_dir     "${project}/test"
+	adopath ++ "${project}/src"
+	
   // net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/develop") replace
   run "${project}/src/lint.ado"
 
@@ -16,7 +18,7 @@
     excel("${test_dir}/detect_lint.xlsx")
   
   // Lint a folder
-  lint "${test_dir}", debug
+  lint "${test_dir}"
   lint "${test_dir}", verbose 
 
   // Lint a folder and create an excel file
@@ -27,7 +29,7 @@
   lint "${test_dir}/bad.do"                     ///
     using "${test_dir}/bad_corrected.do",       ///
     nosummary                               ///
-    replace debug
+    replace
 	
   lint "${test_dir}/bad.do"                     ///
     using "${test_dir}/bad_corrected.do",       ///
@@ -68,3 +70,7 @@
 		replace automatic debug
 	
 	assert _rc == 198
+	
+// -----------------------------------------------------------------------------
+
+	adopath - "${project}/src"

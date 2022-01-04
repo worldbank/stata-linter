@@ -142,13 +142,19 @@ capture program drop lint
     * Check a single do-file
     if !missing("`file'") {
 		
-		if missing("`using'") local header header
+		if   missing("`using'") {
+			local header header
+		}
+		
+		if (!missing("`verbose'") |	(`summary_flag' == 1) | !missing("`excel'") | !missing("`using'")) {
+				local footer footer
+		}	
 		
 		_detect, ///
 			file("`file'") excel("`excel'") ado_path("`ado_path'") ///
 			indent("`indent'") linemax("`linemax'") space("`space'") ///
-			nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
-			`header' footer
+			suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+			`header' `footer'
     }
 
     * Check all do-files in a folder
@@ -161,7 +167,7 @@ capture program drop lint
 			_detect, ///
 				file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
 				indent("`indent'") linemax("`linemax'") space("`space'") ///
-				nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+				suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 				header footer
 		}
 	}
@@ -307,7 +313,7 @@ capture program drop	_detect
 		syntax , ///
 				file(string) ado_path(string) ///
 				indent(string) linemax(string) space(string) ///
-				nocheck_flag(string) suppress_flag(string) summary_flag(string) ///
+				suppress_flag(string) summary_flag(string) ///
 				[excel(string) header footer]
 				
 		* Import relevant python functions
@@ -323,12 +329,12 @@ capture program drop	_detect
 		}
 
 		* Actually run the Python code
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'")
         
 		* Stata result footer
 		if !missing("`footer'") {
     
-				display as result 	_dup(60) "-"
+				display as result 	_dup(85) "-"
 		
 			if "`excel'" != "" {
 				display as result 	`"{phang}File {browse "`excel'":`excel'} created.{p_end}"'

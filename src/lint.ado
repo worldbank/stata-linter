@@ -8,17 +8,17 @@ capture program drop lint
   syntax anything [using/],        	///
 									/// Options
     [                   			///
-      VERBose           			///
+      verbose           			///
       NOSUMmary         			///
       Indent(string)    			///
       Nocheck           			///
       Linemax(string)   			///
-      Tab_space(string) 			///
+      Space(string) 				///
       Correct(string)   			///
       Excel(string)     			///
-      Automatic         			///
+      AUTOmatic         			///
       replace           			///
-      INPRep            			///
+      inprep            			///
 	  debug							///
     ]
 
@@ -35,19 +35,19 @@ capture program drop lint
 *******************************************************************************/
  
   * set indent size = 4 if missing
-  if missing("`indent'")      local indent "4"
+  if missing("`indent'")		local indent "4"
 
-  * set whitespaces for tab (tab_space) = indent size if tab_space is missing
-  if missing("`tab_space'")   local tab_space "`indent'"
+  * set whitespaces for tab (space) = indent size if space is missing
+  if missing("`space'")   		local space "`indent'"
 
   * set linemax = 80 if missing
-  if missing("`linemax'")     local linemax "80"
+  if missing("`linemax'")		local linemax "80"
 
   * if !missing("`excel'")   cap erase `excel'
-  if !missing("`excel'")      cap rm `excel'
+  if !missing("`excel'")		cap rm `excel'
 
   * set excel = "" if excel is missing
-  if missing("`excel'")       local excel ""
+  if missing("`excel'")      	local excel ""
 
   * set a constant for the nocheck option being used
   local nocheck_flag "0"
@@ -55,14 +55,14 @@ capture program drop lint
 
   * set a constant for the suppress option being used
   local suppress_flag "1"
-  if !missing("`verbose'")    local suppress_flag "0"
+  if !missing("`verbose'")    	local suppress_flag "0"
 
   * set a constant for the summary option being used
   local summary_flag "1"
-  if !missing("`nosummary'")  local summary_flag "0"
+  if !missing("`nosummary'")  	local summary_flag "0"
   
   * In debug mode, print status
-  if !missing("`debug'") di "Inputs prepared"
+  if !missing("`debug'") 		di "Inputs prepared"
   
   
 /*******************************************************************************
@@ -119,11 +119,18 @@ capture program drop lint
 	di "Output: `output'"
   }
   
-/*******************************************************************************
-	Check if python is installed
-*******************************************************************************/
+// Check if python is installed ------------------------------------------------
 
-  _checkpyinstall
+	_checkpyinstall
+  
+	* Check that the Python function is defined
+	qui: findfile stata_linter_detect.py
+	if c(os) == "Windows" {
+		local ado_path = subinstr(r(fn), "\", "/", .)
+	}
+	else {
+		local ado_path = r(fn)
+	}
   
 /*******************************************************************************
 ********************************************************************************
@@ -137,15 +144,6 @@ capture program drop lint
 	Detect issues
 *******************************************************************************/
 
-	* Check that the Python function is defined
-	qui: findfile stata_linter_detect.py
-	if c(os) == "Windows" {
-		local ado_path = subinstr(r(fn), "\", "/", .)
-	}
-	else {
-		local ado_path = r(fn)
-	}
-
     * Check a single do-file
     if !missing("`file'") {
 		
@@ -153,7 +151,7 @@ capture program drop lint
 		
 		_detect, ///
 			file("`file'") excel("`excel'") ado_path("`ado_path'") ///
-			indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
+			indent("`indent'") linemax("`linemax'") space("`space'") ///
 			nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 			`header' footer
     }
@@ -167,7 +165,7 @@ capture program drop lint
 			
 			_detect, ///
 				file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
-				indent("`indent'") linemax("`linemax'") tab_space("`tab_space'") ///
+				indent("`indent'") linemax("`linemax'") space("`space'") ///
 				nocheck_flag("`nocheck_flag'") suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
 				header footer
 		}
@@ -183,7 +181,7 @@ capture program drop lint
 	if !missing("`using'") {
 		_correct, ///
 			input("`input'") output("`output'") ///
-			indent("`indent'") tab_space("`tab_space'") linemax("`linemax'") ///
+			indent("`indent'") space("`space'") linemax("`linemax'") ///
 			`replace' `inprep' `automatic' `debug'
 	}
 	
@@ -204,7 +202,7 @@ capture program drop 	_correct
 		
 	syntax, ///
 		input(string) output(string) ///
-		indent(string) tab_space(string) linemax(string) ///
+		indent(string) space(string) linemax(string) ///
 		[replace inprep automatic debug]
 	
 	* Check that the Python function is defined
@@ -289,7 +287,7 @@ capture program drop 	_correct
 		}
 		* If option [manual] was used and input was [Y], or if option [manual] was not used, create the file
 		else if ("`createfile'" == "Y") {
-			python: `fun'("`output'", "`output'", "`indent'", "`tab_space'")
+			python: `fun'("`output'", "`output'", "`indent'", "`space'")
 		}
     }
 
@@ -313,7 +311,7 @@ capture program drop	_detect
 		
 		syntax , ///
 				file(string) ado_path(string) ///
-				indent(string) linemax(string) tab_space(string) ///
+				indent(string) linemax(string) space(string) ///
 				nocheck_flag(string) suppress_flag(string) summary_flag(string) ///
 				[excel(string) header footer]
 				
@@ -330,7 +328,7 @@ capture program drop	_detect
 		}
 
 		* Actually run the Python code
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`tab_space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`nocheck_flag'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'")
         
 		* Stata result footer
 		if !missing("`footer'") {

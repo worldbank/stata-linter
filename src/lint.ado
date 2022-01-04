@@ -11,7 +11,6 @@ capture program drop lint
       verbose           			///
       NOSUMmary         			///
       Indent(string)    			///
-      Nocheck           			///
       Linemax(string)   			///
       Space(string) 				///
       Correct(string)   			///
@@ -51,7 +50,6 @@ capture program drop lint
 
   * set a constant for the nocheck option being used
   local nocheck_flag "0"
-  if !missing("`nocheck'")    local nocheck_flag "1"
 
   * set a constant for the suppress option being used
   local suppress_flag "1"

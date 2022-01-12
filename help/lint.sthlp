@@ -22,7 +22,7 @@ On how to install python packages, refer to {browse "https://blog.stata.com/2020
 {synoptset 25}{...}
 {synopthdr:options}
 {synoptline}
-{pstd}{it:    {ul:{hi:Optional options:}}}{p_end}
+{pstd}{it:    {ul:{hi:Options:}}}{p_end}
 
 {marker columnoptions}{...}
 {synopt :{cmdab:verbose}}Shows line-by-line results{p_end}

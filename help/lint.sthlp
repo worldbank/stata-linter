@@ -174,7 +174,7 @@ options, Stata will ask you confirm if you want a specific bad practice to be co
 
 {title:Authors}
 
-{phang}This command is developed by DIME Analytics at DECIE, The World Bank's unit for Development Impact Evaluations.
+{phang}This command is developed by DIME Analytics at DIME, The World Bank's department for Development Impact Evaluations.
 
 {phang}Please send bug-reports, suggestions and requests for clarifications
 		 writing "stata linter" in the subject line to:{break}

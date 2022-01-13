@@ -240,7 +240,7 @@ Luiza Cardoso de Andrade ([dimeanalytics@worldbank.org](mailto:dimeanalytics@wor
 
 ## **Authors**
 
-This command is developed by DIME Analytics at DECIE, The World Bank's unit for Development Impact Evaluations.
+This command is developed by DIME Analytics at DIME, The World Bank's department for Development Impact Evaluations.
 
 ## About DIME Analytics
 

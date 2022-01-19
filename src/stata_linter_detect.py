@@ -202,6 +202,13 @@ def condition_missing(
     return([style_dictionary, excel_output_list])
 
 # Using "#delimit" should be avoided
+def detect_delimit(line):
+
+    if re.search(r"#delimit(?! cr)", line):
+        return True
+    else:
+        return False
+
 def dont_use_delimit(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -209,7 +216,7 @@ def dont_use_delimit(
     ):
 
     # warn if "#delimit" is used
-    if re.search(r"#delimit(?! cr)", line):
+    if detect_delimit(line):
         print_output = (
             '''Avoid to use "delimit". For line breaks, use "///" instead.'''
             )
@@ -405,7 +412,7 @@ def update_comment_delimiter(comment_delimiter, line):
 
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(
-    input_file, indent, 
+    input_file, indent,
     suppress, summary, excel, linemax,
     tab_space
     ):

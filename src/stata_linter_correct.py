@@ -1,4 +1,4 @@
-# version 0.0.2  21may2021  DIME Analytics dimeanalytics@worldbank.org
+# version 0.0.3  13jan2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ============
 import os
 import re
@@ -55,7 +55,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
                         output_list.append(line)
                     elif delimit_on == 1:
                         # get any non-comment part of the line and
-                        # strip any redundant whitespaces at the end 
+                        # strip any redundant whitespaces at the end
                         line_split_for_comment = re.split(r"//", line)
                         line_main = line_split_for_comment[0]
                         if len(line_split_for_comment) > 1:
@@ -77,7 +77,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
                             output_line = re.sub(delimit_symbol, "\n", output_line)
 
                             # if there is any comment in the line, then
-                            # just append the comment 
+                            # just append the comment
                             if len(line_split_for_comment) > 1:
                                 output_line = output_line + " //" + line_comment
                             # if there is no comment in the line, then
@@ -90,7 +90,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
                         # if the line is blank, just append the blank line
                         elif len(line_main_rstrip) == 0:
                             output_list.append(line)
-                        
+
     with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)
@@ -149,7 +149,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                             nest_level += 1
                             max_nest_level = max(max_nest_level, nest_level)
                         # if the line does not end with an open curly bracket but includes line breaks,
-                        # then search for the line including the open curly bracket in the following lines 
+                        # then search for the line including the open curly bracket in the following lines
                         # and tag the line
                         elif (line_rstrip[-1] != "{") & (re.search(r"\/\/\/", line) != None):
                             loop_start.append(line_index)
@@ -160,7 +160,7 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
                                     break
                             nest_level += 1
                             max_nest_level = max(max_nest_level, nest_level)
-                    # check if the line ends with a closing curly bracket 
+                    # check if the line ends with a closing curly bracket
                     # (ignore it if that is not used for global macro)
                     if (line_rstrip[-1] == "}") & (not re.search(r"\$.?{", line)):
                         bracket_pair.append([loop_start.pop(), line_index, nest_level, bracket_start.pop()])
@@ -217,7 +217,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
                     if len(line_split_for_comment) > 1:
                         line_comment = line_split_for_comment[1]
                     line_indent = (
-                        len(line_main.rstrip()) - 
+                        len(line_main.rstrip()) -
                         len(line_main.rstrip().expandtabs(int(indent)).lstrip())
                         )
 
@@ -242,7 +242,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
                             (
                                 ((i >= 30) & (c == ",")) | # break line at "," if characters > 30
                                 (i >= (70 - line_indent)) # break line if characters > 70
-                                ) & 
+                                ) &
                             (double_quote_count == 0) & # ignore if in double quotes
                             (parenthesis_count == 0) & # ignore if in parentheses
                             (curly_count == 0)# ignore if in curly brackets
@@ -273,7 +273,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
                         else:
                             line_split.append(line_main[break_line_index[k]:break_line_index[k + 1]])
 
-                    # if no line break if needed, then just append the line 
+                    # if no line break if needed, then just append the line
                     # with appropriate indentations (and commends if needed)
                     if len(line_split) == 1:
                         if len(line_split_for_comment) > 1:
@@ -337,7 +337,7 @@ def space_before_curly(input_file, output_file, indent, tab_space):
             if comment_delimiter > 0:
                 output_list.append(line)
             elif comment_delimiter == 0:
-                # replace "{" with " {" if there is no whitespace 
+                # replace "{" with " {" if there is no whitespace
                 # before an open curly bracket, but ignore if
                 # "${" since this is for global macro
                 output_list.append(re.sub(r"([^ $]){", r"\1 {", line))
@@ -403,4 +403,3 @@ def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space):
                 writer.write(output_line)
             elif i == len(output_list) - 1:
                 writer.write(output_line + "\n")
-

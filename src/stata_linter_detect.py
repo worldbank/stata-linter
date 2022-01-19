@@ -396,6 +396,13 @@ def bang_not_tilde(
         excel_output_list.append([line_index + 1, "check", print_output])
     return([check_dictionary, excel_output_list])
 
+def detect_hard_tab(line):
+
+    if re.search(r"\t", line):
+        return True
+    else:
+        return False
+
 # Function to update comment delimiter ======================
 # (detection works only when comment delimiter == 0)
 def update_comment_delimiter(comment_delimiter, line):
@@ -430,7 +437,7 @@ def stata_linter_detect_py(
 
             if comment_delimiter == 0:
                 hard_tab = "No"
-                if re.search(r"\t", line):
+                if detect_hard_tab(line):
                     hard_tab = "Yes"
                     print_output = (
                         '''Use {:d} white spaces instead of tabs. '''.format(int(indent)) +

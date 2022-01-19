@@ -7,6 +7,11 @@ import sys
 # Function to update comment delimiter =============
 # (detection works only when comment delimiter == 0)
 def update_comment_delimiter(comment_delimiter, line):
+    '''
+    This function detects if a line is opening a comment section
+    in a Stata dofile. Comment sections are delimited by the
+    charaters "/*" and "*/"
+    '''
     # if "/*" and "*/" are in the same line, never mind
     if re.search(r"\/\*.*\*\/", line):
         comment_delimiter += 0

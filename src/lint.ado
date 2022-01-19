@@ -249,9 +249,6 @@ capture program drop 	_correct
           while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & "${confirmation}" != "BREAK") {
               if ("`fun'" == "delimit_to_three_forward_slashes") {
                   di as result "{pstd} Avoid using [delimit], use three forward slashes (///) instead. {p_end}"
-									python: x = "holaholaholaaaaa"
-									python: Macro.setLocal('hola', x)
-									di "`hola'"
               }
               else if ("`fun'" == "tab_to_space") {
                   di as result "{pstd} Avoid using hard tabs, use soft tabs (white spaces) instead. {p_end}"

@@ -1,8 +1,13 @@
-# version 0.0.3  13jan2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0.0  20jan2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ============
 import os
 import re
 import sys
+
+# Version Global
+## VERY IMPORTANT: Update the version number here every time there's an update
+## in the package. Otherwise this will cause a major bug
+VERSION = "1.0.0"
 
 # Function to update comment delimiter =============
 # (detection works only when comment delimiter == 0)

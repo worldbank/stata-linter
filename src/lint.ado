@@ -1,4 +1,4 @@
-*! version 0.0.4  21may2021  DIME Analytics dimeanalytics@worldbank.org
+*! version 1.0.0  20jan2022  DIME Analytics dimeanalytics@worldbank.org
 
 capture program drop lint
 		program 	 lint
@@ -126,6 +126,10 @@ capture program drop lint
 	else {
 		local ado_path = r(fn)
 	}
+
+// Check that versions of all auxiliary files are the same ---------------------
+
+_checkversions
 
 /*******************************************************************************
 ********************************************************************************
@@ -436,14 +440,14 @@ capture program drop  	_checkpyinstall
 	* Check if python is installed
 	cap python search
 	if _rc {
-		noi di as error `"{phang} For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
+		noi di as error `"{phang}For this command, Python installation is required. Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for how to integrate Python to Stata. {p_end}"'
 		exit
 	}
 
 	* Check if pandas package is installed
 	cap python which pandas
 	if _rc {
-		noi di as error `"{phang} For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		noi di as error `"{phang}For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
 		exit
 	}
 
@@ -451,7 +455,38 @@ capture program drop  	_checkpyinstall
 	* This is needed to pass Python results into Stata
 	cap python which sfi
 	if _rc {
-		noi di as error `"{phang} For this command to run, a package "sfi" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		noi di as error `"{phang}For this command to run, a package "sfi" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		exit
+	}
+
+end
+
+// Check that version of lint.ado and Python scripts are the same
+
+capture program drop _checkversions
+				program			 _checkversions
+
+	* IMPORTANT: Every time we have a package update, update the version number here
+	* Otherwise we'd be introducing a major bug!
+	local version_ado 1.0.0
+
+	* Check versions of .py files
+	python: from sfi import Macro
+	python: import stata_linter_detect as sld
+	python: import stata_linter_correct as slc
+	python: Macro.setLocal('version_detect', sld.VERSION)
+	python: Macro.setLocal('version_correct', slc.VERSION)
+
+	* Checking that versions are the same
+	cap assert "`version_ado'" == "`version_detect'"
+	if _rc {
+		noi di as error `"{phang}For this command to run, the versions of all its auxiliary files need to be the same. Please update the command to the newest version with: {bf:ssc install stata_linter, replace} , restart Stata, and try again{p_end}"'
+		error
+	}
+	cap assert "`version_ado'" == "`version_correct'"
+	if _rc {
+	noi di as error `"{phang}For this command to run, the versions of all its auxiliary files need to be the same. Please update the command to the newest version with: {bf:ssc install stata_linter, replace} , restart Stata, and try again{p_end}"'
+		error
 	}
 
 end

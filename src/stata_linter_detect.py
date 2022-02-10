@@ -194,7 +194,7 @@ def condition_missing(
     # warn if "var < ." or "var != ." are used
     if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
         print_output = (
-            '''Use "!missing(var)" instead of "var < ." or "var != .".'''
+            '''Use "!missing(var)" instead of "var < ." or "var != ."'''
             )
         if suppress != "1":
             print(
@@ -339,7 +339,7 @@ def check_missing(
     tab_space
     ):
     # ask if missing variables are properly taken into account
-    if re.search(r"(~=)|(!=)(?!(( )*\.))", line):
+    if re.search(r"(~=|!=)(?! *\.(?![0-9]))", line):
         print_output = (
             '''Are you taking missing values into account properly? ''' +
             '''(Remember that "a != 0" includes cases where a is missing.)'''

@@ -192,7 +192,7 @@ def condition_missing(
     ):
 
     # warn if "var < ." or "var != ." are used
-    if re.search(r"(<|!=)( )*(\.(?![0-9]))", line):
+    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
         print_output = (
             '''Use "!missing(var)" instead of "var < ." or "var != .".'''
             )

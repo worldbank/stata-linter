@@ -385,7 +385,7 @@ def bang_not_tilde(
 
     # warn if tilde is used, which suggests
     # that the user may be using tilde for negation
-    if re.search(r"~", line):
+    if re.search(r"~=\s*([^\s.]|\.[0-9]+)", line):
         print_output = (
             '''Are you using tilde (~) for negation? ''' +
             '''If so, for negation, use bang (!) instead of tilde (~).'''

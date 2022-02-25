@@ -345,7 +345,7 @@ capture program drop	_detect
 				display as result 	`"{phang}File {browse "`excel'":`excel'} created.{p_end}"'
 			}
 
-				display as result 	`"{phang}For more information about coding guidelines visit the {browse "https://en.wikibooks.org/wiki/LaTeX/Labels_and_Cross-referencing":Stata linter wiki.}{p_end}"'
+				display as result 	`"{phang}For more information about coding guidelines visit the {browse "https://https://dimewiki.worldbank.org/Stata_Linter":Stata linter wiki.}{p_end}"'
 		}
 
 

@@ -584,7 +584,8 @@ def stata_linter_detect_py(
         print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
         print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
         print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
-        print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", check_dictionary["check_missing"]))
+        print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", style_dictionary["condition_missing"]))
+        print("{:60s} {:10d}".format("Potential omission of missing values in expression: ", check_dictionary["check_missing"]))
         print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
         print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
 

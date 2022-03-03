@@ -119,7 +119,8 @@ def tab_to_space(input_file, output_file, indent, tab_space):
                 output_list.append(line)
             elif comment_delimiter == 0:
                 # replace the hard tabs detected in a line to soft tabs (whitespaces)
-                output_list.append(line.replace("\t", " " * int(tab_space)))
+                spaces = ' ' * int(tab_space)
+                output_list.append(re.sub(r'^\s{0,2}\t', spaces, line))
     with open(output_file, "w") as writer:
         for output_line in output_list:
             writer.write(output_line)

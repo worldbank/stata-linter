@@ -185,14 +185,21 @@ def whitespace_symbol(
     return([style_dictionary, excel_output_list])
 
 # For missing values "var < ." or "var != ." are used (!missing(var) is recommended) ----------------
+def has_condition_missing(line):
+
+    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
+        return True
+    else:
+        return False
+
 def condition_missing(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
     tab_space
     ):
 
-    # warn if "var < ." or "var != ." are used
-    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
+    # warn if "var < ." or "var != ." or "var ~= ." are used
+    if has_condition_missing(line):
         print_output = (
             '''Use "!missing(var)" instead of "var < ." or "var != ." or "var ~= ."'''
             )
@@ -333,16 +340,35 @@ def parentheses_for_global_macro(
 # Check ===================
 
 # Ask if missing variables are properly taken into account
+def check_missing_expression(line):
+
+    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))|!missing\(.+\)", line):
+        return True
+    else:
+        return False
+
+def check_expression(line):
+
+    if re.search(r"(~=|!=|>|>=)(?! *\.(?![0-9]))", line):
+        return True
+    else:
+        return False
+
+
 def check_missing(
     line_index, line, input_lines, indent,
     suppress, check_dictionary, excel_output_list,
     tab_space
     ):
     # ask if missing variables are properly taken into account
-    if re.search(r"(~=|!=)(?! *\.(?![0-9]))", line):
+
+    expression = check_expression(line)
+    missing_expression = check_missing_expression(line)
+
+    if expression and not missing_expression:
         print_output = (
             '''Are you taking missing values into account properly? ''' +
-            '''(Remember that "a != 0" includes cases where a is missing.)'''
+            '''(Remember that "a != 0" or "a > 0" include cases where a is missing.)'''
             )
         if suppress != "1":
             print(

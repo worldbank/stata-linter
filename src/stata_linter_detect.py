@@ -135,18 +135,11 @@ def indent_after_newline(
     tab_space
     ):
 
-    # check if the line includes "///" but the previous line does not include "///"
-    if (
-        (re.search(r"\/\/\/", line) != None) &
-        (re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]) == None)
-        ):
+    # check if the previous line includes "///"
+    if re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]):
         line_ws = line.expandtabs(tab_space)
-        # warn if the following line (after line break) is not properly indented
-        next_line = input_lines[line_index + 1]
-        next_line_ws = next_line.expandtabs(tab_space)
         line_left_spaces = len(line_ws) - len(line_ws.lstrip())
-        next_line_left_spaces = len(next_line_ws) - len(next_line_ws.lstrip())
-        if (next_line_left_spaces - line_left_spaces < indent) & (len(next_line_ws.strip()) > 0):
+        if line_left_spaces < indent:
             print_output = (
                 '''After new line statement ("///"), add indentation ({:d} whitespaces).'''.format(indent)
                 )

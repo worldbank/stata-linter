@@ -81,13 +81,9 @@ def abstract_index_name(
     return([style_dictionary, excel_output_list])
 
 # Use proper indentations in for-loops, while-loops, and if/else statements ----------------
-def proper_indent(
-    line_index, line, input_lines, indent,
-    suppress, style_dictionary, excel_output_list,
-    tab_space
-    ):
+def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
 
-    line_rstrip = re.sub(r"(\/\/)|(\/\*).*", r"", line).rstrip()
+    line_rstrip = re.sub(r"((\/\/)|(\/\*)).*", r"", line).rstrip()
     if len(line_rstrip) > 0:
         # check if the line includes for-loop, while-loop, or if/else statements
         if (
@@ -108,24 +104,37 @@ def proper_indent(
                     next_line = input_lines[line_index + j]
                     break
                 j += 1
-            # warn if the next non-blank line is not properly indented
+            # check if the next non-blank line is not properly indented
             next_line_ws = next_line.expandtabs(tab_space)
             line_left_spaces = len(line_ws) - len(line_ws.lstrip())
             next_line_left_spaces = len(next_line_ws) - len(next_line_ws.lstrip())
             if (next_line_left_spaces - line_left_spaces < indent) & (len(next_line_ws.strip()) > 0):
-                print_output = (
-                    '''After declaring for loop statement or if-else statement, ''' +
-                    '''add indentation ({:d} whitespaces).'''.format(indent)
-                    )
+                return True
 
-                if suppress != "1":
-                    print(
-                        '''(line {:d}): '''.format(line_index + 1) +
-                        print_output
-                        )
+    return False
 
-                style_dictionary["proper_indent"] += 1
-                excel_output_list.append([line_index + 1, "style", print_output])
+def proper_indent(
+    line_index, line, input_lines, indent,
+    suppress, style_dictionary, excel_output_list,
+    tab_space
+    ):
+
+    if detect_bad_indent(line_index, line, input_lines, indent, tab_space):
+
+        print_output = (
+            '''After declaring for loop statement or if-else statement, ''' +
+            '''add indentation ({:d} whitespaces).'''.format(indent)
+            )
+
+        if suppress != "1":
+            print(
+                '''(line {:d}): '''.format(line_index + 1) +
+                print_output
+                )
+
+        style_dictionary["proper_indent"] += 1
+        excel_output_list.append([line_index + 1, "style", print_output])
+
     return([style_dictionary, excel_output_list])
 
 # Use indentations after line breaks (///) ----------------
@@ -258,6 +267,17 @@ def dont_use_cd(
     return([style_dictionary, excel_output_list])
 
 # If a line is too lone, it should be broken into multiple lines
+def detect_line_too_long(line, linemax):
+
+    # if the last char is a line break, we leave it out
+    if len(line) > 0 and line[-1] == '\n':
+        line = line[:-1]
+
+    if (len(line) > linemax) & ("///" not in line):
+        return True
+    else:
+        return False
+
 def too_long_line(
     line_index, line, input_lines, indent, linemax,
     suppress, style_dictionary, excel_output_list,
@@ -265,7 +285,7 @@ def too_long_line(
     ):
 
     # warn if the line is too long (and line breaks are not used yet)
-    if (len(line) >= linemax) & ("///" not in line):
+    if detect_line_too_long(line, linemax):
         print_output = (
             '''This line is too long ({:d} characters). '''.format(len(line)) +
             '''Use "///" for line breaks so that one line has at most {:d} characters.'''.format(linemax)
@@ -426,6 +446,44 @@ def detect_hard_tab(line):
         return True
     else:
         return False
+
+def detect_no_space_before_curly_bracket(line):
+
+    if re.search(r"([^ $]){", line):
+        return True
+    else:
+        return False
+
+def detect_blank_line_before_curly_close(line_index, line, dofile_lines):
+
+    if len(line.strip()) > 0 or line_index == len(dofile_lines) - 1:
+        # non-blank lines or last line in the dofile
+        return False
+
+    # only blank lines from this point
+    else:
+        next_line = dofile_lines[line_index+1]
+        next_line_rstrip = " " + re.sub(r"//.*", r"", next_line).rstrip()
+
+        # Checking if next line is a closing bracket
+        if (next_line_rstrip[-1] == "}") & (not re.search(r"\$.*{", next_line)):
+            return True
+        else:
+            return False
+
+def detect_duplicated_blank_line(line_index, line, dofile_lines):
+
+    if len(line.strip()) > 0 or line_index == len(dofile_lines) - 1:
+        # non-blank lines or last line in the dofile
+        return False
+
+    # only blank lines from this point
+    else:
+        next_line = dofile_lines[line_index+1]
+        if len(next_line.strip()) == 0:
+            return True
+        else:
+            return False
 
 # Function to update comment delimiter ======================
 # (detection works only when comment delimiter == 0)

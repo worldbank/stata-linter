@@ -31,7 +31,7 @@ def update_comment_delimiter(comment_delimiter, line):
 # Functions for auto-correction ===================
 
 # Convert delimit to three forward slashes -------------------
-def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space):
+def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
@@ -107,7 +107,7 @@ def delimit_to_three_forward_slashes(input_file, output_file, indent, tab_space)
 
 
 # Convert hard tabs to soft tabs (= whitespaces) ----------------------
-def tab_to_space(input_file, output_file, indent, tab_space):
+def tab_to_space(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
@@ -126,7 +126,7 @@ def tab_to_space(input_file, output_file, indent, tab_space):
             writer.write(output_line)
 
 # Use indents in brackets after for and while loops or if/else conditions --------------------
-def indent_in_bracket(input_file, output_file, indent, tab_space):
+def indent_in_bracket(input_file, output_file, indent, tab_space, linemax):
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
         loop_start = []
@@ -194,9 +194,9 @@ def indent_in_bracket(input_file, output_file, indent, tab_space):
         for output_line in input_lines:
             writer.write(output_line)
 
-# Split too long line (> 80 characters) to multiple lines
+# Split too long line (> linemax characters) to multiple lines
 # (but do not break strings in double quotes (""), parentheses, or curly brackets) --------------------
-def too_long_line(input_file, output_file, indent, tab_space):
+def too_long_line(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
@@ -210,7 +210,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
             elif comment_delimiter == 0:
                 # do nothing if any of the following conditions are met
                 if (
-                    (len(line) <= 80) | # the line if not too long, or
+                    (len(line) <= linemax) | # the line if not too long, or
                     ((line.lstrip() + " ")[0] == "*") | # the line is a comment
                     ((line.lstrip() + "  ")[:2] == "//") | # the line ends with a line break
                     ("///" in line) # line contains a comment
@@ -337,7 +337,7 @@ def too_long_line(input_file, output_file, indent, tab_space):
 
 # Add a white space before a curly bracket
 # (but not if the curly bracket is used for global macro, as in "${}") --------------------
-def space_before_curly(input_file, output_file, indent, tab_space):
+def space_before_curly(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
@@ -357,7 +357,7 @@ def space_before_curly(input_file, output_file, indent, tab_space):
             writer.write(output_line)
 
 # Remove blank lines before curly brackets are closed --------------------
-def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_space):
+def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
@@ -387,7 +387,7 @@ def remove_blank_lines_before_curly_close(input_file, output_file, indent, tab_s
 
 
 # Remove duplicated blank lines --------------------
-def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space):
+def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space, linemax):
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()

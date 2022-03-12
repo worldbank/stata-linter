@@ -1,8 +1,9 @@
-v 0.0.3
+v 1.0.0
 d DIME Analytics, World Bank Group, Development Economics Research
 p stata_linter
 f /src/stata_linter_detect.py
 f /src/stata_linter_correct.py
+f /src/stata_linter_utils.py
 f /src/lint.ado
 f /help/lint.sthlp
 e

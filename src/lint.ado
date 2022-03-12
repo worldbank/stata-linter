@@ -219,15 +219,7 @@ capture program drop 	_correct
       local ado_path = r(fn)
     }
 
-    * Copy the input file to the output file, which will be edited by the commands below
-    if (!missing("`replace'") | !missing("`inprep'"))  {
-		copy "`input'" "`output'", replace
-	}
-    else {
-		copy "`input'" "`output'"
-	}
-
-    * Display a message if the correct option is added, so the output can be separated
+  * Display a message if the correct option is added, so the output can be separated
     display as text 	" "
     display as result 	_dup(60) "-"
     display as result 	"Correcting {bf:do-file}"
@@ -239,23 +231,76 @@ capture program drop 	_correct
 		python: from sfi import Macro
     python: sys.path.append(os.path.dirname(r"`ado_path'"))
     python: from stata_linter_correct import *
+		python: import stata_linter_detect as sld
+		python: import stata_linter_utils as slu
 
-    * correct the output file, looping for each python command
-     foreach fun in 	delimit_to_three_forward_slashes tab_to_space ///
-						indent_in_bracket too_long_line space_before_curly ///
+	* Checking which issues are present in the dofile so we ask for their correction
+		python: Macro.setLocal('_delimiter',  str(slu.detect_delimit_in_file("`input'")))
+		python: Macro.setLocal('_hard_tab',   str(slu.detect_hard_tab_in_file("`input'")))
+		python: Macro.setLocal('_bad_indent', str(slu.detect_bad_indent_in_file("`input'", "`indent'", "`space'")))
+		python: Macro.setLocal('_long_lines', str(slu.detect_line_too_long_in_file("`input'", "`linemax'")))
+		python: Macro.setLocal('_no_space_before_curly', str(slu.detect_no_space_before_curly_bracket_in_file("`input'")))
+		python: Macro.setLocal('_blank_before_curly', str(slu.detect_blank_line_before_curly_close_in_file("`input'")))
+		python: Macro.setLocal('_dup_blank_line', str(slu.detect_duplicated_blank_line_in_file("`input'")))
+
+	* If no issue was found, the function ends here.
+	* Otherwise _correct continues.
+	 if ("`_delimiter'" == "False" & ///
+	     "`_hard_tab'" == "False" & ///
+			 "`_bad_indent'" == "False" & ///
+			 "`_long_lines'" == "False" & ///
+			 "`_no_space_before_curly'" == "False" & ///
+			 "`_blank_before_curly'" == "False" & ///
+			 "`_dup_blank_line'" == "False") {
+			 display as result `"{phang}Nothing to correct.{p_end}"'
+	     display as result `"{phang}The issues lint is able to correct are not present in your dofile.{p_end}"'
+			 display as result `"{phang}No output files were generated."'
+	 }
+	 else {
+
+  * Correct the output file, looping for each python command
+    foreach fun in 	delimit_to_three_forward_slashes ///
+		 				tab_to_space ///
+						indent_in_bracket ///
+						too_long_line ///
+						space_before_curly ///
 						remove_blank_lines_before_curly_close ///
 						remove_duplicated_blank_lines {
 
-      if missing("`automatic'") {
+			* If the issue is not present, we continue with the next one
+			if ("`_delimiter'" == "False" & "`fun'" == "delimit_to_three_forward_slashes") {
+			    continue
+			}
+			else if ("`_hard_tab'" == "False" & "`fun'" == "tab_to_space") {
+					continue
+			}
+			else if ("`_bad_indent'" == "False" & "`fun'" == "indent_in_bracket") {
+					continue
+			}
+			else if ("`_long_lines'" == "False" & "`fun'" == "too_long_line") {
+					continue
+			}
+			else if ("`_no_space_before_curly'" == "False" & "`fun'" == "space_before_curly") {
+					continue
+			}
+			else if ("`_blank_before_curly'" == "False" & "`fun'" == "remove_blank_lines_before_curly_close") {
+					continue
+			}
+			else if ("`_dup_blank_line'" == "False" & "`fun'" == "remove_duplicated_blank_lines") {
+					continue
+			}
+
+			if missing("`automatic'") {
+
           noi di ""
           global confirmation "" //Reset global
 
-          while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & "${confirmation}" != "BREAK") {
+          while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & upper("${confirmation}") != "BREAK") {
               if ("`fun'" == "delimit_to_three_forward_slashes") {
-                  di as result "{pstd} Avoid using [delimit], use three forward slashes (///) instead. {p_end}"
+							    di as result "{pstd} Avoid using [delimit], use three forward slashes (///) instead. {p_end}"
               }
               else if ("`fun'" == "tab_to_space") {
-                  di as result "{pstd} Avoid using hard tabs, use soft tabs (white spaces) instead. {p_end}"
+              		di as result "{pstd} Avoid using hard tabs, use soft tabs (white spaces) instead. {p_end}"
               }
               else if ("`fun'" == "indent_in_bracket") {
                   di as result "{pstd} Indent commands inside curly brackets. {p_end}"
@@ -282,30 +327,42 @@ capture program drop 	_correct
           if ("`createfile'" == "BREAK") error 1
       }
 
-      // if automatic is used, always create the file
-      else {
-	  	local createfile "Y"
+    // if automatic is used, always run the corresponding function
+    else {
+	      local createfile "Y"
 	  }
 
-		* If option [manual] was used and input was [N], file is not corrected for this issue
+		* Counter of number of issues being corrected
+		local _n_to_correct 0
+
+		* If option [manual] was used and input was [N], function won't be used for this issue
 		if ("`createfile'" == "N") {
-			noi di as result ""
+		    noi di as result ""
 		}
-		* If option [manual] was used and input was [Y], or if option [manual] was not used, create the file
+		* If option input was [Y], or if option [automatic] was used, run the function
 		else if ("`createfile'" == "Y") {
-			python: `fun'("`output'", "`output'", "`indent'", "`space'")
+		    local _n_to_correct = `_n_to_correct' + 1
+
+				* If this is the first issue to correct, create the output file
+				if `_n_to_correct' == 1 {
+
+				    if (!missing("`replace'") | !missing("`inprep'"))  {
+						    copy "`input'" "`output'", replace
+				    }
+				    else {
+						    copy "`input'" "`output'"
+				    }
+				}
+
+		    python: `fun'("`output'", "`output'", "`indent'", "`space'", "`linemax'")
 		}
     }
 
-	* Print link to corrected output file
-    cap confirm file "`output'"
-    if !_rc {
-      display as result `"{phang}Corrected do-file saved to {browse "`output'":`output'}.{p_end}"'
-    }
-    else {
-      display as error "{phang}Could not create `output'.{p_end}"
-      error 1
-    }
+	* Print link to corrected output file if it was created
+   if `_n_to_correct' > 0 {
+	     display as result `"{phang}Corrected do-file saved to {browse "`output'":`output'}.{p_end}"'
+	 }
+	 }
 
 
 end

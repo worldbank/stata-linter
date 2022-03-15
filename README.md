@@ -2,39 +2,37 @@
 
 ## Installation
 
-To install this command run the following:
+### Installing published versions of `stata_linter`
 
-```stata
-net install stata_linter, from("https://raw.githubusercontent.com/worldbank/stata-linter/master") replace
-```
+To install `stata_linter`, type `ssc install stata_linter` and restart Stata.
 
-### Python Stand-alone
-
-To install the linter to run directly with Python and not via Stata, clone the repository and then install using `pip`:
-
-```python
-pip install -e src/
-```
-
-This will also install `pandas` if it is not currently installed.
+This will install the most recent published version of `stata_linter`.
+The main version of the code in this repository (the `master` branch) is what
+is published on SSC as well.
 
 ## Requirements
 
 1. Stata version 16 or higher.
 2. Python 3 or higher
 
-For setting up Stata to use Python, refer to [this web page](https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/). The `lint` command also requires the Python package `pandas`. Refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/) to know more about installing Python packages. Finally, you can also refer to the wiki of this repo to know about requirements, examples, and more.
+For setting up Stata to use Python, refer to [this web page](https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/).
+`stata_linter` also requires the Python package `pandas`, `openpyxl`, and `sfi`.
+Refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/) to know more about installing Python packages.
 
 ## Content
 
-The `lint` command is an opinionated detector that attempts to improve readability of Stata do files. The command is written based on the good coding practices of the Development Impact Evaluation Unit at The World Bank. For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
+The `stata_linter` package works through the `lint` command.
+`lint` is an opinionated detector that attempts to improve the readability and organization of Stata do files.
+The command is written based on the good coding practices of the Development Impact Evaluation Unit at The World Bank.
+For these standards, refer to [DIME's Stata Coding practices](https://dimewiki.worldbank.org/wiki/Stata_Coding_Practices) and _Appendix: The DIME Analytics Coding Guide_ of [Development Research in Practice](https://worldbank.github.io/dime-data-handbook/).
 
 The `lint` command can be broken into two functionalities:
 
-1. **detection** which refers to identifying bad coding practices in one or multiple Stata do-files;
-2. **correction** which refers to correcting bad coding practices in a Stata do-file.
+1. **detection** identifies bad coding practices in one or multiple Stata do-files
+2. **correction** corrects a few of the bad coding practices detected in a Stata do-file
 
-> _Disclaimer_: Note that this command is not guaranteed to correct codes without changing results. It is strongly recommended that, after using this command, you check if results of the do file do not change.
+> _Disclaimer_: Please note that this command is not guaranteed to correct codes without changing results.
+It is strongly recommended that after using this command you check if results of the do file do not change.
 
 ## Syntax and basic usage
 
@@ -101,9 +99,12 @@ If you would like to correct bad practices in a do-file you can run the followin
 lint "test/bad.do" using "test/bad_corrected.do"   
 ```
 
-In this case, the lint command will export a do-file called `bad_corrected.do`. Stata will ask you if you would like to perform a set of corrections. You can add the option `automatic` to perform the corrections automatically. Additionally, it is strongly recommended that the output file has a different name from the input file, as the original do-file should be kept as a backup.
+In this case, the lint command will create a do-file called `bad_corrected.do`.
+Stata will ask you if you would like to perform a set of corrections for each bad practice detected, one by one.
+You can add the option `automatic` to perform the corrections automatically and skip the manual confirmations.
+It is strongly recommended that the output file has a different name from the input file, as the original do-file should be kept as a backup.
 
-As a result of this command, for example,
+As a result of this command, a piece of Stata code as the following:
 
 ```stata
 #delimit ;
@@ -117,7 +118,7 @@ foreach something in something something something something something something
 
 ```
 
-becomes
+becomes:
 
 ```stata
 foreach something in something something something something something something ///
@@ -157,31 +158,33 @@ You can use the following options with the `lint` command:
   - `nosummary`: suppress the summary of bad practices.
   - `excel()`: export detection results to Excel.
 
-- Options related to the **correction** feature:
-  - `automatic`: correct all bad coding practices without asking if you want each bad coding practice to be corrected or not (use only with the correction feature).
-  - `replace`: replace the existing output file (use only with the correction feature).
-  - `inprep`: allow the output file name to be the same as the name of the input file (use only with the correction feature).
+- Options exclusive to the **correction** feature:
+  - `automatic`: correct all bad coding practices without asking if you want each bad coding practice detected to be corrected or not.
+  - `replace`: replace the existing output file.
+  - `inprep`: allow the output file name to be the same as the name of the input file (not recommended).
 
 - Options for **both** features:
   - `indent()`: specify the number of whitespaces used for indentation (default is 4).
   - `linemax()`: maximum number of characters in a line (default: 80)
   - `tab_space()`: number of whitespaces used instead of hard tabs (default is 4).
 
-## Style rules to be checked
+## Coding practices to be detected
 
 - **Use soft tabs (i.e., whitespaces), not hard tabs:**
-Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs. You can change this option in the do-file editor preferences.
+Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs.
+You can change this option in the do-file editor preferences.
 
-- **Avoid to use abstract index names:**
-In *for loops*, index names should describe what the code is looping over.  Hence, for example, avoid coding like this:
+- **Avoid using abstract index names:**
+In *for loops*, index names should describe what the code is looping over.
+Hence, for example, avoid coding like this:
 
-  ```
+  ```{stata}
   foreach i of var cassava maize wheat { }
   ```
 
-  Instead, when looping commands should name that index descriptively:
+  Instead, looping commands should name the index local descriptively:
 
-  ```
+  ```{stata}
   foreach crop of var cassava maize wheat { }
   ```
 
@@ -191,8 +194,16 @@ After declaring a for loop statement or if-else statement, add indentation with 
 - **Use indentations after declaring newline symbols `///`:**
 After a new line statement `(///)`, add indentation (usually 2 or 4 whitespaces).
 
-- **Use `!missing` function for conditions of missing values:**
+- **Use `!missing()` function for conditions of missing values:**
 For clarity, use `!missing(var)` instead of `var < .` or `var != .`
+
+- **Add whitespaces around math symbols (`+`, ``=`, `<`, `>`):**
+For better readability, add whitespaces around math symbols.
+For example, write `gen a = b + c if d == e` instead of `gen a=b+c if d==e`.
+
+- **Specify the condition in the if statement:**
+Always explicitly specify the condition in the if statement.
+For example, declare `if var == 1` instead of `if var`.
 
 - **Do not use `delimit`, instead use `///` for line breaks:**
 More information about the use of line breaks [here](https://worldbank.github.io/dime-data-handbook/coding.html#line-breaks).
@@ -201,34 +212,59 @@ More information about the use of line breaks [here](https://worldbank.github.io
 Use absolute and dynamic file paths. More about this [here](https://worldbank.github.io/dime-data-handbook/coding.html#writing-file-paths).
 
 - **Use line breaks for too long lines:**
-For lines that are too long, use `///` for line breaks and divide them into multiple lines. It is recommended to restrict the number of characters in a line under 80.  Though sometimes this is difficult since, for example, Stata does not allow line
+For lines that are too long, use `///` for line breaks and divide them into multiple lines.
+It is recommended to restrict the number of characters in a line under 80.
+Though sometimes this is difficult since, for example, Stata does not allow line
 breaks within double quotes, try to follow this rule when possible.
 
-- **Add whitespaces around math symbols such as `+, =, <, >,` etc.:**
-For better readability, add whitespaces around math symbols.  For example, write `gen a = b + c if d == e` instead of `gen a=b+c if d==e`.
-
-- **Specify the condition in the if statement:**
-Always explicitly specify the condition in the if statement.  For example, declare `if var == 1` instead of `if var`.
-
 - **Use curly brackets for global macros:**
-Always use `${ }` for global macros.  For instance, use `${global}` instead of `$global`.
+Always use `${ }` for global macros.
+For instance, use `${global}` instead of `$global`.
 
-- **Use of `.` where `missing()` is appropriate:**
-Note that `a != 0` includes cases where `a` is missing. That is why it is recommended to use `missing()` instead.
+- **Include missing values in condition expressions:**
+Condition expressions like `var != 0` or `var > 0` are evaluated to true for missing values.
+Make sure to explicitly take missing values into account by using `missing()` in expressions.
 
 - **Check if backslashes are not used in file paths:**
-Check if backslashes `(\)` are not used in file paths. If you are using them, then replace them with forward slashes `(/)`.
+Check if backslashes `(\)` are not used in file paths.
+If you are using them, then replace them with forward slashes `(/)`.
 
 - **Check if tildes `(~)` are not used for negations:**
-If you are using tildes `(~)` are used for negations, replace them with the bang symbol `(!)`.
+If you are using tildes `(~)` for negations, replace them with the bang symbol `(!)`.
 
-## Workflow
+## Coding practices to be corrected
 
-To minimize the risk of crashing a do-file, the `correction` feature works based on fewer rules than the `detection` feature. That is, we can can detect more bad coding practices with `lint "input_file"` in comparison to `lint "input_file" using "output_file"`. Therefore, after writing a do-file, you can first `detect` bad practices to check how many bad coding practices are contained in the do-file and later decide whether you would like to use the correction feature.
+The `correction` feature does not correct all the bad practices detected by `detect`.
+It only corrects the following:
 
-If there are not many bad practices, you can go through the lines flagged by the `detection` feature and manually correct them. This also avoids potential crashes by the `correction` feature.
+- Replaces the use of `delimit` with three forward slashes (`///`) in each line affected by `delimit`
+- Replaces hard tabs with soft spaces (4 by default). The amount of spaces can be set with the `tab_space()` option
+- Indents lines inside curly brackets with 4 spaces by default. The amount of spaces can be set with the `indent()` option
+- Breaks long lines into two lines. Long lines are considered to have more than 80 characters by default, but this setting can be changed with the option `linemax()`
+- Adds a whitespace before opening curly brackets, except for globals
+- Removes redundant blank lines after closing curly brackets
+- Removes duplicated blank lines
 
-If there are many bad practices detected, you can use the `correction` feature first to correct some of the flagged lines, and then you can `detect` again and `correct` the remaining bad practices manually. After this process, do not forget to check if the results are not changed by the correction feature.
+If the option `automatic` is omitted, `lint` will prompt the user to confirm that they want to correct each of these bad practices only in case they are detected. If none of these are detected, it will show the message:
+
+  ```{stata}
+  Nothing to correct.
+  The issues lint is able to correct are not present in your dofile.
+  No output files were generated.
+  ```
+
+## Recommended use
+
+To minimize the risk of crashing a do-file, the `correction` feature works based on fewer rules than the `detection` feature.
+That is, we can can detect more bad coding practices with `lint "input_file"` in comparison to `lint "input_file" using "output_file"`.
+Therefore, after writing a do-file, you can first `detect` bad practices to check how many bad coding practices are contained in the do-file and later decide whether you would like to use the correction feature.
+
+If there are not too many bad practices, you can go through the lines flagged by the `detection` feature and manually correct them.
+This also avoids potential crashes by the `correction` feature.
+
+If there are many bad practices detected, you can use the `correction` feature first to correct some of the flagged lines, and then you can `detect` again and `correct` the remaining bad practices manually.
+We strongly recommend not overwriting the original input do-file so it can remain as a backup in case `correct` introduces unintended changes in the code.
+Additionally, we recommend checking that the results of the do-file are not changed by the correction feature.
 
 ## License
 
@@ -236,7 +272,7 @@ If there are many bad practices detected, you can use the `correction` feature f
 
 ## Main Contact
 
-Luiza Cardoso de Andrade ([dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org))
+Luis Eduardo San Martin ([dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org))
 
 ## **Authors**
 

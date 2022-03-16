@@ -266,6 +266,31 @@ If there are many bad practices detected, you can use the `correction` feature f
 We strongly recommend not overwriting the original input do-file so it can remain as a backup in case `correct` introduces unintended changes in the code.
 Additionally, we recommend checking that the results of the do-file are not changed by the correction feature.
 
+## Bug Reports and Feature Requests
+
+If you are familiar with GitHub go to the [**Contributions**](https://github.com/worldbank/stata-linter#contributions) section below for advanced instructions.
+
+An easy but still very efficient way to provide any feedback on these commands is to create an *issue* in GitHub. You can read *issues* submitted by other users or create a new *issue* in the top menu below [**worldbank**/**stata-linter**](https://github.com/worldbank/stata-linter). If you have an idea for a new command, or a new feature on an existing command, creating an *issue* is a great tool for suggesting that. Please read already existing *issues* to check whether someone else has made the same suggestion or reported the same error before creating a new *issue*.
+
+While we have a slight preference for receiving feedback here on GitHub, you are still very welcome to send a regular email with your feedback to [dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org).
+
+## Contributions
+
+If you are not familiar with GitHub see the [**Bug reports and feature requests**](https://github.com/worldbank/stata-linter#bug-reports-and-feature-requests) section above for a less technical but still very helpful way to contribute to **stata-linter**.
+
+We appreciate contributions directly to the code and will give credit to anyone providing contributions that we merge to the master branch.
+If you have any questions on anything in this section, please do not hesitate to email [dimeanalytics@worldbank.org](mailto:dimeanalytics@worldbank.org).
+
+The files on the `master` branch are the files most recently released on the SSC server.
+README, LICENSE and similar files are updated directly to `master` in between releases.
+All the other files are updated in the `develop` branch before being merged into `master`.
+Check out the `develop` branch if you want to see what future updates we are currently working on.
+
+Please make pull requests to the `master` branch **only** if you wish to contribute to README, LICENSE or similar meta data files.
+If you wish to make a contribution to any other file, then please **do not** use the `master` branch.
+Instead, please fork this repository from `develop` and make your pull request to that branch.
+The `develop` branch includes all minor edits we have made to already published commands since the last release that we will include in the next version released on the SSC server.
+
 ## License
 
 **stata_linter** is developed under MIT license. See http://adampritchard.mit-license.org/ or see [the `LICENSE` file](https://github.com/worldbank/ietoolkit/blob/master/LICENSE) for details.

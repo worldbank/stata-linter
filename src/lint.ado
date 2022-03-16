@@ -235,13 +235,13 @@ capture program drop 	_correct
 		python: import stata_linter_utils as slu
 
 	* Checking which issues are present in the dofile so we ask for their correction
-		python: Macro.setLocal('_delimiter',  str(slu.detect_delimit_in_file("`input'")))
-		python: Macro.setLocal('_hard_tab',   str(slu.detect_hard_tab_in_file("`input'")))
-		python: Macro.setLocal('_bad_indent', str(slu.detect_bad_indent_in_file("`input'", "`indent'", "`space'")))
-		python: Macro.setLocal('_long_lines', str(slu.detect_line_too_long_in_file("`input'", "`linemax'")))
-		python: Macro.setLocal('_no_space_before_curly', str(slu.detect_no_space_before_curly_bracket_in_file("`input'")))
-		python: Macro.setLocal('_blank_before_curly', str(slu.detect_blank_line_before_curly_close_in_file("`input'")))
-		python: Macro.setLocal('_dup_blank_line', str(slu.detect_duplicated_blank_line_in_file("`input'")))
+		python: Macro.setLocal('_delimiter',  str(slu.detect_delimit_in_file(r"`input'")))
+		python: Macro.setLocal('_hard_tab',   str(slu.detect_hard_tab_in_file(r"`input'")))
+		python: Macro.setLocal('_bad_indent', str(slu.detect_bad_indent_in_file(r"`input'", "`indent'", "`space'")))
+		python: Macro.setLocal('_long_lines', str(slu.detect_line_too_long_in_file(r"`input'", "`linemax'")))
+		python: Macro.setLocal('_no_space_before_curly', str(slu.detect_no_space_before_curly_bracket_in_file(r"`input'")))
+		python: Macro.setLocal('_blank_before_curly', str(slu.detect_blank_line_before_curly_close_in_file(r"`input'")))
+		python: Macro.setLocal('_dup_blank_line', str(slu.detect_duplicated_blank_line_in_file(r"`input'")))
 
 	* If no issue was found, the function ends here.
 	* Otherwise _correct continues.

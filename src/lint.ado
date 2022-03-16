@@ -355,7 +355,7 @@ capture program drop 	_correct
 				    }
 				}
 
-		    python: `fun'("`output'", "`output'", "`indent'", "`space'", "`linemax'")
+		    python: `fun'(r"`output'", r"`output'", "`indent'", "`space'", "`linemax'")
 		}
     }
 

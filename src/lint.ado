@@ -254,9 +254,12 @@ capture program drop 	_correct
 			 "`_dup_blank_line'" == "False") {
 			 display as result `"{phang}Nothing to correct.{p_end}"'
 	     display as result `"{phang}The issues lint is able to correct are not present in your dofile.{p_end}"'
-			 display as result `"{phang}No output files were generated."'
+			 display as result `"{phang}No output files were generated.{p_end}"'
 	 }
 	 else {
+
+	* Counter of number of issues being corrected
+	  local _n_to_correct 0
 
   * Correct the output file, looping for each python command
     foreach fun in 	delimit_to_three_forward_slashes ///
@@ -332,15 +335,13 @@ capture program drop 	_correct
 	      local createfile "Y"
 	  }
 
-		* Counter of number of issues being corrected
-		local _n_to_correct 0
-
 		* If option [manual] was used and input was [N], function won't be used for this issue
 		if ("`createfile'" == "N") {
 		    noi di as result ""
 		}
 		* If option input was [Y], or if option [automatic] was used, run the function
 		else if ("`createfile'" == "Y") {
+
 		    local _n_to_correct = `_n_to_correct' + 1
 
 				* If this is the first issue to correct, create the output file

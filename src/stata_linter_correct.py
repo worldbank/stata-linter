@@ -210,7 +210,7 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
             elif comment_delimiter == 0:
                 # do nothing if any of the following conditions are met
                 if (
-                    (len(line) <= linemax) | # the line if not too long, or
+                    (len(line) <= int(linemax)) | # the line is not too long, or
                     ((line.lstrip() + " ")[0] == "*") | # the line is a comment
                     ((line.lstrip() + "  ")[:2] == "//") | # the line ends with a line break
                     ("///" in line) # line contains a comment

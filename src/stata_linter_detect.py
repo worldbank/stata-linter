@@ -164,6 +164,19 @@ def indent_after_newline(
     return([style_dictionary, excel_output_list])
 
 # No whitespaces around math symbols ----------------
+def no_space_before_symbol(line):
+
+    if re.search(r"(?:a-z|A-Z|0-9|_|\)|'"+'|")(?:<|>|=|\+|-|\*|\^)', line):
+        return True
+    else:
+        return False
+
+def no_space_after_symbol(line):
+    if re.search(r'(?:<|>|=|\+|-|\*|\^)(?:a-z|A-Z|0-9|_|\(|`|"|\.)', line):
+        return True
+    else:
+        return False
+
 def whitespace_symbol(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -171,7 +184,7 @@ def whitespace_symbol(
     ):
 
     # warn if no whitespaces around math symbols
-    if re.search(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)", line):
+    if no_space_before_symbol(line) or no_space_after_symbol(line):
         print_output = (
             '''Before and after math symbols (>, <, =, +, etc), it is recommended to use whitespaces. ''' +
             '''(For example, do "gen a = b + c" instead of "gen a=b+c".)'''

@@ -202,7 +202,7 @@ def whitespace_symbol(
 # For missing values "var < ." or "var != ." are used (!missing(var) is recommended) ----------------
 def has_condition_missing(line):
 
-    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
+    if re.search(r"(<|<=|>|>=|!=|~=|==)( )*(\.(?![0-9]))", line):
         return True
     else:
         return False
@@ -358,7 +358,7 @@ def parentheses_for_global_macro(
     # warn if global macros are used without parentheses
     if re.search(r"\$[a-zA-Z]", line):
         print_output = (
-            '''Always use "\${}" for global macros. '''
+            '''Always use "${}" for global macros. '''
             )
         if suppress != "1":
             print(

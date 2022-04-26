@@ -244,6 +244,13 @@ def dont_use_delimit(
         excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
+def check_cd(line):
+
+    if re.search(r"^cd\s", line.lstrip()):
+        return True
+    else:
+        return False
+
 # Using "cd" should be avoided
 def dont_use_cd(
     line_index, line, input_lines, indent,
@@ -252,7 +259,7 @@ def dont_use_cd(
     ):
 
     # warn if "#cd" is used
-    if re.search(r"(^| )cd ", line.lstrip()):
+    if check_cd(line):
         print_output = (
             '''Do not use "cd" but use absolute and dynamic file paths.'''
             )
@@ -394,6 +401,25 @@ def check_missing(
     return([check_dictionary, excel_output_list])
 
 # Ask if the user may be using backslashes in file paths
+def check_global(line):
+
+    if re.search(r"^global\s", line.lstrip()):
+        return True
+    else:
+        return False
+
+def check_local(line):
+    if re.search(r"^local\s", line.lstrip()):
+        return True
+    else:
+        return False
+
+def check_backslash(line):
+    if re.search(r"\\", line):
+        return True
+    else:
+        return False
+
 def backslash_in_path(
     line_index, line, input_lines, indent,
     suppress, check_dictionary, excel_output_list,
@@ -401,7 +427,12 @@ def backslash_in_path(
     ):
     # warn if anything is sandwiched by backslashes,
     # which suggests that the user may be using backslashes for file paths
-    if re.search(r"\\(\w| |-)+\\", line):
+    changes_dir = check_cd(line)
+    is_local = check_local(line)
+    is_global = check_global(line)
+    has_backslash = check_backslash(line)
+
+    if (changes_dir | is_local | is_global) & has_backslash:
         print_output = (
             '''Are you using backslashes ("\\") for a file path? ''' +
             '''If so, use forward slashes ("/") instead.'''

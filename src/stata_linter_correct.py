@@ -212,8 +212,7 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
                 if (
                     (len(line) <= int(linemax)) | # the line is not too long, or
                     ((line.lstrip() + " ")[0] == "*") | # the line is a comment
-                    ((line.lstrip() + "  ")[:2] == "//") | # the line ends with a line break
-                    ("///" in line) # line contains a comment
+                    ((line.lstrip() + "  ")[:2] == "//") # line contains a comment
                     ):
                     output_list.append(line)
                 # otherwise, do the followings
@@ -234,6 +233,7 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
 
                     i = 0
                     break_line = []
+                    potential_break_line = []
                     double_quote_count = 0
                     parenthesis_count = 0
                     curly_count = 0
@@ -241,33 +241,40 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
                     for j, c in enumerate(line_main):
                         if c == '''"''':
                             double_quote_count = 1 - double_quote_count
-                        if c == "(":
+                        elif c == "(":
                             parenthesis_count += 1
-                        if c == ")":
+                        elif c == ")":
                             parenthesis_count -= 1
-                        if c == "{":
+                        elif c == "{":
                             curly_count += 1
-                        if c == "}":
+                        elif c == "}":
                             curly_count -= 1
-                        if (
-                            (
-                                ((i >= 30) & (c == ",")) | # break line at "," if characters > 30
-                                (i >= (70 - line_indent)) # break line if characters > 70
-                                ) &
-                            (double_quote_count == 0) & # ignore if in double quotes
-                            (parenthesis_count == 0) & # ignore if in parentheses
+
+                        # We check "potential" break lines first
+                        if ((c == "," or c == " ") and # break line at "," or " "
+                            (double_quote_count == 0) and # ignore if in double quotes
+                            (parenthesis_count == 0) and # ignore if in parentheses
                             (curly_count == 0)# ignore if in curly brackets
                             ):
-                            if (c == " "):
-                                break_line.append(j)
-                                i = 0
-                            if (c == ","):
-                                break_line.append(j + 1)
+
+                            if c == " ":
+                                potential_break_line.append(j)
+                            elif c == ",":
+                                potential_break_line.append(j + 1)
+
+                            # If the soon-to-be new line is equal to the linemax,
+                            # we add the last potential line break position
+                            if i == int(linemax) - 3 + line_indent:
+                                break_line.append(potential_break_line[-1])
                                 i = 0
                             else:
                                 i += 1
                         else:
-                            i += 1
+                            if i == int(linemax) - 3 + line_indent:
+                                break_line.append(potential_break_line[-1])
+                                i = 0
+                            else:
+                                i += 1
 
                     # break lines
                     line_split = []
@@ -284,7 +291,7 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
                         else:
                             line_split.append(line_main[break_line_index[k]:break_line_index[k + 1]])
 
-                    # if no line break if needed, then just append the line
+                    # if no line break is needed, then just append the line
                     # with appropriate indentations (and commends if needed)
                     if len(line_split) == 1:
                         if len(line_split_for_comment) > 1:

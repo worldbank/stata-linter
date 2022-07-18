@@ -310,7 +310,7 @@ def detect_line_too_long(line, linemax):
     if len(line) > 0 and line[-1] == '\n':
         line = line[:-1]
 
-    if (len(line) > linemax) & ("///" not in line):
+    if (len(line) > linemax):
         return True
     else:
         return False

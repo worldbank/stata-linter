@@ -144,11 +144,27 @@ def indent_after_newline(
     tab_space
     ):
 
-    # check if the previous line includes "///"
-    if re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]):
+    # check if the previous line doesn't have "///" or if it's first line in dofile
+    if not re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]) or line_index == 0:
+        # no "///" found, the function finishes here
+        return([style_dictionary, excel_output_list])
+
+    else:
+        # Now we check which of the previous lines contained "///"
+        # we then check indentation spaces with respect of the first
+        # line with "///"
+        i = 0
+        while re.search(r"\/\/\/", input_lines[line_index - (i + 1)]):
+            i += 1
+            pass
+
+        first_line = input_lines[line_index - i].expandtabs(tab_space)
+        first_line_indent = len(first_line) - len(first_line.lstrip())
+
         line_ws = line.expandtabs(tab_space)
         line_left_spaces = len(line_ws) - len(line_ws.lstrip())
-        if line_left_spaces < indent:
+
+        if line_left_spaces - first_line_indent < indent:
             print_output = (
                 '''After new line statement ("///"), add indentation ({:d} whitespaces).'''.format(indent)
                 )
@@ -161,7 +177,8 @@ def indent_after_newline(
 
             style_dictionary["indent_after_newline"] += 1
             excel_output_list.append([line_index + 1, "style", print_output])
-    return([style_dictionary, excel_output_list])
+
+        return([style_dictionary, excel_output_list])
 
 # No whitespaces around math symbols ----------------
 def no_space_before_symbol(line):

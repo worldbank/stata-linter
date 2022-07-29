@@ -8,7 +8,7 @@ capture program drop lint
   syntax anything [using/],        	///
 									/// Options
     [                   			///
-      verbose           			///
+      Verbose           			///
       NOSUMmary         			///
       Indent(string)    			///
       Linemax(string)   			///

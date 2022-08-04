@@ -7,6 +7,7 @@ help for {hi:lint}
 {title:Title}
 
 {p 4 4 2}
+
 {cmdab:lint} {hline 2} detects and corrects bad coding practices in Stata do-files
 
 {p 4 4 2}
@@ -36,7 +37,6 @@ For this command to run, you will need Stata version 16 or greater, Python,
 {synopthdr:Option}
 {synoptline}
 
-{marker columnoptions}{...}
 {synopt :{cmdab:v:erbose}}Reports flags found on each line of code so the user can
   identify exact suggested changes in the original do-file.{p_end}
 {synopt :{cmdab:nosum:mary}}Suppress summary table of suggested corrections and potential issues.{p_end}
@@ -55,7 +55,6 @@ For this command to run, you will need Stata version 16 or greater, Python,
 {synoptline}
 
 
-
 {title:Style rules and potential issues detected and/or corrected}
 
 {pstd}{hi:Use soft tabs (i.e, whitespaces), not hard tabs}
@@ -69,7 +68,7 @@ Hence, for example, avoid the code like this:
 
 {pmore}{input:foreach i of var cassava maize wheat {  }}
 
-{pstd}Instead, when looping commands should name that index descriptively:
+{pstd}Instead, looping commands should name the index local descriptively:
 
 {pmore}{input:foreach crop of var cassava maize wheat {  }}
 
@@ -81,9 +80,19 @@ After declaring for-loop statements or if-else statements, add indentation with 
 {break}
 After a new line statement (///), add indentation (usually 2 or 4 whitespaces).
 
-{pstd}{hi:Use "{cmdab:!missing}" function for conditions of missing values}
+{pstd}{hi:Use "{cmdab:!missing()}" function for conditions of missing values}
 {break}
 For clarity, use {cmdab:!missing(var)} instead of {cmdab:var < .} or {cmdab:var != .}
+
+{pstd}{hi:Add whitespaces around math symbols ({cmdab:+, =, <, >})}
+{break}
+For better readability, add whitespaces around math symbols.
+For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d==e}.
+
+{pstd}{hi:Specify the condition in the if statement}
+{break}
+Always explicitly specify the condition in the if statement.
+For example, declare {cmdab:if var == 1} instead of {cmdab:if var}.
 
 {pstd}{hi:Do not use "{cmdab:#delimit}", instead use "///" for line breaks}
 {break}
@@ -97,28 +106,15 @@ Use absolute and dynamic file paths. More about this {browse "https://worldbank.
 {break}
 For lines that are too long, use {cmdab:///} for line breaks and divide them into multiple lines.
 It is recommended to restrict the number of characters in a line under 80.
-Whereas sometimes this is difficult since, for example, Stata does not allow line breaks within double quotes, try to follow this rule when possible.
-
-{pstd}{hi:Add whitespaces around math symbols such as {cmdab:+, =, <, >,} etc.}
-{break}
-For better readability, add whitespaces around math symbols.
-For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d==e}.
-
-{pstd}{hi:Specify the condition in the if statement}
-{break}
-Always explicitly specify the condition in the if statement.
-For example, declare {cmdab:if var == 1} instead of {cmdab:if var}.
 
 {pstd}{hi:Use curly brackets for global macros}
 {break}
 Always use {cmdab:${ }} for global macros.
 For instance, use {cmdab:${global}} instead of {cmdab:$global}.
 
-{title:Check suggestions}
-
-{pstd}{hi:Check if missing values are properly taken into account}
-{break}
-Note that {cmdab:a != 0} includes cases where {cmdab:a} is missing.
+{pstd}{hi:Include missing values in condition expressions}
+Condition expressions like {cmdab:var != 0} or {cmdab:var > 0} are evaluated to true for missing values.
+Make sure to explicitly take missing values into account by using {cmdab:missing()} in expressions.
 
 {pstd}{hi:Check if backslashes are not used in file paths}
 {break}
@@ -129,12 +125,38 @@ If you are using them, then replace them with forward slashes ({cmdab:/}).
 {break}
 If you are using tildes ({cmdab:~}) are used for negations, replace them with bangs ({cmdab:!}).
 
+{title:Coding practices to corrected}
+
+{p 4 4 2}
+The correction feature does not correct all the bad practices detected.
+It only corrects the following:
+
+{pstd}- Replaces the use of {cmdab:delimit} with three forward slashes ({cmdab:///}) in each line affected by {cmdab:delimit}
+
+{pstd}- Replaces hard tabs with soft spaces (4 by default). The amount of spaces can be set with the {cmdab:tab_space()} option
+
+{pstd}- Indents lines inside curly brackets with 4 spaces by default. The amount of spaces can be set with the {cmdab:indent()} option
+
+{pstd}- Breaks long lines into two lines. Long lines are considered to have more than 80 characters by default, but this setting can be changed with the option {cmdab:linemax()}
+
+{pstd}- Adds a whitespace before opening curly brackets, except for globals
+
+{pstd}- Removes redundant blank lines after closing curly brackets
+
+{pstd}- Removes duplicated blank lines
+
+{p 4 4 2}
+If the option {cmdab:automatic} is omitted, Stata will prompt the user to confirm that
+they want to correct each of these bad practices only in case they are detected.
+If none of these are detected, it will show a message saying that none of the
+bad practices it can correct were detected.
+
 {marker exa}
 {title:Examples}
 
 {p 4 4 2}
-The following examples are intended to illustrate the basic usage of
-{cmd:lint}. Additional examples can be found at
+The following examples are intended to illustrate the basic usage of {cmd:lint}.
+Additional examples can be found at
 {browse "https://github.com/worldbank/stata-linter/wiki/Lint"}.
 
 {pstd}{hi:1. Detecting bad coding practices}
@@ -147,7 +169,7 @@ The following examples are intended to illustrate the basic usage of
 
         Options:
 
-        1. Show in which lines there are bad coding practices
+        1. Show which lines have bad coding practices
         {com}. lint "test/bad.do", verbose
 
         2. Remove the summary of bad practices
@@ -160,9 +182,9 @@ The following examples are intended to illustrate the basic usage of
         {com}. lint "test/bad.do", linemax(100)
 
         5. Specify the number of whitespaces used instead of hard tabs (default: 4):
-        {com}. lint "test/bad.do", tab_space(100)
+        {com}. lint "test/bad.do", tab_space(6)
 
-        6. Exports to excel the results of the line by line analysis
+        6. Export to Excel the results of the line by line analysis
         {com}. lint "test/bad.do", excel("test_dir/detect_output.xlsx")
 
         7. You can also use this command to test all the do-files that are in a folder:
@@ -170,9 +192,10 @@ The following examples are intended to illustrate the basic usage of
 
 {pstd}{hi:2. Correcting bad coding practices}
 
-{p 4 4 2} In the case of correcting a do file, the basic usage is to point to a do-file
-that will be corrected and assign a new name to said do-file. If you do not include any
-options, Stata will ask you confirm if you want a specific bad practice to be corrected:
+{p 4 4 2} The basic usage of the correction feature requires to specify the input do-file
+and the output do-file that will have the corrections.
+If you do not include any options, Stata will ask you confirm if you want a specific bad practice to be corrected
+for each bad practice detected:
 
         1. Basic usage (Stata will prompt you with questions):
         {com}. lint "test/bad.do" using "test/bad_corrected.do"
@@ -180,10 +203,10 @@ options, Stata will ask you confirm if you want a specific bad practice to be co
         2. Automatic (Stata will correct the file automatically):
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic
 
-        3. Have the same name for the output file:
+        3. Use the same name for the output file (this will overwrite the input file):
         {com}. lint "test/bad.do" using "test/bad.do", automatic inprep
 
-        4. Replace the output file
+        4. Replace the output file if it already exists
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic replace
 
 {title:Authors}

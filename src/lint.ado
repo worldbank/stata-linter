@@ -100,6 +100,8 @@ capture program drop lint
 
 	if !missing("`excel'") {
 
+		_checkopenpyxlinstall
+
 		_testpath "`excel'", ext(`"".xls", ".xlsx""') argument(lint's [excel] argument) `debug'
 		local excel = "`r(file)'"
 	}
@@ -185,12 +187,11 @@ _checkversions
 
 	if !missing("`using'") {
 
-		_checkopenpyxlinstall
-
 		_correct, ///
 			input("`input'") output("`output'") ///
 			indent("`indent'") space("`space'") linemax("`linemax'") ///
 			`replace' `inprep' `automatic' `debug'
+
 	}
 
 end

@@ -44,9 +44,9 @@ For this command to run, you will need Stata version 16 or greater, Python,
 {synopt :{cmdab:s:pace(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
 {synopt :{cmdab:l:inemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80){p_end}
 {synopt :{cmdab:e:xcel(}{it:{help filename}}{cmd:)}}Save an Excel file of line-by-line results{p_end}
-{synopt :{cmdab:inprep}}Allow the output file name to be the same as the name of the input file; 
+{synopt :{cmdab:inprep}}Allow the output file name to be the same as the name of the input file;
   in other words, allow the command to overwrite the original do-file.{p_end}
-{synopt :{cmdab:auto:matic}}Correct all bad coding practices without asking 
+{synopt :{cmdab:auto:matic}}Correct all bad coding practices without asking
   if you want each bad coding practice to be corrected or not.
 	By default, the command will query each correction interactively
 	after producing the summary report and optionally verbose output.{p_end}
@@ -125,7 +125,7 @@ If you are using them, then replace them with forward slashes ({cmdab:/}).
 {break}
 If you are using tildes ({cmdab:~}) are used for negations, replace them with bangs ({cmdab:!}).
 
-{title:Coding practices to corrected}
+{title:Coding practices to be corrected}
 
 {p 4 4 2}
 The correction feature does not correct all the bad practices detected.
@@ -137,7 +137,10 @@ It only corrects the following:
 
 {pstd}- Indents lines inside curly brackets with 4 spaces by default. The amount of spaces can be set with the {cmdab:indent()} option
 
-{pstd}- Breaks long lines into two lines. Long lines are considered to have more than 80 characters by default, but this setting can be changed with the option {cmdab:linemax()}
+{pstd}- Breaks long lines into two lines. Long lines are considered to have more than 80 characters by default,
+but this setting can be changed with the option {cmdab:linemax()}.
+Note that lines can only be split in whitespaces that are not inside
+parentheses, curly brackets, or double quotes.
 
 {pstd}- Adds a whitespace before opening curly brackets, except for globals
 

@@ -10,13 +10,23 @@ This will install the most recent published version of `stata_linter`.
 The main version of the code in this repository (the `master` branch) is what
 is published on SSC as well.
 
+### Python stand-alone installation
+
+To install the linter to run directly with Python and not via Stata, clone this repository and then run the following command on your terminal:
+
+```python
+pip install -e src/
+```
+
+This will also install `pandas` and `openpyxl` if they are not currently installed.
+
 ## Requirements
 
 1. Stata version 16 or higher.
 2. Python 3 or higher
 
 For setting up Stata to use Python, refer to [this web page](https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/).
-`stata_linter` also requires the Python package `pandas`, `openpyxl`, and `sfi`.
+`stata_linter` also requires the Python package `pandas` and `openpyxl`.
 Refer to [this web page](https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/) to know more about installing Python packages.
 
 ## Content

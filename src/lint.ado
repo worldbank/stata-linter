@@ -184,6 +184,9 @@ _checkversions
 *******************************************************************************/
 
 	if !missing("`using'") {
+
+		_checkopenpyxlinstall
+
 		_correct, ///
 			input("`input'") output("`output'") ///
 			indent("`indent'") space("`space'") linemax("`linemax'") ///
@@ -505,15 +508,19 @@ capture program drop  	_checkpyinstall
 	* Check if pandas package is installed
 	cap python which pandas
 	if _rc {
-		noi di as error `"{phang}For this command to run, a package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		noi di as error `"{phang}For this command to run, the Python package "pandas" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install Python packages. {p_end}"'
 		exit
 	}
 
-	* Check if sfi package is installed
-	* This is needed to pass Python results into Stata
-	cap python which sfi
+end
+
+capture program drop  	_checkopenpyxlinstall
+		program 		_checkopenpyxlinstall
+
+	* Check if openpyxl package is installed
+	cap python which openpyxl
 	if _rc {
-		noi di as error `"{phang}For this command to run, a package "sfi" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install python packages. {p_end}"'
+		noi di as error `"{phang}For this command to run, the Python package "openpyxl" needs to be installed. Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for how to install Python packages. {p_end}"'
 		exit
 	}
 

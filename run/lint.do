@@ -1,6 +1,6 @@
 * Set the global to folder where test files are stored
 
-	global project 	  	"C:\Users\wb501238\Documents\GitHub/stata-linter"
+	global project 	  	"/Users/bbdaniels/GitHub/stata-linter"
 	global test_dir     "${project}/test"
 	adopath ++ "${project}/src"
 	

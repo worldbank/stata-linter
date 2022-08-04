@@ -144,11 +144,27 @@ def indent_after_newline(
     tab_space
     ):
 
-    # check if the previous line includes "///"
-    if re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]):
+    # check if the previous line doesn't have "///" or if it's first line in dofile
+    if not re.search(r"\/\/\/", input_lines[max(line_index - 1, 0)]) or line_index == 0:
+        # no "///" found, the function finishes here
+        return([style_dictionary, excel_output_list])
+
+    else:
+        # Now we check which of the previous lines contained "///"
+        # we then check indentation spaces with respect of the first
+        # line with "///"
+        i = 0
+        while re.search(r"\/\/\/", input_lines[line_index - (i + 1)]):
+            i += 1
+            pass
+
+        first_line = input_lines[line_index - i].expandtabs(tab_space)
+        first_line_indent = len(first_line) - len(first_line.lstrip())
+
         line_ws = line.expandtabs(tab_space)
         line_left_spaces = len(line_ws) - len(line_ws.lstrip())
-        if line_left_spaces < indent:
+
+        if line_left_spaces - first_line_indent < indent:
             print_output = (
                 '''After new line statement ("///"), add indentation ({:d} whitespaces).'''.format(indent)
                 )
@@ -161,9 +177,23 @@ def indent_after_newline(
 
             style_dictionary["indent_after_newline"] += 1
             excel_output_list.append([line_index + 1, "style", print_output])
-    return([style_dictionary, excel_output_list])
+
+        return([style_dictionary, excel_output_list])
 
 # No whitespaces around math symbols ----------------
+def no_space_before_symbol(line):
+
+    if re.search(r"(?:a-z|A-Z|0-9|_|\)|'"+'|")(?:<|>|=|\+|-|\*|\^)', line):
+        return True
+    else:
+        return False
+
+def no_space_after_symbol(line):
+    if re.search(r'(?:<|>|=|\+|-|\*|\^)(?:a-z|A-Z|0-9|_|\(|`|"|\.)', line):
+        return True
+    else:
+        return False
+
 def whitespace_symbol(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -171,7 +201,7 @@ def whitespace_symbol(
     ):
 
     # warn if no whitespaces around math symbols
-    if re.search(r"(( )*(<|>|=|==|\+)\w|\w(<|>|=|==|\+)( )*)", line):
+    if no_space_before_symbol(line) or no_space_after_symbol(line):
         print_output = (
             '''Before and after math symbols (>, <, =, +, etc), it is recommended to use whitespaces. ''' +
             '''(For example, do "gen a = b + c" instead of "gen a=b+c".)'''
@@ -189,7 +219,7 @@ def whitespace_symbol(
 # For missing values "var < ." or "var != ." are used (!missing(var) is recommended) ----------------
 def has_condition_missing(line):
 
-    if re.search(r"(<|!=|~=)( )*(\.(?![0-9]))", line):
+    if re.search(r"(<|<=|>|>=|!=|~=|==)( )*(\.(?![0-9]))", line):
         return True
     else:
         return False
@@ -244,6 +274,13 @@ def dont_use_delimit(
         excel_output_list.append([line_index + 1, "style", print_output])
     return([style_dictionary, excel_output_list])
 
+def check_cd(line):
+
+    if re.search(r"^cd\s", line.lstrip()):
+        return True
+    else:
+        return False
+
 # Using "cd" should be avoided
 def dont_use_cd(
     line_index, line, input_lines, indent,
@@ -252,7 +289,7 @@ def dont_use_cd(
     ):
 
     # warn if "#cd" is used
-    if re.search(r"(^| )cd ", line.lstrip()):
+    if check_cd(line):
         print_output = (
             '''Do not use "cd" but use absolute and dynamic file paths.'''
             )
@@ -273,7 +310,7 @@ def detect_line_too_long(line, linemax):
     if len(line) > 0 and line[-1] == '\n':
         line = line[:-1]
 
-    if (len(line) > linemax) & ("///" not in line):
+    if (len(line) > linemax):
         return True
     else:
         return False
@@ -336,9 +373,9 @@ def parentheses_for_global_macro(
     ):
 
     # warn if global macros are used without parentheses
-    if re.search(r"\\$\w", line):
+    if re.search(r"\$[a-zA-Z]", line):
         print_output = (
-            '''Always use "\${}" for global macros. '''
+            '''Always use "${}" for global macros. '''
             )
         if suppress != "1":
             print(
@@ -394,6 +431,25 @@ def check_missing(
     return([check_dictionary, excel_output_list])
 
 # Ask if the user may be using backslashes in file paths
+def check_global(line):
+
+    if re.search(r"^global\s", line.lstrip()):
+        return True
+    else:
+        return False
+
+def check_local(line):
+    if re.search(r"^local\s", line.lstrip()):
+        return True
+    else:
+        return False
+
+def check_backslash(line):
+    if re.search(r"\\", line):
+        return True
+    else:
+        return False
+
 def backslash_in_path(
     line_index, line, input_lines, indent,
     suppress, check_dictionary, excel_output_list,
@@ -401,7 +457,12 @@ def backslash_in_path(
     ):
     # warn if anything is sandwiched by backslashes,
     # which suggests that the user may be using backslashes for file paths
-    if re.search(r"\\(\w| |-)+\\", line):
+    changes_dir = check_cd(line)
+    is_local = check_local(line)
+    is_global = check_global(line)
+    has_backslash = check_backslash(line)
+
+    if (changes_dir | is_local | is_global) & has_backslash:
         print_output = (
             '''Are you using backslashes ("\\") for a file path? ''' +
             '''If so, use forward slashes ("/") instead.'''

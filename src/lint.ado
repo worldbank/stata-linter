@@ -8,7 +8,7 @@ capture program drop lint
   syntax anything [using/],        	///
 									/// Options
     [                   			///
-      verbose           			///
+      Verbose           			///
       NOSUMmary         			///
       Indent(string)    			///
       Linemax(string)   			///
@@ -235,13 +235,13 @@ capture program drop 	_correct
 		python: import stata_linter_utils as slu
 
 	* Checking which issues are present in the dofile so we ask for their correction
-		python: Macro.setLocal('_delimiter',  str(slu.detect_delimit_in_file("`input'")))
-		python: Macro.setLocal('_hard_tab',   str(slu.detect_hard_tab_in_file("`input'")))
-		python: Macro.setLocal('_bad_indent', str(slu.detect_bad_indent_in_file("`input'", "`indent'", "`space'")))
-		python: Macro.setLocal('_long_lines', str(slu.detect_line_too_long_in_file("`input'", "`linemax'")))
-		python: Macro.setLocal('_no_space_before_curly', str(slu.detect_no_space_before_curly_bracket_in_file("`input'")))
-		python: Macro.setLocal('_blank_before_curly', str(slu.detect_blank_line_before_curly_close_in_file("`input'")))
-		python: Macro.setLocal('_dup_blank_line', str(slu.detect_duplicated_blank_line_in_file("`input'")))
+		python: Macro.setLocal('_delimiter',  str(slu.detect_delimit_in_file(r"`input'")))
+		python: Macro.setLocal('_hard_tab',   str(slu.detect_hard_tab_in_file(r"`input'")))
+		python: Macro.setLocal('_bad_indent', str(slu.detect_bad_indent_in_file(r"`input'", "`indent'", "`space'")))
+		python: Macro.setLocal('_long_lines', str(slu.detect_line_too_long_in_file(r"`input'", "`linemax'")))
+		python: Macro.setLocal('_no_space_before_curly', str(slu.detect_no_space_before_curly_bracket_in_file(r"`input'")))
+		python: Macro.setLocal('_blank_before_curly', str(slu.detect_blank_line_before_curly_close_in_file(r"`input'")))
+		python: Macro.setLocal('_dup_blank_line', str(slu.detect_duplicated_blank_line_in_file(r"`input'")))
 
 	* If no issue was found, the function ends here.
 	* Otherwise _correct continues.
@@ -254,9 +254,12 @@ capture program drop 	_correct
 			 "`_dup_blank_line'" == "False") {
 			 display as result `"{phang}Nothing to correct.{p_end}"'
 	     display as result `"{phang}The issues lint is able to correct are not present in your dofile.{p_end}"'
-			 display as result `"{phang}No output files were generated."'
+			 display as result `"{phang}No output files were generated.{p_end}"'
 	 }
 	 else {
+
+	* Counter of number of issues being corrected
+	  local _n_to_correct 0
 
   * Correct the output file, looping for each python command
     foreach fun in 	delimit_to_three_forward_slashes ///
@@ -332,15 +335,13 @@ capture program drop 	_correct
 	      local createfile "Y"
 	  }
 
-		* Counter of number of issues being corrected
-		local _n_to_correct 0
-
 		* If option [manual] was used and input was [N], function won't be used for this issue
 		if ("`createfile'" == "N") {
 		    noi di as result ""
 		}
 		* If option input was [Y], or if option [automatic] was used, run the function
 		else if ("`createfile'" == "Y") {
+
 		    local _n_to_correct = `_n_to_correct' + 1
 
 				* If this is the first issue to correct, create the output file
@@ -354,7 +355,7 @@ capture program drop 	_correct
 				    }
 				}
 
-		    python: `fun'("`output'", "`output'", "`indent'", "`space'", "`linemax'")
+		    python: `fun'(r"`output'", r"`output'", "`indent'", "`space'", "`linemax'")
 		}
     }
 

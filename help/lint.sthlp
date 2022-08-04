@@ -7,49 +7,61 @@ help for {hi:lint}
 {title:Title}
 
 {p 4 4 2}
-{cmdab:lint} {hline 2} detects and corrects bad coding practices in do-files
+
+{cmdab:lint} {hline 2} detects and corrects bad coding practices in Stata do-files
 
 {p 4 4 2}
-For this command to run, you will need Stata >=16, Python, and the Python packages {cmdab:pandas}, {cmdab:openpyxl}, and {cmdab:sfi}.
-Refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page} for instructions on how to install Python.
-Refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page} for instructions on how to install Python packages.
+For this command to run, you will need Stata version 16 or greater, Python,
+  and the Python package {browse "https://pandas.pydata.org/":pandas} installed. {break}
+	To install Python, refer to {browse "https://blog.stata.com/2020/08/18/stata-python-integration-part-1-setting-up-stata-to-use-python/":this page}. {break}
+  To install Python packages, refer to {browse "https://blog.stata.com/2020/09/01/stata-python-integration-part-3-how-to-install-python-packages/":this page}.
 
 {title:Basic syntax}
 
-{p 4 4 2}
-{cmdab:lint} {it:input_file} [using {it:output_file}], {it:options}
+{p 4 6 6}
+{cmdab:lint} "{it:input_file}" [using "{it:output_file}"] , [{it:options}]
+{p_end}
+{break}
+{p 4 4 2} The lint command can be broken into two functionalities:
+      {break}1. {it:Detection}, which refers to identifying bad coding practices in one or multiple Stata do-files;
+      {break}2. {it:Correction}, which refers to correcting bad coding practices in a Stata do-file.
+{p_end}
+{break}
+{p 4 4 6} If an {it:output_file} is specified using {opt using},
+  then the command will write a new file with corrections to that location.{break}
+	If not, the command will return a report of suggested corrections
+	and potential issues in the do-file in the Results window.{p_end}
 
 {marker opts}{...}
 {synoptset 25}{...}
-{synopthdr:options}
-{synoptline}
-{pstd}{it:    {ul:{hi:Options:}}}{p_end}
-
-{marker columnoptions}{...}
-{synopt :{cmdab:verbose}}Shows line-by-line results{p_end}
-{synopt :{cmdab:nosummary}}Excludes summary results (number of bad practices){p_end}
-{synopt :{cmdab:indent(}{it:integer}{cmd:)}}Defines the number of whitespaces used for indentation checks (default: 4){p_end}
-{synopt :{cmdab:tab_space(}{it:integer}{cmd:)}}Defines the number of whitespaces used to replace hard tabs (default: 4){p_end}
-{synopt :{cmdab:linemax(}{it:integer}{cmd:)}}Defines the maximum number of characters of a line (default: 80){p_end}
-{synopt :{cmdab:excel(}{it:{help filename}}{cmd:)}}Creates an excel file with line-by-line results{p_end}
-{synopt :{cmdab:inprep}}Allows the output file name to be the same as the name of the input file. Can only be used when an output file is specified{p_end}
-{synopt :{cmdab:automatic}}Corrects all bad coding practices without asking if you want each bad coding practice to be corrected or not. Can only be used when an output file is specified{p_end}
-{synopt :{cmdab:replace}}Replaces the existing {it:output} file. Can only be used when an output file is specified{p_end}
-
+{synopthdr:Option}
 {synoptline}
 
-{p 4 4 2} The lint command can be broken into two functionalities:
+{synopt :{cmdab:v:erbose}}Reports flags found on each line of code so the user can
+  identify exact suggested changes in the original do-file.{p_end}
+{synopt :{cmdab:nosum:mary}}Suppress summary table of suggested corrections and potential issues.{p_end}
+{synopt :{cmdab:i:ndent(}{it:integer}{cmd:)}}The number of whitespaces used for indentation (default: 4){p_end}
+{synopt :{cmdab:s:pace(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
+{synopt :{cmdab:l:inemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80){p_end}
+{synopt :{cmdab:e:xcel(}{it:{help filename}}{cmd:)}}Save an Excel file of line-by-line results{p_end}
+{synopt :{cmdab:inprep}}Allow the output file name to be the same as the name of the input file; 
+  in other words, allow the command to overwrite the original do-file.{p_end}
+{synopt :{cmdab:auto:matic}}Correct all bad coding practices without asking 
+  if you want each bad coding practice to be corrected or not.
+	By default, the command will query each correction interactively
+	after producing the summary report and optionally verbose output.{p_end}
+{synopt :{cmdab:replace}}Overwrite an existing {it:output} file.{p_end}
 
-      1. {it:detection} identifies bad coding practices in one or multiple Stata do-files
-      2. {it:correction} corrects bad coding practices in a Stata do-file. This feature is activated when an output file is specified with {it:using}
+{synoptline}
 
-{title:Coding practices to be detected}
+
+{title:Style rules and potential issues detected and/or corrected}
 
 {pstd}{hi:Use soft tabs (i.e, whitespaces), not hard tabs}
 {break}
 Use white spaces (usually 2 or 4 whitespaces are used) instead of hard tabs. You can change this option in the do-file editor preferences.
 
-{pstd}{hi:Avoid to use abstract index names}
+{pstd}{hi:Avoid abstract index names}
 {break}
 In for loops, index names should describe what the code is looping over.
 Hence, for example, avoid the code like this:
@@ -62,7 +74,7 @@ Hence, for example, avoid the code like this:
 
 {pstd}{hi:Use proper indentations}
 {break}
-After declaring for loop statement or if-else statement, add indentation with whitespaces (usually 2 or 4 whitespaces).
+After declaring for-loop statements or if-else statements, add indentation with whitespaces (usually 2 or 4 whitespaces).
 
 {pstd}{hi:Use indentations after declaring newline symbols (///)}
 {break}
@@ -82,7 +94,7 @@ For example, do {cmdab:gen a = b + c if d == e} instead of {cmdab:gen a=b+c if d
 Always explicitly specify the condition in the if statement.
 For example, declare {cmdab:if var == 1} instead of {cmdab:if var}.
 
-{pstd}{hi:Do not use "{cmdab:delimit}", instead use "///" for line breaks}
+{pstd}{hi:Do not use "{cmdab:#delimit}", instead use "///" for line breaks}
 {break}
 More information about the use of line breaks {browse "https://worldbank.github.io/dime-data-handbook/coding.html#line-breaks":here}.
 

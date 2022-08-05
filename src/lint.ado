@@ -303,6 +303,11 @@ capture program drop 	_correct
           global confirmation "" //Reset global
 
           while (upper("${confirmation}") != "Y" & upper("${confirmation}") != "N" & upper("${confirmation}") != "BREAK") {
+					    if ("${confirmation}" != "") {
+									noi di as txt "{pstd} Invalid input. {p_end}"
+									noi di as txt "{pstd} Please type {bf:Y} or {bf:N} and hit enter. Type {bf:BREAK} and hit enter to exit. {p_end}"
+									noi di ""
+							}
               if ("`fun'" == "delimit_to_three_forward_slashes") {
 							    di as result "{pstd} Avoid using [delimit], use three forward slashes (///) instead. {p_end}"
               }

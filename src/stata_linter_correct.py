@@ -120,7 +120,7 @@ def tab_to_space(input_file, output_file, indent, tab_space, linemax):
             elif comment_delimiter == 0:
                 # replace the hard tabs detected in a line to soft tabs (whitespaces)
                 spaces = ' ' * int(tab_space)
-                pattern = r'^( *)(\t+)([^\t].*\n)'
+                pattern = r'^( *)(\t+)([^\t].*\n{0,1})'
                 match = re.match(pattern, line)
                 if match:
                     output_list.append(match.group(1) +
@@ -245,7 +245,10 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
                     parenthesis_count = 0
                     curly_count = 0
                     # looking at each character of a line, tag where to break the line
-                    for j, c in enumerate(line_main):
+                    for j, c in enumerate(line_main.lstrip()):
+
+                        position = j + len(line_main) - len(line_main.lstrip())
+
                         if c == '''"''':
                             double_quote_count = 1 - double_quote_count
                         elif c == "(":
@@ -265,21 +268,38 @@ def too_long_line(input_file, output_file, indent, tab_space, linemax):
                             ):
 
                             if c == " ":
-                                potential_break_line.append(j)
-                            elif c == ",":
-                                potential_break_line.append(j + 1)
 
-                            # If the soon-to-be new line is equal to the linemax,
-                            # we add the last potential line break position
-                            if i == int(linemax) - 3 + line_indent:
-                                break_line.append(potential_break_line[-1])
-                                i = 0
-                            else:
-                                i += 1
+                                position2 = line_indent + i + 4
+                                potential_break_line.append(position)
+
+                                # If the soon-to-be new line is equal to the linemax,
+                                # we add the last potential line break position
+                                if position2 >= int(linemax):
+                                    break_line.append(potential_break_line[-1])
+                                    i = int(indent) + position - potential_break_line[-1]
+                                else:
+                                    i += 1
+
+                            elif c == ",":
+
+                                position2 = line_indent + i + 5
+
+                                # If the soon-to-be new line is equal to the linemax,
+                                # we add the last potential line break position
+                                if position2 >= int(linemax):
+                                    break_line.append(potential_break_line[-1])
+                                    i = int(indent) + position - potential_break_line[-1]
+                                else:
+                                    i += 1
+
+                                potential_break_line.append(position + 1)
+
                         else:
-                            if i == int(linemax) - 3 + line_indent:
+
+                            position2 = line_indent + i + 4
+                            if position2 >= int(linemax):
                                 break_line.append(potential_break_line[-1])
-                                i = 0
+                                i = int(indent) + position - potential_break_line[-1]
                             else:
                                 i += 1
 

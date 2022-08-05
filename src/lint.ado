@@ -312,11 +312,11 @@ capture program drop 	_correct
               else if ("`fun'" == "indent_in_bracket") {
                   di as result "{pstd} Indent commands inside curly brackets. {p_end}"
               }
-              else if ("`fun'" == "too_long_line") {
-                  di as result "{pstd} Limit line length to `linemax' characters. {p_end}"
-              }
               else if ("`fun'" == "space_before_curly") {
                   di as result "{pstd} Use white space before opening curly brackets. {p_end}"
+              }
+							else if ("`fun'" == "too_long_line") {
+                  di as result "{pstd} Limit line length to `linemax' characters. {p_end}"
               }
               else if ("`fun'" == "remove_blank_lines_before_curly_close") {
                   di as result "{pstd} Remove redundant blank lines before closing brackets. {p_end}"

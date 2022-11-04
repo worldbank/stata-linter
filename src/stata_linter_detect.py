@@ -183,17 +183,27 @@ def indent_after_newline(
 # No whitespaces around math symbols ----------------
 def no_space_before_symbol(line):
 
-    #if re.search(r"(?:[a-z]|[A-Z]|[0-9]|_|\)|'"+'|")(?:<|>|=|\+|-|\*|\^)', line):
-    if re.search("(?:[a-z]|[A-Z]|[0-9]|_|\)|'|\")(?:<|>|=|\+|-|\*|\^)", line):
-        return True
-    else:
-        return False
+    groups = line.split('"')
+
+    for i, group in enumerate(groups):
+
+        if i % 2 == 0:
+            if re.search(r"(?:[a-z]|[A-Z]|[0-9]|_|\)|')(?:<|>|=|\+|-|\*|\^)", group):
+                return True
+
+    return False
 
 def no_space_after_symbol(line):
-    if re.search(r'(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|[0-9]|_|\(|`|"|\.)', line):
-        return True
-    else:
-        return False
+
+    groups = line.split('"')
+
+    for i, group in enumerate(groups):
+
+        if i % 2 == 0:
+            if re.search(r"(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|[0-9]|_|\(|`|\.|$)", group):
+                return True
+
+    return False
 
 def whitespace_symbol(
     line_index, line, input_lines, indent,

@@ -1,4 +1,4 @@
-# version 1.0.0  20jan2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0.0  04nov2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -183,13 +183,14 @@ def indent_after_newline(
 # No whitespaces around math symbols ----------------
 def no_space_before_symbol(line):
 
-    if re.search(r"(?:a-z|A-Z|0-9|_|\)|'"+'|")(?:<|>|=|\+|-|\*|\^)', line):
+    #if re.search(r"(?:[a-z]|[A-Z]|[0-9]|_|\)|'"+'|")(?:<|>|=|\+|-|\*|\^)', line):
+    if re.search("(?:[a-z]|[A-Z]|[0-9]|_|\)|'|\")(?:<|>|=|\+|-|\*|\^)", line):
         return True
     else:
         return False
 
 def no_space_after_symbol(line):
-    if re.search(r'(?:<|>|=|\+|-|\*|\^)(?:a-z|A-Z|0-9|_|\(|`|"|\.)', line):
+    if re.search(r'(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|[0-9]|_|\(|`|"|\.)', line):
         return True
     else:
         return False
@@ -219,7 +220,7 @@ def whitespace_symbol(
 # For missing values "var < ." or "var != ." are used (!missing(var) is recommended) ----------------
 def has_condition_missing(line):
 
-    if re.search(r"(<|<=|>|>=|!=|~=|==)( )*(\.(?![0-9]))", line):
+    if re.search(r"(<|<=|!=|~=)( )*(\.(?![0-9]))", line):
         return True
     else:
         return False

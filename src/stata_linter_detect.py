@@ -183,6 +183,7 @@ def indent_after_newline(
 # No whitespaces around math symbols ----------------
 def no_space_before_symbol(line):
 
+    line = line.split('///')[0]
     groups = line.split('"')
 
     for i, group in enumerate(groups):
@@ -195,6 +196,7 @@ def no_space_before_symbol(line):
 
 def no_space_after_symbol(line):
 
+    line = line.split('///')[0]
     groups = line.split('"')
 
     for i, group in enumerate(groups):

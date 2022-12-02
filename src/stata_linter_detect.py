@@ -1,4 +1,4 @@
-# version 1.0.0  04nov2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0.0  12dec2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -547,12 +547,19 @@ def detect_blank_line_before_curly_close(line_index, line, dofile_lines):
 
 def detect_duplicated_blank_line(line_index, line, dofile_lines):
 
-    if len(line.strip()) > 0 or line_index == len(dofile_lines) - 1:
-        # non-blank lines or last line in the dofile
+    #if len(line.strip()) > 0 or line_index == len(dofile_lines) - 1:
+    if len(line.strip()) > 0:
+        # non-blank lines
         return False
 
     # only blank lines from this point
     else:
+        # Check if there is not next line -- note that Python doesn't show
+        # empty next lines as an empty last element
+        if line_index+1 >= len(dofile_lines):
+            return True
+
+        # Check if next line is also blank:
         next_line = dofile_lines[line_index+1]
         if len(next_line.strip()) == 0:
             return True

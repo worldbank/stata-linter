@@ -1,8 +1,9 @@
-# version 1.0.0  04nov2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0.0  12dec2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ============
 import os
 import re
 import sys
+import stata_linter_detect as sld
 
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
@@ -420,7 +421,6 @@ def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space, li
     output_list = []
     with open(input_file, "r") as reader:
         input_lines = reader.readlines()
-        blank_line_flag = 0
         comment_delimiter = 0
         for line_index, line in enumerate(input_lines):
             # update comment_delimiter
@@ -428,18 +428,10 @@ def remove_duplicated_blank_lines(input_file, output_file, indent, tab_space, li
             if comment_delimiter > 0:
                 output_list.append(line)
             elif comment_delimiter == 0:
-                if len(line.strip()) == 0:
-                    if blank_line_flag == 1:
-                        pass
-                    elif blank_line_flag == 0:
-                        output_list.append(line)
-                    blank_line_flag = 1
-                elif len(line.strip()) > 0:
-                    blank_line_flag = 0
+                if sld.detect_duplicated_blank_line(line_index, line, input_lines):
+                    pass
+                else:
                     output_list.append(line)
     with open(output_file, "w") as writer:
         for i, output_line in enumerate(output_list):
-            if i < len(output_list) - 1:
-                writer.write(output_line)
-            elif i == len(output_list) - 1:
-                writer.write(output_line + "\n")
+            writer.write(output_line)

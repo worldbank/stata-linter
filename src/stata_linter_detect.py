@@ -80,9 +80,11 @@ def abstract_index_name(
 
     return([style_dictionary, excel_output_list])
 
-# Use proper indentations in for-loops, while-loops, and if/else statements ----------------
-def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
+def loop_open(line):
 
+    '''
+    Detect if a line is opening a loop
+    '''
     line_rstrip = re.sub(r"((\/\/)|(\/\*)).*", r"", line).rstrip()
     if len(line_rstrip) > 0:
         # check if the line includes for-loop, while-loop, or if/else statements
@@ -90,27 +92,82 @@ def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
             (re.search(r"^(qui[a-z]*\s+)?(foreach |forv|if |else )", line.lstrip()) != None) &
             (line_rstrip[-1] == "{")
             ):
-            line_ws = line.expandtabs(tab_space)
-            j = 1
-            # find the next non-blank line
-            while (j + line_index <= len(input_lines)):
-                if (j + line_index == len(input_lines)):
-                    next_line = input_lines[line_index + 1]
-                    break
-                if (
-                    (len(input_lines[line_index + j].strip()) > 0) &
-                    (re.search(r"^(\*|\/\/)", input_lines[line_index + j].lstrip()) == None)
-                    ):
-                    next_line = input_lines[line_index + j]
-                    break
-                j += 1
-            # check if the next non-blank line is not properly indented
-            next_line_ws = next_line.expandtabs(tab_space)
-            line_left_spaces = len(line_ws) - len(line_ws.lstrip())
-            next_line_left_spaces = len(next_line_ws) - len(next_line_ws.lstrip())
-            if (next_line_left_spaces - line_left_spaces < indent) & (len(next_line_ws.strip()) > 0):
-                return True
+            return True
+    return False
 
+
+def loop_close(line):
+
+    '''
+    Detects if a line is closing a loop
+    '''
+    if re.split('//', line)[0].rstrip() =='}':
+        return True
+    else:
+        return False
+
+def bad_indent_in_loop(line, open_loop_line, indent, tab_space):
+
+    '''
+    Detect if a line is correctly indented by checking the indentation of
+    the first line of the loop
+    '''
+    line_ws = line.expandtabs(tab_space)
+    line_left_spaces1 = len(open_loop_line) - len(open_loop_line.lstrip())
+    line_left_spaces2 = len(line_ws) - len(line_ws.lstrip())
+    if (line_left_spaces2 - line_left_spaces1 < indent) & (len(line_ws.strip()) > 0):
+        return True
+    else:
+        return False
+
+# Use proper indentations in for-loops, while-loops, and if/else statements ----------------
+def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
+
+    if loop_open(line):
+        line_ws = line.expandtabs(tab_space)
+        j = 1
+        embedded_loops = 0
+
+        # Checking the lines inside the loop
+        while j + line_index < len(input_lines):
+
+            next_line = input_lines[line_index + j]
+            print('\t'+next_line)
+
+            # (next) line is opening another loop
+            if loop_open(next_line):
+                embedded_loops += 1
+                j += 1
+                continue
+
+            # (next) line is closing a loop
+            if loop_close(line):
+                if embedded_loops > 0:
+                    # closing an embedded loop
+                    embedded_loops -= 1
+                else:
+                    # closing the main loop
+                    break
+
+            # (next) line is inside an embedded loop, we don't check it here.
+            # it will be checked when this function is applied on its
+            # correcponding loop level
+            if embedded_loops > 0:
+                j += 1
+                continue
+
+            # for other cases, we check they're non-blank lines and then
+            # correct indentation
+            if (
+                (len(input_lines[line_index + j].strip()) > 0) &
+                (re.search(r"^(\*|\/\/)", input_lines[line_index + j].lstrip()) == None)
+                ):
+                if bad_indent_in_loop(next_line, line_ws, indent, tab_space):
+                    return True
+
+            j += 1
+
+    # No bad indentations detected
     return False
 
 def proper_indent(

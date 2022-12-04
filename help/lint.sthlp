@@ -37,19 +37,19 @@ For this command to run, you will need Stata version 16 or greater, Python,
 {synopthdr:Option}
 {synoptline}
 
-{synopt :{cmdab:v:erbose}}Reports flags found on each line of code so the user can
+{synopt :{cmdab:v:erbose}}Report flags found on each line of code so the user can
   identify exact suggested changes in the original do-file.{p_end}
 {synopt :{cmdab:nosum:mary}}Suppress summary table of suggested corrections and potential issues.{p_end}
-{synopt :{cmdab:i:ndent(}{it:integer}{cmd:)}}The number of whitespaces used for indentation (default: 4){p_end}
-{synopt :{cmdab:s:pace(}{it:integer}{cmd:)}}The number of whitespaces used instead of hard tabs (default: same as {it:indent}){p_end}
-{synopt :{cmdab:l:inemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80){p_end}
-{synopt :{cmdab:e:xcel(}{it:{help filename}}{cmd:)}}Save an Excel file of line-by-line results{p_end}
-{synopt :{cmdab:inprep}}Allow the output file name to be the same as the name of the input file;
-  in other words, allow the command to overwrite the original do-file.{p_end}
+{synopt :{cmdab:i:ndent(}{it:integer}{cmd:)}}Number of whitespaces used for indentation (default: 4).{p_end}
+{synopt :{cmdab:s:pace(}{it:integer}{cmd:)}}Number of whitespaces used instead of hard tabs (default: same as {it:indent}).{p_end}
+{synopt :{cmdab:l:inemax(}{it:integer}{cmd:)}}Maximum number of characters in a line (default: 80).{p_end}
+{synopt :{cmdab:e:xcel(}{it:{help filename}}{cmd:)}}Save an Excel file of line-by-line results.{p_end}
+{synopt :{cmdab:force}}Allow the output file name to be the same as the name of the input file;
+  overwriting the original do-file. The use of this option is not recommended.{p_end}
 {synopt :{cmdab:auto:matic}}Correct all bad coding practices without asking
   if you want each bad coding practice to be corrected or not.
-	By default, the command will query each correction interactively
-	after producing the summary report and optionally verbose output.{p_end}
+	By default, the command will ask the user about each correction interactively
+	after producing the summary report.{p_end}
 {synopt :{cmdab:replace}}Overwrite an existing {it:output} file.{p_end}
 
 {synoptline}
@@ -168,7 +168,7 @@ Additional examples can be found at
 
         {com}. lint "test/bad.do"
 
-{p 4 4 2} For the detection feature you can use all the options but {it:automatic, inprep, and replace}.
+{p 4 4 2} For the detection feature you can use all the options but {it:automatic, force, and replace}.
 
         Options:
 
@@ -206,8 +206,8 @@ for each bad practice detected:
         2. Automatic (Stata will correct the file automatically):
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic
 
-        3. Use the same name for the output file (this will overwrite the input file):
-        {com}. lint "test/bad.do" using "test/bad.do", automatic inprep
+        3. Use the same name for the output file (note that this will overwrite the input file):
+        {com}. lint "test/bad.do" using "test/bad.do", automatic force
 
         4. Replace the output file if it already exists
         {com}. lint "test/bad.do" using "test/bad_corrected.do", automatic replace

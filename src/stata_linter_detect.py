@@ -130,9 +130,7 @@ def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
 
         # Checking the lines inside the loop
         while j + line_index < len(input_lines):
-
             next_line = input_lines[line_index + j]
-            print('\t'+next_line)
 
             # (next) line is opening another loop
             if loop_open(next_line):

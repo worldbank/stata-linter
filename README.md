@@ -171,7 +171,7 @@ You can use the following options with the `lint` command:
 - Options exclusive to the **correction** feature:
   - `automatic`: correct all bad coding practices without asking if you want each bad coding practice detected to be corrected or not.
   - `replace`: replace the existing output file.
-  - `inprep`: allow the output file name to be the same as the name of the input file (not recommended).
+  - `force`: allow the output file name to be the same as the name of the input file (not recommended).
 
 - Options for **both** features:
   - `indent()`: specify the number of whitespaces used for indentation (default is 4).

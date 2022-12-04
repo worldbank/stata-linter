@@ -17,7 +17,7 @@ capture program drop lint
       Excel(string)     			///
       AUTOmatic         			///
       replace           			///
-      inprep            			///
+      force            			///
 	  debug							///
     ]
 
@@ -89,9 +89,9 @@ capture program drop lint
 		_testpath "`using'", ext(`"".do", ".ado""') argument(lint's [using] argument) `debug'
 		local output = "`r(file)'"
 
-		* Unless inprep is used, the output file should have a different name than the input
-		if missing("`inprep'") & ("`input'" == "`output'") {
-			di as error "{phang}It is recommended to use different file names for lint's main argument and its [using] argument. This is because it is possible that the corrected do-file created by the command will contain bugs, and you may want to keep a backup. If you want to replace the current do-file with the do-file corrected by lint, use the option [inprep]. {p_end}"
+		* Unless force is used, the output file should have a different name than the input
+		if missing("`force'") & ("`input'" == "`output'") {
+			di as error "{phang}It is recommended to use different file names for lint's main argument and its [using] argument. This is because it is slightly possible that the corrected do-file created by the command will break something in your code, and you may want to keep a backup. If you want still to replace the current do-file with the do-file corrected by lint, use the option [force]. {p_end}"
 			error 198
 		}
     }
@@ -190,7 +190,7 @@ _checkversions
 		_correct, ///
 			input("`input'") output("`output'") ///
 			indent("`indent'") space("`space'") linemax("`linemax'") ///
-			`replace' `inprep' `automatic' `debug'
+			`replace' `force' `automatic' `debug'
 
 	}
 
@@ -212,7 +212,7 @@ capture program drop 	_correct
 	syntax, ///
 		input(string) output(string) ///
 		indent(string) space(string) linemax(string) ///
-		[replace inprep automatic debug]
+		[replace force automatic debug]
 
 	* Check that the Python function is defined
     qui: findfile stata_linter_correct.py
@@ -356,11 +356,8 @@ capture program drop 	_correct
 				* If this is the first issue to correct, create the output file
 				if `_n_to_correct' == 1 {
 
-				    if (!missing("`replace'") | !missing("`inprep'"))  {
-						    copy "`input'" "`output'", replace
-				    }
-				    else {
-						    copy "`input'" "`output'"
+				    if (missing("`force'")) {
+						    qui copy "`input'" "`output'", replace
 				    }
 				}
 

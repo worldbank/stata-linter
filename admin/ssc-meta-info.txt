@@ -1,0 +1,16 @@
+
+TITLE:
+'STATA_LINTER': tool to detect and correct bad Stata coding practices
+
+DESCRIPTION
+
+The stata_linter package provides linter for Stata code. Read about what a linter is here: https://en.wikipedia.org/wiki/Lint_(software). This linter is based on the best practices outlines in The DIME Analytics Coding Guide published as an appendix to the book Development Research in Practice. See here https://worldbank.github.io/dime-data-handbook/coding.html. For more info about this linter, see https://github.com/worldbank/stata_linter.
+
+AUTHOR:
+"DIME Analytics, DIME, The World Bank Group", dimeanalytics@worldbank.org
+
+KEYWORDS:
+"linter", "style guide", "code best practices"
+
+STATA VERSION REQUIREMENT:
+Stata 16

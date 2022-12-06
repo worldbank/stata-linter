@@ -1,3 +1,5 @@
+# version 1.0.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
+# Import packages ====================
 import re
 import pandas as pd
 import stata_linter_detect as sld

@@ -1,4 +1,4 @@
-v 1.0
+v 1.1
 d DIME Analytics, World Bank Group, Development Economics Research
 p stata_linter
 f /src/stata_linter_detect.py

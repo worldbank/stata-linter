@@ -1,4 +1,4 @@
-# version 1.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.1  06dec2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -9,7 +9,7 @@ import argparse
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
 ## in the package. Otherwise this will cause a major bug
-VERSION = "1.0"
+VERSION = "1.1"
 
 # simple run entry point
 def run():

@@ -1,4 +1,4 @@
-*! version 1.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
+*! version 1.1  06dec2022  DIME Analytics dimeanalytics@worldbank.org
 
 capture program drop lint
 		program 	 lint
@@ -536,7 +536,7 @@ capture program drop _checkversions
 
 	* IMPORTANT: Every time we have a package update, update the version number here
 	* Otherwise we'd be introducing a major bug!
-	local version_ado 1.0
+	local version_ado 1.1
 
 	* Check versions of .py files
 	python: from sfi import Macro

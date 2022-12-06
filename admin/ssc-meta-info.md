@@ -1,3 +1,6 @@
+### PACKAGE NAME:
+STATA_LINTER
+
 ### TITLE:
 'STATA_LINTER': tool to detect and correct bad Stata coding practices
 
@@ -21,7 +24,7 @@ See here https://worldbank.github.io/dime-data-handbook/coding.html. For more in
 ### STATA VERSION REQUIREMENT:
 Stata 16
 
-### FILES IN PACKAGE
+### FILES REQUIRED TO BE IN PACKAGE:
 - lint.ado
 - lint.sthlp
 - stata_linter_correct.py

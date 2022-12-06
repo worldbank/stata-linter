@@ -1,7 +1,7 @@
 ### TITLE:
 'STATA_LINTER': tool to detect and correct bad Stata coding practices
 
-### DESCRIPTION
+### DESCRIPTION:
 The stata_linter package provides a linter for Stata code.
 Read about what a linter is here: https://en.wikipedia.org/wiki/Lint_(software).
 The package contains a command that detects bad Stata coding practices in a do-file so that users can manually correct them.

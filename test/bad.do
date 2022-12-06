@@ -22,7 +22,7 @@
 	#delimit cr
 
 	* Add indentation in brackets
-	if something ~= 1 & something != . {
+	if something {
 	do something
 	if another == 1 {
 	do that

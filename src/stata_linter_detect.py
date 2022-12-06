@@ -101,7 +101,7 @@ def loop_close(line):
     '''
     Detects if a line is closing a loop
     '''
-    if re.split('//', line)[0].rstrip() =='}':
+    if re.split('//', line)[0].rstrip()[-1] =='}':
         return True
     else:
         return False
@@ -139,7 +139,7 @@ def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
                 continue
 
             # (next) line is closing a loop
-            if loop_close(line):
+            if loop_close(next_line):
                 if embedded_loops > 0:
                     # closing an embedded loop
                     embedded_loops -= 1
@@ -157,8 +157,8 @@ def detect_bad_indent(line_index, line, input_lines, indent, tab_space):
             # for other cases, we check they're non-blank lines and then
             # correct indentation
             if (
-                (len(input_lines[line_index + j].strip()) > 0) &
-                (re.search(r"^(\*|\/\/)", input_lines[line_index + j].lstrip()) == None)
+                (len(next_line.strip()) > 0) &
+                (re.search(r"^(\*|\/\/)", next_line.lstrip()) == None)
                 ):
                 if bad_indent_in_loop(next_line, line_ws, indent, tab_space):
                     return True

@@ -1,4 +1,4 @@
-# version 1.0.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import re
 import pandas as pd

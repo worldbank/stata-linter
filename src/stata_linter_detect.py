@@ -1,4 +1,4 @@
-# version 1.0.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.0  06dec2022  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -9,7 +9,7 @@ import argparse
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
 ## in the package. Otherwise this will cause a major bug
-VERSION = "1.0.0"
+VERSION = "1.0"
 
 # simple run entry point
 def run():
@@ -101,8 +101,15 @@ def loop_close(line):
     '''
     Detects if a line is closing a loop
     '''
-    if re.split('//', line)[0].rstrip()[-1] =='}':
-        return True
+    relevant_part = re.split('//', line)[0].rstrip()
+
+    if len(relevant_part) > 0:
+
+        if relevant_part[-1] =='}':
+            return True
+        else:
+            return False
+
     else:
         return False
 

@@ -1,5 +1,5 @@
 {smcl}
-{* 06 Dec 2022}{...}
+{* 07 Dec 2022}{...}
 {hline}
 help for {hi:lint}
 {hline}
@@ -227,7 +227,7 @@ for each bad practice detected:
 
 {phang}This work is a product of the initial idea and work of Mizuhiro Suzuki.
   Rony Rodriguez Ramirez, Luiza Cardoso de Andrade and Luis Eduardo San Martin also contributed to this command,
-  and Kristoffer Bjarkefur and Benjamin B. Daniels provided comments and code reviews.
+  and Kristoffer Bjärkefur and Benjamin B. Daniels provided comments and code reviews.
 
 {title:Authors}
 

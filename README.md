@@ -207,7 +207,7 @@ After a new line statement `(///)`, add indentation (usually 2 or 4 whitespaces)
 - **Use `!missing()` function for conditions of missing values:**
 For clarity, use `!missing(var)` instead of `var < .` or `var != .`
 
-- **Add whitespaces around math symbols (`+`, ``=`, `<`, `>`):**
+- **Add whitespaces around math symbols (`+`, `=`, `<`, `>`):**
 For better readability, add whitespaces around math symbols.
 For example, write `gen a = b + c if d == e` instead of `gen a=b+c if d==e`.
 

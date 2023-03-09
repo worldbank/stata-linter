@@ -247,11 +247,12 @@ def no_space_before_symbol(line):
 
     line = line.split('///')[0]
     groups = line.split('"')
+    pattern = r"(?:[a-z]|[A-Z]|[0-9]|_|\)|')(?:<|>|=|\+|-|\*|\^)"
 
     for i, group in enumerate(groups):
 
         if i % 2 == 0:
-            if re.search(r"(?:[a-z]|[A-Z]|[0-9]|_|\)|')(?:<|>|=|\+|-|\*|\^)", group):
+            if re.search(pattern, group):
                 return True
 
     return False
@@ -260,11 +261,12 @@ def no_space_after_symbol(line):
 
     line = line.split('///')[0]
     groups = line.split('"')
+    pattern = r"(?:(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|_|\(|`|\.|$))|(?:(?:<|>|=|\+|\*|\^)(?:[0-9]))"
 
     for i, group in enumerate(groups):
 
         if i % 2 == 0:
-            if re.search(r"(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|[0-9]|_|\(|`|\.|$)", group):
+            if re.search(pattern, group):
                 return True
 
     return False

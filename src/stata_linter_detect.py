@@ -413,6 +413,23 @@ def too_long_line(
     return([style_dictionary, excel_output_list])
 
 # "if" condition should be explicit
+def detect_implicit_if(line):
+
+    search_if = re.search(r"^(?:if|else if) ", line.lstrip())
+
+    if search_if != None:
+
+        line = line[search_if.span()[0]:]
+        if (
+            (re.search(r"missing\(", line) == None) &
+            (re.search(r"inrange\(", line) == None) &
+            (re.search(r"inlist\(", line) == None) &
+            (re.search(r"=|<|>", line) == None)
+            ):
+            return True
+
+    return False
+
 def explicit_if(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -420,23 +437,18 @@ def explicit_if(
     ):
 
     # warn if "if" statement is used but the condition is not explicit
-    search_if = re.search(r"^(if|else if) ", line.lstrip())
-    if (search_if != None):
-        if (
-            (re.search(r"missing\(", line[search_if.span()[0]:]) == None) &
-            (re.search(r"((=|<|>))", line[search_if.span()[0]:]) == None)
-            ):
-            print_output = (
-                '''Always explicitly specify the condition in the if statement. ''' +
-                '''(For example, declare "if var == 1" instead of "if var".) '''
+    if detect_implicit_if(line):
+        print_output = (
+            '''Always explicitly specify the condition in the if statement. ''' +
+            '''(For example, declare "if var == 1" instead of "if var".) '''
+            )
+        if suppress != "1":
+            print(
+                '''(line {:d}): '''.format(line_index + 1) +
+                print_output
                 )
-            if suppress != "1":
-                print(
-                    '''(line {:d}): '''.format(line_index + 1) +
-                    print_output
-                    )
-            style_dictionary["explicit_if"] += 1
-            excel_output_list.append([line_index + 1, "style", print_output])
+        style_dictionary["explicit_if"] += 1
+        excel_output_list.append([line_index + 1, "style", print_output])
 
     return([style_dictionary, excel_output_list])
 

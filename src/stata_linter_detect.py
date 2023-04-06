@@ -417,7 +417,7 @@ def too_long_line(
 # "if" condition should be explicit
 def detect_implicit_if(line):
 
-    search_if = re.search(r"^(?:if|else if) ", line.lstrip())
+    search_if  = re.search(r"(?:^|\s)(?:if|else if)\s", line.lstrip())
 
     if search_if != None:
 

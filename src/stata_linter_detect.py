@@ -1,4 +1,4 @@
-# version 1.1  07dec2022  DIME Analytics dimeanalytics@worldbank.org
+# version 1.02  06apr2023  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -9,7 +9,7 @@ import argparse
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
 ## in the package. Otherwise this will cause a major bug
-VERSION = "1.1"
+VERSION = "1.02"
 
 # simple run entry point
 def run():
@@ -247,11 +247,12 @@ def no_space_before_symbol(line):
 
     line = line.split('///')[0]
     groups = line.split('"')
+    pattern = r"(?:[a-z]|[A-Z]|[0-9]|_|\)|')(?:<|>|=|\+|-|\*|\^)"
 
     for i, group in enumerate(groups):
 
         if i % 2 == 0:
-            if re.search(r"(?:[a-z]|[A-Z]|[0-9]|_|\)|')(?:<|>|=|\+|-|\*|\^)", group):
+            if re.search(pattern, group):
                 return True
 
     return False
@@ -260,11 +261,12 @@ def no_space_after_symbol(line):
 
     line = line.split('///')[0]
     groups = line.split('"')
+    pattern = r"(?:(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|_|\(|`|\.|$))|(?:(?:<|>|=|\+|\*|\^)(?:[0-9]))"
 
     for i, group in enumerate(groups):
 
         if i % 2 == 0:
-            if re.search(r"(?:<|>|=|\+|-|\*|\^)(?:[a-z]|[A-Z]|[0-9]|_|\(|`|\.|$)", group):
+            if re.search(pattern, group):
                 return True
 
     return False
@@ -413,6 +415,23 @@ def too_long_line(
     return([style_dictionary, excel_output_list])
 
 # "if" condition should be explicit
+def detect_implicit_if(line):
+
+    search_if  = re.search(r"(?:^|\s)(?:if|else if)\s", line.lstrip())
+
+    if search_if != None:
+
+        line = line[search_if.span()[0]:]
+        if (
+            (re.search(r"missing\(", line) == None) &
+            (re.search(r"inrange\(", line) == None) &
+            (re.search(r"inlist\(", line) == None) &
+            (re.search(r"=|<|>", line) == None)
+            ):
+            return True
+
+    return False
+
 def explicit_if(
     line_index, line, input_lines, indent,
     suppress, style_dictionary, excel_output_list,
@@ -420,23 +439,18 @@ def explicit_if(
     ):
 
     # warn if "if" statement is used but the condition is not explicit
-    search_if = re.search(r"^(if|else if) ", line.lstrip())
-    if (search_if != None):
-        if (
-            (re.search(r"missing\(", line[search_if.span()[0]:]) == None) &
-            (re.search(r"((=|<|>))", line[search_if.span()[0]:]) == None)
-            ):
-            print_output = (
-                '''Always explicitly specify the condition in the if statement. ''' +
-                '''(For example, declare "if var == 1" instead of "if var".) '''
+    if detect_implicit_if(line):
+        print_output = (
+            '''Always explicitly specify the condition in the if statement. ''' +
+            '''(For example, declare "if var == 1" instead of "if var".) '''
+            )
+        if suppress != "1":
+            print(
+                '''(line {:d}): '''.format(line_index + 1) +
+                print_output
                 )
-            if suppress != "1":
-                print(
-                    '''(line {:d}): '''.format(line_index + 1) +
-                    print_output
-                    )
-            style_dictionary["explicit_if"] += 1
-            excel_output_list.append([line_index + 1, "style", print_output])
+        style_dictionary["explicit_if"] += 1
+        excel_output_list.append([line_index + 1, "style", print_output])
 
     return([style_dictionary, excel_output_list])
 

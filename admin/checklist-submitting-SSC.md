@@ -9,7 +9,7 @@
 	- [ ] 3.2 **Update version and date** - In the _version_ branch, update the version number and date in all ado-files and all dates in all help files. See section below for details.
 	- [ ] 3.3 **Update version globals** - Update the _version_ado_ local in the file _lint.ado_ and the  _VERSION_ global in _stata_linter_detect.py_ and _stata_linter_correct.py_.
 	- [ ] 3.4 **Update version in .pkg and .toc** - This has nothing to do with SSC but should be kept up to date to. This is for when people install directly through GitHub using `net install`. If any new command has been added, remember to add the files for that command to the `.pkg` file.
-	- [ ] 3.5 **Create a .zip file** - Create a .zip file with all ado-files and help files only. These files are not allowed to be in a sub-folder in this .zip file. No other files should be in this folder. Make a copy of this file in the archive folder of this package.
+	- [ ] 3.5 **Create a .zip file** - Create a .zip file with the files listed below (ado-files, Python scripts, and help files). If a version update ever includes a new ado-file or Python script necessary to run the linter, include that new file in the .zip too. These files are not allowed to be in a sub-folder in this .zip file. No other files should be in this folder. Make a copy of this file in the archive folder of this package.
 - [ ] 4. **Email Prof. Baum** - Email the .zip file created in step 3.5 to **kit.baum@bc.edu**.
 	- [ ] 4.1 - If any commands are added or deleted, make note of that in the email.
 	- [ ] 4.2 - If any of the meta info (title, description, keywords, version or author/contact) has changed then include those updates in your email.

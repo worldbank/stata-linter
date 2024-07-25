@@ -15,7 +15,7 @@ is published on SSC as well.
 To install the linter to run directly with Python and not via Stata, clone this repository and then run the following command on your terminal:
 
 ```python
-pip install -e src/
+pip install -e src-py/
 ```
 
 This will also install `pandas` and `openpyxl` if they are not currently installed.

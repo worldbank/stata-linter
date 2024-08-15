@@ -20,6 +20,7 @@ capture program drop lint
       force            				///
 	  debug							///
 	  Include(string)				///
+	  Exclude(string)				///
     ]
 
 /*******************************************************************************
@@ -62,6 +63,9 @@ capture program drop lint
 
   * set include = "everything" if include is missing
   if missing("`include'")      	local include "everything"
+
+  * set exclude = "nothing" if exclude is missing
+  if missing("`exclude'")      	local exclude "nothing"
 
 
 /*******************************************************************************
@@ -156,14 +160,15 @@ _checkversions
 			local header header
 		}
 
-		if (!missing("`verbose'") |	(`summary_flag' == 1) | !missing("`excel'") | !missing("`using'") | !missing("`include'")) {
+		if (!missing("`verbose'") |	(`summary_flag' == 1) | !missing("`excel'") | !missing("`using'") | !missing("`include'") | !missing("`exclude'")) {
 				local footer footer
 		}
 
 		_detect, ///
 			file("`file'") excel("`excel'") ado_path("`ado_path'") ///
 			indent("`indent'") linemax("`linemax'") space("`space'") ///
-			suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") include("`include'") ///
+			suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+			include("`include'") exclude("`exclude'") ///
 			`header' `footer'
     }
 
@@ -177,7 +182,8 @@ _checkversions
 			_detect, ///
 				file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
 				indent("`indent'") linemax("`linemax'") space("`space'") ///
-				suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") include("`include'") ///
+				suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+				include("`include'") exclude("`exclude'") ///
 				header footer
 		}
 	}
@@ -386,7 +392,8 @@ capture program drop	_detect
 		syntax , ///
 				file(string) ado_path(string) ///
 				indent(string) linemax(string) space(string) ///
-				suppress_flag(string) summary_flag(string) include(string) ///
+				suppress_flag(string) summary_flag(string) /// 
+				include(string) exclude(string) ///
 				[excel(string) header footer]
 
 		* Import relevant python functions
@@ -402,7 +409,7 @@ capture program drop	_detect
 		}
 
 		* Actually run the Python code
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'", "`include'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'", "`include'", "`exclude'")
 
 		* Stata result footer
 		if !missing("`footer'") {

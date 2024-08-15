@@ -40,7 +40,10 @@ def run():
                             help="If specified, save results to Excel workbook"
                             )
     parser.add_argument('--include', type=str, nargs='?', default="",
-                            help="if specified, states what criteria use for detect linter"
+                            help="If specified, states what criteria use for detect linter"
+                            )
+    parser.add_argument('--exclude', type=str, nargs='?', default="",
+                            help="If specified, states what criteria not to use for detect linter"
                             )
 
 
@@ -53,7 +56,8 @@ def run():
         excel=args.excel_output,
         linemax=args.linemax,
         tab_space=args.indent,
-        include=args.include
+        include=args.include,
+        exclude=args.exclude
         )
 
 # Style ===================
@@ -691,29 +695,64 @@ def criteria_to_be_included(include):
         return ALL_POSSIBLE_CRITERIA
     
     # if include is specified, check what criteria is in "include" and append it to criteria list
-    criteria_lst = []
+    include_criteria_lst = []
     # divide include input in a list of words
     words = include.split()
     for single_word in words:
-        criteria_lst.append(single_word)
-    return criteria_lst
+        include_criteria_lst.append(single_word)
+    return include_criteria_lst
+
+# Exclude ===================
+
+# check if the user is only adding strings related to criteria to review for the stata linter
+def exclude_is_well_defined(exclude):
+    # if exclude not specified (string equal to "nothing"), exclude is well defined
+    if exclude == "nothing":
+        return True
+    # divide "exclude" in a list of words
+    words = exclude.split()
+    # if any word is not in the option to review of the stata linter, return False
+    for single_word in words:
+        if single_word not in ALL_POSSIBLE_CRITERIA:
+            return False
+    # all words are well defined, return True
+    return True
+
+def criteria_to_be_excluded(exclude):
+    # if exclude not specified (string equal to "nothing"), return an empty list
+    if exclude == "nothing":
+        return []
+    
+    # if exclude is specified, check what criteria is in "exclude" and append it to criteria list
+    exclude_criteria_lst = []
+    # divide exclude input in a list of words
+    words = exclude.split()
+    for single_word in words:
+        exclude_criteria_lst.append(single_word)
+    return exclude_criteria_lst
 
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(
     input_file, indent,
     suppress, summary, excel, linemax,
-    tab_space, include
+    tab_space, include, exclude
     ):
 
+    # check if include option is well defined and assign list to include criteria
     if not include_is_well_defined(include):
         return print("The include option is not well defined. Use only the criteria available for this command.")
-    criteria_lst = criteria_to_be_included(include) 
+    include_criteria_lst = criteria_to_be_included(include) 
+
+    # check if exclude option is well defined and assign list to exclude criteria
+    if not exclude_is_well_defined(exclude):
+        return print("The exclude option is not well defined. Use only the criteria available for this command.")
+    exclude_criteria_lst = criteria_to_be_excluded(exclude) 
 
     excel_output_list = []
 
     # style ============
     # Any hard tabs in the do file
-    if "hard_tabs" in criteria_lst:
+    if "hard_tabs" in include_criteria_lst and "hard_tabs" not in exclude_criteria_lst:
         with open(input_file, "r") as f:
             input_lines = f.readlines()
             comment_delimiter = 0
@@ -763,61 +802,61 @@ def stata_linter_detect_py(
             elif comment_delimiter > 0:
                 pass
             else:
-                if "abstract_index_name" in criteria_lst:
+                if "abstract_index_name" in include_criteria_lst and "abstract_index_name" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = abstract_index_name(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "proper_indent" in criteria_lst:
+                if "proper_indent" in include_criteria_lst and "proper_indent" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = proper_indent(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "indent_after_newline" in criteria_lst:
+                if "indent_after_newline" in include_criteria_lst and "indent_after_newline" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = indent_after_newline(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "whitespace_symbol" in criteria_lst:
+                if "whitespace_symbol" in include_criteria_lst and "whitespace_symbol" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = whitespace_symbol(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "condition_missing" in criteria_lst:
+                if "condition_missing" in include_criteria_lst and "condition_missing" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = condition_missing(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "explicif_if" in criteria_lst:
+                if "explicif_if" in include_criteria_lst and "explicif_if" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = explicit_if(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "dont_use_delimit" in criteria_lst:
+                if "dont_use_delimit" in include_criteria_lst and "dont_use_delimit" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = dont_use_delimit(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "dont_use_cd" in criteria_lst:
+                if "dont_use_cd" in include_criteria_lst and "dont_use_cd" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = dont_use_cd(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "too_long_line" in criteria_lst:
+                if "too_long_line" in include_criteria_lst and "too_long_line" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = too_long_line(
                         line_index, line, input_lines, int(indent), int(linemax),
                         suppress, style_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "parenthesis_for_global_macro" in criteria_lst:
+                if "parenthesis_for_global_macro" in include_criteria_lst and "parenthesis_for_global_macro" not in exclude_criteria_lst:
                     style_dictionary, excel_output_list = parentheses_for_global_macro(
                         line_index, line, input_lines, int(indent),
                         suppress, style_dictionary, excel_output_list,
@@ -843,19 +882,19 @@ def stata_linter_detect_py(
             elif comment_delimiter > 0:
                 pass
             else:
-                if "missing_values" in criteria_lst:
+                if "missing_values" in include_criteria_lst and "missing_values" not in exclude_criteria_lst:
                     check_dictionary, excel_output_list = check_missing(
                         line_index, line, input_lines, int(indent),
                         suppress, check_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "backlash_in_path" in criteria_lst:
+                if "backlash_in_path" in include_criteria_lst and "backlash_in_path" not in exclude_criteria_lst:
                     check_dictionary, excel_output_list = backslash_in_path(
                         line_index, line, input_lines, int(indent),
                         suppress, check_dictionary, excel_output_list,
                         int(tab_space)
                         )
-                if "bang_not_tilde" in criteria_lst:
+                if "bang_not_tilde" in include_criteria_lst and "bang_not_tilde" not in exclude_criteria_lst:
                     check_dictionary, excel_output_list = bang_not_tilde(
                             line_index, line, input_lines, int(indent),
                             suppress, check_dictionary, excel_output_list,
@@ -868,33 +907,33 @@ def stata_linter_detect_py(
         print("{:69s} {:30s}".format("Bad practice", "Occurrences"))
         print("-------------------------------------------------------------------------------------")
 
-        if "hard_tabs" in criteria_lst:
+        if "hard_tabs" in include_criteria_lst and "hard_tabs" not in exclude_criteria_lst:
             print("{:69s} {:10s}".format("Hard tabs used instead of soft tabs: ", hard_tab))
-        if "abstract_index_name" in criteria_lst:
+        if "abstract_index_name" in include_criteria_lst and "abstract_index_name" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("One-letter local name in for-loop: ", style_dictionary["abstract_index_name"]))
-        if "proper_indent" in criteria_lst:
+        if "proper_indent" in include_criteria_lst and "proper_indent" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Non-standard indentation in { } code block: ", style_dictionary["proper_indent"]))
-        if "indent_after_newline" in criteria_lst:
+        if "indent_after_newline" in include_criteria_lst and "indent_after_newline" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("No indentation on line following ///: ", style_dictionary["indent_after_newline"]))
-        if "condition_missing" in criteria_lst:
+        if "condition_missing" in include_criteria_lst and "condition_missing" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", style_dictionary["condition_missing"]))
-        if "whitespace_symbol" in criteria_lst:
+        if "whitespace_symbol" in include_criteria_lst and "whitespace_symbol" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Missing whitespaces around operators: ", style_dictionary["whitespace_symbol"]))
-        if "explicit_if" in criteria_lst:
+        if "explicit_if" in include_criteria_lst and "explicit_if" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Implicit logic in if-condition: ", style_dictionary["explicit_if"]))
-        if "dont_use_delimit" in criteria_lst:
+        if "dont_use_delimit" in include_criteria_lst and "dont_use_delimit" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Delimiter changed: ", style_dictionary["dont_use_delimit"]))
-        if "dont_use_cd" in criteria_lst:
+        if "dont_use_cd" in include_criteria_lst and "dont_use_cd" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
-        if "too_long_line" in criteria_lst:
+        if "too_long_line" in include_criteria_lst and "too_long_line" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
-        if "parentheses_for_global_macro" in criteria_lst:
+        if "parentheses_for_global_macro" in include_criteria_lst and "parentheses_for_global_macro" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
-        if "missing_values" in criteria_lst:
+        if "missing_values" in include_criteria_lst and "missing_values" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Potential omission of missing values in expression: ", check_dictionary["check_missing"]))
-        if "backlash_in_path" in criteria_lst:
+        if "backlash_in_path" in include_criteria_lst and "backlash_in_path" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
-        if "bang_not_tilde" in criteria_lst:
+        if "bang_not_tilde" in include_criteria_lst and "bang_not_tilde" not in exclude_criteria_lst:
             print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
 
     output_df = pd.DataFrame(excel_output_list)

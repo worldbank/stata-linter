@@ -1,4 +1,4 @@
-*! version 1.02  06apr2023  DIME Analytics dimeanalytics@worldbank.org
+*! version 1.041 06apr2023  DIME Analytics dimeanalytics@worldbank.org
 
 capture program drop lint
 		program 	 lint
@@ -17,8 +17,9 @@ capture program drop lint
       Excel(string)     			///
       AUTOmatic         			///
       replace           			///
-      force            			///
+      force            				///
 	  debug							///
+	  Include(string)				///
     ]
 
 /*******************************************************************************
@@ -58,6 +59,9 @@ capture program drop lint
 
   * In debug mode, print status
   if !missing("`debug'") 		di "Inputs prepared"
+
+  * set include = "everything" if include is missing
+  if missing("`include'")      	local include "everything"
 
 
 /*******************************************************************************
@@ -152,14 +156,14 @@ _checkversions
 			local header header
 		}
 
-		if (!missing("`verbose'") |	(`summary_flag' == 1) | !missing("`excel'") | !missing("`using'")) {
+		if (!missing("`verbose'") |	(`summary_flag' == 1) | !missing("`excel'") | !missing("`using'") | !missing("`include'")) {
 				local footer footer
 		}
 
 		_detect, ///
 			file("`file'") excel("`excel'") ado_path("`ado_path'") ///
 			indent("`indent'") linemax("`linemax'") space("`space'") ///
-			suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+			suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") include("`include'") ///
 			`header' `footer'
     }
 
@@ -173,7 +177,7 @@ _checkversions
 			_detect, ///
 				file("`folder'/`file'") excel("`excel'") ado_path("`ado_path'") ///
 				indent("`indent'") linemax("`linemax'") space("`space'") ///
-				suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") ///
+				suppress_flag("`suppress_flag'") summary_flag("`summary_flag'") include("`include'") ///
 				header footer
 		}
 	}
@@ -382,7 +386,7 @@ capture program drop	_detect
 		syntax , ///
 				file(string) ado_path(string) ///
 				indent(string) linemax(string) space(string) ///
-				suppress_flag(string) summary_flag(string) ///
+				suppress_flag(string) summary_flag(string) include(string) ///
 				[excel(string) header footer]
 
 		* Import relevant python functions
@@ -398,7 +402,7 @@ capture program drop	_detect
 		}
 
 		* Actually run the Python code
-        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'")
+        python: r = stata_linter_detect_py("`file'", "`indent'", "`suppress_flag'", "`summary_flag'", "`excel'", "`linemax'", "`space'", "`include'")
 
 		* Stata result footer
 		if !missing("`footer'") {
@@ -536,7 +540,7 @@ capture program drop _checkversions
 
 	* IMPORTANT: Every time we have a package update, update the version number here
 	* Otherwise we'd be introducing a major bug!
-	local version_ado 1.02
+	local version_ado 1.041
 
 	* Check versions of .py files
 	python: from sfi import Macro

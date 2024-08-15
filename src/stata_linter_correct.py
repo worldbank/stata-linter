@@ -1,4 +1,4 @@
-# version 1.02  06apr2023  DIME Analytics dimeanalytics@worldbank.org
+# version 1.041  06apr2023  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ============
 import os
 import re
@@ -8,7 +8,7 @@ import stata_linter_detect as sld
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
 ## in the package. Otherwise this will cause a major bug
-VERSION = "1.02"
+VERSION = "1.041"
 
 # Function to update comment delimiter =============
 # (detection works only when comment delimiter == 0)

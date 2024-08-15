@@ -1,4 +1,4 @@
-# version 1.02  06apr2023  DIME Analytics dimeanalytics@worldbank.org
+# version 1.041  06apr2023  DIME Analytics dimeanalytics@worldbank.org
 # Import packages ====================
 import os
 import re
@@ -9,7 +9,15 @@ import argparse
 # Version Global
 ## VERY IMPORTANT: Update the version number here every time there's an update
 ## in the package. Otherwise this will cause a major bug
-VERSION = "1.02"
+VERSION = "1.041"
+
+## All potential criteria of the stata linter, to be used in include and exclude options
+ALL_POSSIBLE_CRITERIA = [
+    "hard_tabs", "abstract_index_name", "proper_indent", "indent_after_newline",
+    "condition_missing", "whitespace_symbol", "explicit_if", "dont_use_delimit",
+    "dont_use_cd", "too_long_line", "parentheses_for_global_macro", "missing_values",
+    "backlash_in_path", "bang_not_tilde"
+    ]
 
 # simple run entry point
 def run():
@@ -31,6 +39,9 @@ def run():
     parser.add_argument('--excel_output', type=str, nargs='?', default="",
                             help="If specified, save results to Excel workbook"
                             )
+    parser.add_argument('--include', type=str, nargs='?', default="",
+                            help="if specified, states what criteria use for detect linter"
+                            )
 
 
     args=parser.parse_args()
@@ -41,7 +52,8 @@ def run():
         summary="1" if args.summary else "0",
         excel=args.excel_output,
         linemax=args.linemax,
-        tab_space=args.indent
+        tab_space=args.indent,
+        include=args.include
         )
 
 # Style ===================
@@ -656,39 +668,74 @@ def update_comment_delimiter(comment_delimiter, line):
         comment_delimiter -= 1
     return(comment_delimiter)
 
+
+# Include ===================
+
+# check if the user is only adding strings related to criteria to review for the stata linter
+def include_is_well_defined(include):
+    # if include not specified (string equal to "everything"), include is well defined
+    if include == "everything":
+        return True
+    # divide "include" in a list of words
+    words = include.split()
+    # if any word is not in the option to review of the stata linter, return False
+    for single_word in words:
+        if single_word not in ALL_POSSIBLE_CRITERIA:
+            return False
+    # all words are well defined, return True
+    return True
+
+def criteria_to_be_included(include):
+    # if include not specified (string equal to "everything"), return all possible criteria list
+    if include == "everything":
+        return ALL_POSSIBLE_CRITERIA
+    
+    # if include is specified, check what criteria is in "include" and append it to criteria list
+    criteria_lst = []
+    # divide include input in a list of words
+    words = include.split()
+    for single_word in words:
+        criteria_lst.append(single_word)
+    return criteria_lst
+
 # Run linter program to detect bad coding practices ===================
 def stata_linter_detect_py(
     input_file, indent,
     suppress, summary, excel, linemax,
-    tab_space
+    tab_space, include
     ):
+
+    if not include_is_well_defined(include):
+        return print("The include option is not well defined. Use only the criteria available for this command.")
+    criteria_lst = criteria_to_be_included(include) 
 
     excel_output_list = []
 
     # style ============
     # Any hard tabs in the do file
-    with open(input_file, "r") as f:
-        input_lines = f.readlines()
-        comment_delimiter = 0
-        for line_index, line in enumerate(input_lines):
+    if "hard_tabs" in criteria_lst:
+        with open(input_file, "r") as f:
+            input_lines = f.readlines()
+            comment_delimiter = 0
+            for line_index, line in enumerate(input_lines):
 
-            comment_delimiter = update_comment_delimiter(comment_delimiter, line)
+                comment_delimiter = update_comment_delimiter(comment_delimiter, line)
 
-            if comment_delimiter == 0:
-                hard_tab = "No"
-                if detect_hard_tab(line):
-                    hard_tab = "Yes"
-                    print_output = (
-                        '''Use {:d} white spaces instead of tabs. '''.format(int(indent)) +
-                        '''(This may apply to other lines as well.)'''
-                        )
-                    excel_output_list.append([line_index + 1, "style", print_output])
-                    if suppress != "1":
-                        print(
-                            '''(line {:d}): '''.format(line_index + 1) +
-                            print_output
+                if comment_delimiter == 0:
+                    hard_tab = "No"
+                    if detect_hard_tab(line):
+                        hard_tab = "Yes"
+                        print_output = (
+                            '''Use {:d} white spaces instead of tabs. '''.format(int(indent)) +
+                            '''(This may apply to other lines as well.)'''
                             )
-                    break
+                        excel_output_list.append([line_index + 1, "style", print_output])
+                        if suppress != "1":
+                            print(
+                                '''(line {:d}): '''.format(line_index + 1) +
+                                print_output
+                                )
+                        break
 
     # Other line-by-line bad practices
     style_dictionary = {
@@ -716,56 +763,66 @@ def stata_linter_detect_py(
             elif comment_delimiter > 0:
                 pass
             else:
-                style_dictionary, excel_output_list = abstract_index_name(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = proper_indent(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = indent_after_newline(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = whitespace_symbol(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = condition_missing(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = explicit_if(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = dont_use_delimit(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = dont_use_cd(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = too_long_line(
-                    line_index, line, input_lines, int(indent), int(linemax),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                style_dictionary, excel_output_list = parentheses_for_global_macro(
-                    line_index, line, input_lines, int(indent),
-                    suppress, style_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
+                if "abstract_index_name" in criteria_lst:
+                    style_dictionary, excel_output_list = abstract_index_name(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "proper_indent" in criteria_lst:
+                    style_dictionary, excel_output_list = proper_indent(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "indent_after_newline" in criteria_lst:
+                    style_dictionary, excel_output_list = indent_after_newline(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "whitespace_symbol" in criteria_lst:
+                    style_dictionary, excel_output_list = whitespace_symbol(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "condition_missing" in criteria_lst:
+                    style_dictionary, excel_output_list = condition_missing(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "explicif_if" in criteria_lst:
+                    style_dictionary, excel_output_list = explicit_if(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "dont_use_delimit" in criteria_lst:
+                    style_dictionary, excel_output_list = dont_use_delimit(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "dont_use_cd" in criteria_lst:
+                    style_dictionary, excel_output_list = dont_use_cd(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "too_long_line" in criteria_lst:
+                    style_dictionary, excel_output_list = too_long_line(
+                        line_index, line, input_lines, int(indent), int(linemax),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "parenthesis_for_global_macro" in criteria_lst:
+                    style_dictionary, excel_output_list = parentheses_for_global_macro(
+                        line_index, line, input_lines, int(indent),
+                        suppress, style_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
     # check ============
     check_dictionary = {
         "check_missing": 0,
@@ -786,21 +843,24 @@ def stata_linter_detect_py(
             elif comment_delimiter > 0:
                 pass
             else:
-                check_dictionary, excel_output_list = check_missing(
-                    line_index, line, input_lines, int(indent),
-                    suppress, check_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                check_dictionary, excel_output_list = backslash_in_path(
-                    line_index, line, input_lines, int(indent),
-                    suppress, check_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
-                check_dictionary, excel_output_list = bang_not_tilde(
-                    line_index, line, input_lines, int(indent),
-                    suppress, check_dictionary, excel_output_list,
-                    int(tab_space)
-                    )
+                if "missing_values" in criteria_lst:
+                    check_dictionary, excel_output_list = check_missing(
+                        line_index, line, input_lines, int(indent),
+                        suppress, check_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "backlash_in_path" in criteria_lst:
+                    check_dictionary, excel_output_list = backslash_in_path(
+                        line_index, line, input_lines, int(indent),
+                        suppress, check_dictionary, excel_output_list,
+                        int(tab_space)
+                        )
+                if "bang_not_tilde" in criteria_lst:
+                    check_dictionary, excel_output_list = bang_not_tilde(
+                            line_index, line, input_lines, int(indent),
+                            suppress, check_dictionary, excel_output_list,
+                            int(tab_space)
+                            )
         print("")
 
     if summary == "1":
@@ -808,20 +868,34 @@ def stata_linter_detect_py(
         print("{:69s} {:30s}".format("Bad practice", "Occurrences"))
         print("-------------------------------------------------------------------------------------")
 
-        print("{:69s} {:10s}".format("Hard tabs used instead of soft tabs: ", hard_tab))
-        print("{:60s} {:10d}".format("One-letter local name in for-loop: ", style_dictionary["abstract_index_name"]))
-        print("{:60s} {:10d}".format("Non-standard indentation in { } code block: ", style_dictionary["proper_indent"]))
-        print("{:60s} {:10d}".format("No indentation on line following ///: ", style_dictionary["indent_after_newline"]))
-        print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", style_dictionary["condition_missing"]))
-        print("{:60s} {:10d}".format("Missing whitespaces around operators: ", style_dictionary["whitespace_symbol"]))
-        print("{:60s} {:10d}".format("Implicit logic in if-condition: ", style_dictionary["explicit_if"]))
-        print("{:60s} {:10d}".format("Delimiter changed: ", style_dictionary["dont_use_delimit"]))
-        print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
-        print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
-        print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
-        print("{:60s} {:10d}".format("Potential omission of missing values in expression: ", check_dictionary["check_missing"]))
-        print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
-        print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
+        if "hard_tabs" in criteria_lst:
+            print("{:69s} {:10s}".format("Hard tabs used instead of soft tabs: ", hard_tab))
+        if "abstract_index_name" in criteria_lst:
+            print("{:60s} {:10d}".format("One-letter local name in for-loop: ", style_dictionary["abstract_index_name"]))
+        if "proper_indent" in criteria_lst:
+            print("{:60s} {:10d}".format("Non-standard indentation in { } code block: ", style_dictionary["proper_indent"]))
+        if "indent_after_newline" in criteria_lst:
+            print("{:60s} {:10d}".format("No indentation on line following ///: ", style_dictionary["indent_after_newline"]))
+        if "condition_missing" in criteria_lst:
+            print("{:60s} {:10d}".format("Use of . where missing() is appropriate: ", style_dictionary["condition_missing"]))
+        if "whitespace_symbol" in criteria_lst:
+            print("{:60s} {:10d}".format("Missing whitespaces around operators: ", style_dictionary["whitespace_symbol"]))
+        if "explicit_if" in criteria_lst:
+            print("{:60s} {:10d}".format("Implicit logic in if-condition: ", style_dictionary["explicit_if"]))
+        if "dont_use_delimit" in criteria_lst:
+            print("{:60s} {:10d}".format("Delimiter changed: ", style_dictionary["dont_use_delimit"]))
+        if "dont_use_cd" in criteria_lst:
+            print("{:60s} {:10d}".format("Working directory changed: ", style_dictionary["dont_use_cd"]))
+        if "too_long_line" in criteria_lst:
+            print("{:60s} {:10d}".format("Lines too long: ", style_dictionary["too_long_line"]))
+        if "parentheses_for_global_macro" in criteria_lst:
+            print("{:60s} {:10d}".format("Global macro reference without { }: ", style_dictionary["parentheses_for_global_macro"]))
+        if "missing_values" in criteria_lst:
+            print("{:60s} {:10d}".format("Potential omission of missing values in expression: ", check_dictionary["check_missing"]))
+        if "backlash_in_path" in criteria_lst:
+            print("{:60s} {:10d}".format("Backslash detected in potential file path: ", check_dictionary["backslash_in_path"]))
+        if "bang_not_tilde" in criteria_lst:
+            print("{:60s} {:10d}".format("Tilde (~) used instead of bang (!) in expression: ", check_dictionary["bang_not_tilde"]))
 
     output_df = pd.DataFrame(excel_output_list)
     if excel != "":

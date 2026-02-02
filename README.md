@@ -1,4 +1,6 @@
-# stata_linter - Stata command for do file linter
+# stata_linter - Stata command for do file linter (archived)
+
+This command is now part of https://github.com/worldbank/repkit and this repo is archived. This repo is only kept for retaining old Git history.
 
 ## Installation
 
